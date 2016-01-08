@@ -1,4 +1,9 @@
 /*
+ * Copyright (c) 2015-2016, DTU
+ * Simplified BSD License
+ */
+
+/*
  * A simple ISA simulator of RISC-V.
  * 
  * Author: Martin Schoeberl (martin@jopdesign.com)
@@ -8,6 +13,10 @@
  */
 
 package wildcat.isasim
+
+import Opcode._
+import AluFunct._
+import AluFunct7._
 
 class SimRV(code: Array[Int], mem: Array[Int]) {
 
@@ -19,7 +28,7 @@ class SimRV(code: Array[Int], mem: Array[Int]) {
   // TODO: maybe initialize other registers with random values
 
   def execute(instr: Int) {
-    printf("instr -> %08xd\n", instr)
+    printf("instr -> %08x\n", instr)
     // first quick extraction of decoded fields
     val opcode = instr & 0x7f
     val rd = (instr >> 7) & 0x01f
@@ -28,24 +37,41 @@ class SimRV(code: Array[Int], mem: Array[Int]) {
     val funct3 = (instr >> 12) & 0x03
     val funct7 = (instr >> 25) & 0x03f
     // immediate is more tricky
-    val immi = (instr & 0xfff00000) >> 20 // is this correctly sign extension?
+    val immi = (instr & 0xfff00000) >> 20
     val imms = ((instr & 0xfe00000) >> (25 - 5)) | ((opcode & 0x0f80) >> 7)
-    val immu = (instr & 0xfffff000) >> 12
+    val immu = (instr & 0xfffff000) >>> 12
     // TODO: there are two additional versions of immediate
+    
+    val sraSub = funct7 == SRA_SUB
 
-    // TODO: this shall be switch/pattern matching
-    // TODO: have named constants shared with the hardware
-    opcode match {
-      case 0x13 => { // I instruction
-        if (funct3 == 0x0) { // ADDI
-          if (rd != 0) {
-            reg(rd) = reg(rs1) + immi
-          }
-        }
+    def alu(funct3: Int, sraSub: Boolean, op1: Int, op2: Int): Int = {
+
+      val shamt = op2 & 0x1f
+
+      funct3 match {
+        case ADD_SUB => if (sraSub) op1 - op2 else op1 + op2
+        case SLL => op1 << shamt
+        case SLT => if (op1 < op2) 1 else 0
+        case SLTU => if ((op1 < op2) ^ (op1 < 0) ^ (op2 < 0)) 1 else 0
+        case XOR => op1 ^ op2
+        case SRL_SRA => if (sraSub) op1 >> shamt else op1 >>> shamt
+        case OR => op1 | op2
+        case AND => op1 & op2
       }
-      case _ => {
-        println(opcode + " not yet imlemented")
-      }
+    }
+
+    // Don't know if we really should use Tuples.
+    // Scala is already stretching the readability for teaching.
+    
+    val result = opcode match {
+      case AluImm => (alu(funct3, sraSub, reg(rs1), immi), true)
+      case Alu => (alu(funct3, sraSub, reg(rs1), reg(rs2)), true)     
+    }
+    
+    println("result " + result)
+    
+    if (rd != 0 && result._2) {
+      reg(rd) = result._1
     }
   }
 
@@ -58,18 +84,16 @@ class SimRV(code: Array[Int], mem: Array[Int]) {
     pc += 1
   }
 
-  // TODO: maybe functions to encode instructions, such as:
-  // addi(rs, imm, rd) ...
-
 }
 
 object SimRV extends App {
   println("Hello RISC-V World")
 
   val code = Array(
-    Helper.genAddi(0, 0x0f, 0),
-    Helper.genAddi(0, 111, 1),
-    Helper.genAddi(1, 222, 2), 123)
+    Helper.genAlu(AluImm, ADD_SUB, 0, 0, 0x0f, 0),
+    Helper.genAlu(AluImm, ADD_SUB, 0, 0, 111, 1),
+    Helper.genAlu(AluImm, ADD_SUB, 1, 0, 222, 2),
+    Helper.genAlu(Alu, ADD_SUB, 1, 2, 0, 3))
 
   val mem = new Array[Int](1024)
 
