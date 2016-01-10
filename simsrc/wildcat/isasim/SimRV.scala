@@ -78,7 +78,7 @@ class SimRV(code: Array[Int], mem: Array[Int]) {
   while (pc < code.length) {
     execute(code(pc))
     for (i <- 0 to 3) {
-      print(reg(i) + " ")
+      printf("%08x ", reg(i))
     }
     println
     pc += 1
@@ -86,16 +86,30 @@ class SimRV(code: Array[Int], mem: Array[Int]) {
 
 }
 
+/* 
+ * TODO: grab the precompiled tests form sodor and run them.
+ * 
+ * Test result signalling in riscv-test
+ * 
+ * #undef RVTEST_PASS
+#define RVTEST_PASS li a0, 1; scall
+
+#undef RVTEST_FAIL
+#define RVTEST_FAIL sll a0, TESTNUM, 1; 1:beqz a0, 1b; or a0, a0, 1; scall;
+ */
+
 object SimRV extends App {
   println("Hello RISC-V World")
 
-  val code = Array(
+  val codeLocal = Array(
     Helper.genAlu(AluImm, ADD_SUB, 0, 0, 0x0f, 0),
     Helper.genAlu(AluImm, ADD_SUB, 0, 0, 111, 1),
     Helper.genAlu(AluImm, ADD_SUB, 1, 0, 222, 2),
     Helper.genAlu(Alu, ADD_SUB, 1, 2, 0, 3))
 
   val mem = new Array[Int](1024)
+  
+  val code = Util.readBin("/Users/martin/source/wildcat/asm/a.bin")
 
   new SimRV(code, mem)
 }
