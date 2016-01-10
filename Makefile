@@ -25,3 +25,10 @@ hdl:
 # Generate C++ code (simulation)
 cpp:
 	$(SBT) "run-main hello.HelloMain --backend c --compile --targetDir generated"
+
+# get the test cases from Sodor as simple hex files
+test:
+	-rm -rf riscv-sodor
+	git clone https://github.com/ucb-bar/riscv-sodor.git
+	cp -r riscv-sodor/install/riscv-tests/ tests
+	rm -rf riscv-sodor
