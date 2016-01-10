@@ -29,12 +29,12 @@ class SimRV(code: Array[Int], mem: Array[Int]) {
 
   def execute(instr: Int) {
     printf("instr -> %08x\n", instr)
-    // first quick extraction of decoded fields
+    // quick extraction of decoded fields
     val opcode = instr & 0x7f
     val rd = (instr >> 7) & 0x01f
     val rs1 = (instr >> 15) & 0x01f
     val rs2 = (instr >> 20) & 0x01f
-    val funct3 = (instr >> 12) & 0x03
+    val funct3 = (instr >> 12) & 0x07
     val funct7 = (instr >> 25) & 0x03f
     // immediate is more tricky
     val immi = (instr & 0xfff00000) >> 20
@@ -47,6 +47,8 @@ class SimRV(code: Array[Int], mem: Array[Int]) {
     def alu(funct3: Int, sraSub: Boolean, op1: Int, op2: Int): Int = {
 
       val shamt = op2 & 0x1f
+      
+      printf("instr: %d ops: %08x %08x\n", funct3, op1, op2)
 
       funct3 match {
         case ADD_SUB => if (sraSub) op1 - op2 else op1 + op2
