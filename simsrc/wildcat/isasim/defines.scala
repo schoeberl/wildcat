@@ -5,18 +5,8 @@ package wildcat.isasim
 object Opcode {
   val AluImm = 0x13
   val Alu = 0x33
+  val Branch = 0x63
 }
-
-//object AluImmFunct {
-//  val ADDI = 0x00
-//  val SLLI = 0x01
-//  val SLTI = 0x02
-//  val SLTIU = 0x03
-//  val XORI = 0x04
-//  val SRLI_SRLA = 0x05
-//  val ORI = 0x06
-//  val ANDI = 0x07
-//}
 
 object AluFunct7 {
   val DEFAULT = 0x00
@@ -32,4 +22,13 @@ object AluFunct {
   val SRL_SRA = 0x05
   val OR = 0x06
   val AND = 0x07
+}
+
+object BranchFunct {
+  val BEQ = 0x00
+  val BNE = 0x01
+  val BLT = 0x04
+  val BGE = 0x05
+  val BLTU = 0x06
+  val BGEU = 0x07
 }
