@@ -8,7 +8,16 @@ object Opcode {
   val Branch = 0x63
   val Load = 0x03
   val Store = 0x23
+  val Lui = 0x37
+  val AuiPc = 0x17
+  val Jal = 0x6f
+  val JalR = 0x57
   val SCall = 0x73
+}
+
+object InstrType extends Enumeration {
+  type InstrType = Value
+  val R, I, S, SB, U, UJ = Value
 }
 
 object AluFunct7 {

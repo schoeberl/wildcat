@@ -1,0 +1,14 @@
+
+Some notes and suggestions to improve the documentation:
+
+Use either SB and UJ or B and J for instruction types, don't mix it.
+
+Assembler listing of instruction is confusing. Instruction 0x12345678
+is listed as 0x78563412. Don't write out a word in byte oder.
+
+Branch explanaition: is it PC or next PC?
+
+Quetsion to me:
+
+Don't understand why a shift by 2 (instead of 1) is needed when the
+immediate for the branch is already in multiples of 2 bytes?

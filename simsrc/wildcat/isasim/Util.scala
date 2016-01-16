@@ -39,7 +39,7 @@ object Util {
         word >>>= 8
         word += (byteArray(i * 4 + j).toInt & 0xff) << 24
       }
-      printf("%08x\n", word)
+      // printf("%08x\n", word)
       arr(i) = word
     }
 
