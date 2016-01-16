@@ -18,8 +18,9 @@ import Opcode._
 import AluFunct._
 import AluFunct7._
 import BranchFunct._
+import LoadStoreFunct._
 
-class SimRV(code: Array[Int], mem: Array[Int]) {
+class SimRV(mem: Array[Int]) {
 
   // That's the state of the processor
   // That's it, nothing else (except memory ;-)
@@ -28,7 +29,7 @@ class SimRV(code: Array[Int], mem: Array[Int]) {
   reg(0) = 0
   // TODO: maybe initialize other registers with random values
 
-  def execute(instr: Int) {
+  def execute(instr: Int): Boolean =  {
 
     // extraction of decoded fields
     val opcode = instr & 0x7f
@@ -38,13 +39,15 @@ class SimRV(code: Array[Int], mem: Array[Int]) {
     val funct3 = (instr >> 12) & 0x07
     val funct7 = (instr >> 25) & 0x03f
     // immediate is more tricky - probably the main overhead in simulation
+    // maybe compute it within the function and only when used - do benchmark
+    // this first, before obscuring readability
     val immi = (instr & 0xfff00000) >> 20
     val imms = ((instr & 0xfe00000) >> (25 - 5)) | ((opcode & 0x0f80) >> 7)
     val immu = (instr & 0xfffff000) >>> 12
     val immb = (instr & 0x80000000) >> 19 | (instr & 0x0080) << 4 |
       (instr & 0x7e000000) >>> 20 | (instr & 0x0f00) >>> 7
     val boff = immb >> 2 // now in words
-    // TODO: there is one additional versions of immediate
+    // TODO: there is one additional version of immediate
 
     // single bit on extended function
     val sraSub = funct7 == SRA_SUB
@@ -64,45 +67,71 @@ class SimRV(code: Array[Int], mem: Array[Int]) {
       }
     }
 
-    def compare(funct3: Int, rs1: Int, rs2: Int): Boolean = {
+    def compare(funct3: Int, op1: Int, op2: Int): Boolean = {
       funct3 match {
-        case BEQ => rs1 == rs2
-        case BNE => !(rs1 == rs2)
-        case BLT => rs1 < rs2
-        case BGE => rs1 >= rs2
-        case BLTU => (rs1 < rs2) ^ (rs1 < 0) ^ (rs2 < 0)
-        case BGEU => rs1 == rs2 || ((rs1 > rs2) ^ (rs1 < 0) ^ (rs2 < 0))
+        case BEQ => op1 == op2
+        case BNE => !(op1 == op2)
+        case BLT => op1 < op2
+        case BGE => op1 >= op2
+        case BLTU => (op1 < op2) ^ (op1 < 0) ^ (op2 < 0)
+        case BGEU => op1 == op2 || ((op1 > op2) ^ (op1 < 0) ^ (op2 < 0))
+      }
+    }
+    
+    def load(funct3: Int, base: Int, displ: Int): Int = {
+      funct3 match {
+        case LSB => throw new Exception("B implementation needed")
+        case LSH => throw new Exception("H implementation needed")
+        case LSW => mem((base + displ) >> 2)
+        case LBU => throw new Exception("BU implementation needed")
+        case LHU => throw new Exception("HU implementation needed")
       }
     }
 
-    // Don't know if we really should use Tuples.
-    // Scala is already stretching the readability for teaching.
-
+    // read register file
+    val rs1Val = reg(rs1)
+    val rs2Val = reg(rs2)
+    // next pc
+    val pcNext = pc + 1
+    
+    // Execute the instruction and
+    // return a tuple for the result: (ALU result, writeBack, next PC)
     val result = opcode match {
-      case AluImm => (alu(funct3, sraSub, reg(rs1), immi), true, pc + 1)
-      case Alu => (alu(funct3, sraSub, reg(rs1), reg(rs2)), true, pc + 1)
-      case Branch => (0, false,
-        if (compare(funct3, reg(rs1), reg(rs2))) pc + boff else pc + 1)
+      case AluImm => (alu(funct3, sraSub, rs1Val, immi), true, pcNext)
+      case Alu => (alu(funct3, sraSub, rs1Val, rs2Val), true, pcNext)
+      case Branch => (0, false, if (compare(funct3, rs1Val, rs2Val)) pc + boff else pcNext)
+      case Load => (load(funct3, rs1Val, immi), true, pcNext)
+      case SCall => {
+        // test a0 (x10) for test condition: 1 = ok
+        // but FlexPRET examples use x1 -- maybe change those examples later
+        if (reg(1) == 1) {
+          println("Test passed")
+        } else {
+          println("Test failed with return code "+reg(1))
+        }
+        (0, false, pcNext)
+      }
       case _ => {
-        throw new Exception("Opcode " + opcode + " not implemented")
+        throw new Exception("Opcode " + opcode + " not (yet) implemented")
       }
     }
 
-    printf("instr: %08x ", instr)
-    // println("result " + result)
     printf("pc: %04x ", pc * 4)
+    printf("instr: %08x ", instr)
 
     if (rd != 0 && result._2) {
       reg(rd) = result._1
     }
 
+    val oldPc = pc
     pc = result._3
+    
+    pc != oldPc // detect endless loop to stop simulation
   }
 
-  while (pc < code.length) {
-    execute(code(pc))
+  while (execute(mem(pc))) {
     print("regs: ")
-    for (i <- 0 to 3) {
+    for (i <- 0 to 7) {
       printf("%08x ", reg(i))
     }
     println
@@ -112,6 +141,7 @@ class SimRV(code: Array[Int], mem: Array[Int]) {
 
 /* 
  * TODO: grab the precompiled tests form sodor and run them.
+ * Or better use the riscv-test code.
  * 
  * Test result signaling in riscv-test
  * 
@@ -125,15 +155,13 @@ class SimRV(code: Array[Int], mem: Array[Int]) {
 object SimRV extends App {
   println("Hello RISC-V World")
 
-  val codeLocal = Array(
-    Helper.genAlu(AluImm, ADD_SUB, 0, 0, 0x0f, 0),
-    Helper.genAlu(AluImm, ADD_SUB, 0, 0, 111, 1),
-    Helper.genAlu(AluImm, ADD_SUB, 1, 0, 222, 2),
-    Helper.genAlu(Alu, ADD_SUB, 1, 2, 0, 3))
-
   val mem = new Array[Int](1024)
 
   val code = Util.readBin("/Users/martin/source/wildcat/asm/a.bin")
+  
+  for (i <- 0 to code.length-1) {
+    mem(i) = code(i)
+  }
 
-  new SimRV(code, mem)
+  new SimRV(mem)
 }

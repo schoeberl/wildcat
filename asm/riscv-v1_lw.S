@@ -11,7 +11,8 @@
 
         # Test 1: Load some data
 
-        addi x1, x0, %lo(tdat)
+	.set data_addr, 0x84   # hardcoded as I don't find how to do it with as
+        addi x1, x0, data_addr
 
         lw    x2, 0(x1)
         addi x3, x0, 0x0ff
@@ -31,7 +32,7 @@
 
         # Test 2: Load some data with negative offsets
 
-        addi x1, x0, %lo(tdat4)
+        addi x1, x0, 0x90 # %lo(tdat4)
 
         lw    x2, -12(x1)
         addi x3, x0, 0x0ff
@@ -63,10 +64,10 @@ pass:
 	ecall
 1:      beq   x0, x0, 1b
 
-        # Test data
+        # Test data, just in the .text segment
         #-------------------------------------------------------------
 
-        .data
+#        .data
 tdat:
 tdat1:  .word 0x000000ff
 tdat2:  .word 0x000007f0

@@ -6,6 +6,9 @@ object Opcode {
   val AluImm = 0x13
   val Alu = 0x33
   val Branch = 0x63
+  val Load = 0x03
+  val Store = 0x23
+  val SCall = 0x73
 }
 
 object AluFunct7 {
@@ -31,4 +34,12 @@ object BranchFunct {
   val BGE = 0x05
   val BLTU = 0x06
   val BGEU = 0x07
+}
+
+object LoadStoreFunct {
+  val LSB = 0x00
+  val LSH = 0x01
+  val LSW = 0x02
+  val LBU = 0x04
+  val LHU = 0x05
 }
