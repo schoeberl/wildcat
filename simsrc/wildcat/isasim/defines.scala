@@ -11,7 +11,7 @@ object Opcode {
   val Lui = 0x37
   val AuiPc = 0x17
   val Jal = 0x6f
-  val JalR = 0x57
+  val JalR = 0x67
   val SCall = 0x73
 }
 

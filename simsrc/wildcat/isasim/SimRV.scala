@@ -23,16 +23,15 @@ import InstrType._
 
 class SimRV(mem: Array[Int]) {
 
-  // That's the state of the processor
+  // That's the state of the processor.
   // That's it, nothing else (except memory ;-)
   var pc = 0
   var reg = new Array[Int](32)
   reg(0) = 0
-  // TODO: maybe initialize other registers with random values
 
   def execute(instr: Int): Boolean = {
 
-    // extraction of decoded fields
+    // Do some decoding: extraction of decoded fields
     val opcode = instr & 0x7f
     val rd = (instr >> 7) & 0x01f
     val rs1 = (instr >> 15) & 0x01f
@@ -99,19 +98,7 @@ class SimRV(mem: Array[Int]) {
         (imm10_5 << 5) | (imm4_1 << 1) | imm0
     }
 
-    //    // immediate is more tricky - probably the main overhead in simulation
-    //    // maybe compute it within the function and only when used - do benchmark
-    //    // this first, before obscuring readability
-    //    val immi = (instr & 0xfff00000) >> 20
-    //    val imms = ((instr & 0xfe00000) >> (25 - 5)) | ((opcode & 0x0f80) >> 7)
-    //    val immu = (instr & 0xfffff000) >>> 12
-    //    val immb = (instr & 0x80000000) >> 19 | (instr & 0x0080) << 4 |
-    //      (instr & 0x7e000000) >>> 20 | (instr & 0x0f00) >>> 7
-    //    val boff = immb >> 2 // now in words
-    //    // TODO: there is one additional version of immediate
-
     val imm = genImm()
-    // val boff = imm >> 2 // now in words
 
     // single bit on extended function
     val sraSub = funct7 == SRA_SUB
@@ -157,7 +144,12 @@ class SimRV(mem: Array[Int]) {
         case LSB => throw new Exception("B implementation needed")
         case LSH => throw new Exception("H implementation needed")
         case LSW => {
-          mem(((base + displ) >> 2) & 0x3ff) = value
+          // very primitive IO simulation
+          if ((base + displ) == 0xf0000000) {
+            println("out: " + value.toChar)
+          } else {
+            mem(((base + displ) >> 2) & 0x3ff) = value
+          }
         }
         case LBU => throw new Exception("BU implementation needed")
         case LHU => throw new Exception("HU implementation needed")
@@ -172,19 +164,19 @@ class SimRV(mem: Array[Int]) {
     printf("pc: %04x ", pc)
     printf("instr: %08x ", instr)
 
-    // Execute the instruction and
-    // return a tuple for the result: (ALU result, writeBack, next PC)
+    // Execute the instruction and return a tuple for the result:
+    // (ALU result, writeBack, next PC)
     val result = opcode match {
       case AluImm => (alu(funct3, sraSub, rs1Val, imm), true, pcNext)
       case Alu => (alu(funct3, sraSub, rs1Val, rs2Val), true, pcNext)
       case Branch => (0, false, if (compare(funct3, rs1Val, rs2Val)) pc + imm else pcNext)
       case Load => (load(funct3, rs1Val, imm), true, pcNext)
-      case Store => store(funct3, rs1Val, imm, rs2Val); (0 , false, pcNext)
+      case Store =>
+        store(funct3, rs1Val, imm, rs2Val); (0, false, pcNext)
+      case Lui => (imm, true, pcNext)
       case AuiPc => (pc + imm, true, pcNext)
-      case Jal => {
-        println(pc + " " + imm + " " + ((pc + imm) & 0xfffffffe))
-        (pc + 4, true, (pc + imm) & 0xfffffffe)
-      }
+      case Jal => (pc + 4, true, pc + imm)
+      case JalR => (pc + 4, true, (rs1Val + imm) & 0xfffffffe)
       case SCall => {
         // test a0 (x10) for test condition: 1 = ok
         // but FlexPRET examples use x1 -- maybe change those examples later
@@ -212,7 +204,7 @@ class SimRV(mem: Array[Int]) {
 
   while (execute(mem(pc >> 2))) {
     print("regs: ")
-    for (i <- 0 to 7) {
+    for (i <- 0 to 16) {
       printf("%08x ", reg(i))
     }
     println
