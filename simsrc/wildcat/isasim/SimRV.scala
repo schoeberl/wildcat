@@ -91,28 +91,28 @@ class SimRV(mem: Array[Int]) {
         case UJ => instr20
         case _ => instr31
       }
-      val imm19_12 = if (iType==U || iType==UJ) instr19_12 else sext8
-      val imm31_20 = if (iType==U) instr31_20 else sext12
-      
+      val imm19_12 = if (iType == U || iType == UJ) instr19_12 else sext8
+      val imm31_20 = if (iType == U) instr31_20 else sext12
+
       // now glue together
       (imm31_20 << 20) | (imm19_12 << 12) | (imm11 << 11) |
         (imm10_5 << 5) | (imm4_1 << 1) | imm0
     }
-    
-//    // immediate is more tricky - probably the main overhead in simulation
-//    // maybe compute it within the function and only when used - do benchmark
-//    // this first, before obscuring readability
-//    val immi = (instr & 0xfff00000) >> 20
-//    val imms = ((instr & 0xfe00000) >> (25 - 5)) | ((opcode & 0x0f80) >> 7)
-//    val immu = (instr & 0xfffff000) >>> 12
-//    val immb = (instr & 0x80000000) >> 19 | (instr & 0x0080) << 4 |
-//      (instr & 0x7e000000) >>> 20 | (instr & 0x0f00) >>> 7
-//    val boff = immb >> 2 // now in words
-//    // TODO: there is one additional version of immediate
+
+    //    // immediate is more tricky - probably the main overhead in simulation
+    //    // maybe compute it within the function and only when used - do benchmark
+    //    // this first, before obscuring readability
+    //    val immi = (instr & 0xfff00000) >> 20
+    //    val imms = ((instr & 0xfe00000) >> (25 - 5)) | ((opcode & 0x0f80) >> 7)
+    //    val immu = (instr & 0xfffff000) >>> 12
+    //    val immb = (instr & 0x80000000) >> 19 | (instr & 0x0080) << 4 |
+    //      (instr & 0x7e000000) >>> 20 | (instr & 0x0f00) >>> 7
+    //    val boff = immb >> 2 // now in words
+    //    // TODO: there is one additional version of immediate
 
     val imm = genImm()
-    val boff = imm >> 2 // now in words
-    
+    // val boff = imm >> 2 // now in words
+
     // single bit on extended function
     val sraSub = funct7 == SRA_SUB
 
@@ -152,19 +152,33 @@ class SimRV(mem: Array[Int]) {
       }
     }
 
+    def store(funct3: Int, base: Int, displ: Int, value: Int): Unit = {
+      funct3 match {
+        case LSB => throw new Exception("B implementation needed")
+        case LSH => throw new Exception("H implementation needed")
+        case LSW => mem((base + displ) >> 2) = value
+        case LBU => throw new Exception("BU implementation needed")
+        case LHU => throw new Exception("HU implementation needed")
+      }
+    }
     // read register file
     val rs1Val = reg(rs1)
     val rs2Val = reg(rs2)
     // next pc
-    val pcNext = pc + 1
+    val pcNext = pc + 4
+
+    printf("pc: %04x ", pc)
+    printf("instr: %08x ", instr)
 
     // Execute the instruction and
     // return a tuple for the result: (ALU result, writeBack, next PC)
     val result = opcode match {
       case AluImm => (alu(funct3, sraSub, rs1Val, imm), true, pcNext)
       case Alu => (alu(funct3, sraSub, rs1Val, rs2Val), true, pcNext)
-      case Branch => (0, false, if (compare(funct3, rs1Val, rs2Val)) pc + boff else pcNext)
+      case Branch => (0, false, if (compare(funct3, rs1Val, rs2Val)) pc + imm else pcNext)
       case Load => (load(funct3, rs1Val, imm), true, pcNext)
+      case Store => store(funct3, rs1Val, imm, rs2Val); (0 , false, pcNext)
+      case AuiPc => (pc + imm, true, pcNext)
       case SCall => {
         // test a0 (x10) for test condition: 1 = ok
         // but FlexPRET examples use x1 -- maybe change those examples later
@@ -180,9 +194,6 @@ class SimRV(mem: Array[Int]) {
       }
     }
 
-    printf("pc: %04x ", pc * 4)
-    printf("instr: %08x ", instr)
-
     if (rd != 0 && result._2) {
       reg(rd) = result._1
     }
@@ -193,7 +204,7 @@ class SimRV(mem: Array[Int]) {
     pc != oldPc // detect endless loop to stop simulation
   }
 
-  while (execute(mem(pc))) {
+  while (execute(mem(pc >> 2))) {
     print("regs: ")
     for (i <- 0 to 7) {
       printf("%08x ", reg(i))

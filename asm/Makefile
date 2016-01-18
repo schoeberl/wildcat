@@ -4,6 +4,7 @@ all:
 	riscv64-unknown-elf-as -m32 riscv-v1_bne.S
 	riscv64-unknown-elf-as -m32 riscv-v1_addi.S
 	riscv64-unknown-elf-as -m32 -a riscv-v1_lw.S
+	riscv64-unknown-elf-as -m32 -a riscv-v1_sw.S
 	riscv64-unknown-elf-objdump -d a.out
 	riscv64-unknown-elf-objcopy -O binary -j .text a.out text.bin
 	riscv64-unknown-elf-objcopy -O binary -j .data a.out data.bin

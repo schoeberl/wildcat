@@ -2,12 +2,7 @@
 # riscv-v1_sw.S
 #-----------------------------------------------------------------------------
 #
-# Test sw instruction. Note that since SMIPSv1 does not support a lui
-# instruction we must be careful when forming addresses. We cannot use the
-# standard la assembler pseudo-instruction. Instead we use the %lo(addr)
-# assembler directive which tells the linker to subsitute in the low order 15
-# bits of the indicated label.
-#
+# Test sw instruction.
 
         # Test 1: Store then load some data
 
