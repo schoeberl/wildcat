@@ -25,9 +25,12 @@ class SimRV(mem: Array[Int]) {
 
   // That's the state of the processor.
   // That's it, nothing else (except memory ;-)
-  var pc = 0
+  var pc = 0x200 // RISC-V tests start at 0x200
   var reg = new Array[Int](32)
   reg(0) = 0
+  
+  // some statistics
+  var iCnt = 0
 
   def execute(instr: Int): Boolean = {
 
@@ -40,12 +43,12 @@ class SimRV(mem: Array[Int]) {
     val funct7 = (instr >> 25) & 0x03f
 
     /**
-     * Immediate generation is a little bit more elaborated,
+     * Immediate generation is a little bit elaborated,
      * but shall give smaller multiplexers in the hardware.
      */
     def genImm() = {
 
-      val iType: InstrType = opcode match {
+      val instrType: InstrType = opcode match {
         case AluImm => I
         case Alu => R
         case Branch => SB
@@ -72,26 +75,26 @@ class SimRV(mem: Array[Int]) {
       val sext12 = if (instr31 == 1) 0xfff else 0
 
       // subfields of the immediate, depending on instruction type
-      val imm0 = iType match {
+      val imm0 = instrType match {
         case I => instr20
         case S => instr7
         case _ => 0
       }
-      val imm4_1 = iType match {
+      val imm4_1 = instrType match {
         case I => instr24_21
         case U => 0
         case UJ => instr24_21
         case _ => instr11_8
       }
-      val imm10_5 = if (iType == U) 0 else instr30_25
-      val imm11 = iType match {
+      val imm10_5 = if (instrType == U) 0 else instr30_25
+      val imm11 = instrType match {
         case SB => instr7
         case U => 0
         case UJ => instr20
         case _ => instr31
       }
-      val imm19_12 = if (iType == U || iType == UJ) instr19_12 else sext8
-      val imm31_20 = if (iType == U) instr31_20 else sext12
+      val imm19_12 = if (instrType == U || instrType == UJ) instr19_12 else sext8
+      val imm31_20 = if (instrType == U) instr31_20 else sext12
 
       // now glue together
       (imm31_20 << 20) | (imm19_12 << 12) | (imm11 << 11) |
@@ -155,17 +158,27 @@ class SimRV(mem: Array[Int]) {
         case LHU => throw new Exception("HU implementation needed")
       }
     }
+
+    def scall(): Unit = {
+      // test a0 (x10) for test condition: 1 = ok
+      // but FlexPRET examples use x1 -- maybe change those examples later
+      if (reg(1) == 1) {
+        println("Test passed")
+      } else {
+        println("Test failed with return code " + reg(1))
+      }
+    }
+
     // read register file
     val rs1Val = reg(rs1)
     val rs2Val = reg(rs2)
     // next pc
     val pcNext = pc + 4
 
-    printf("pc: %04x ", pc)
-    printf("instr: %08x ", instr)
+    printf("pc: %04x instr: %08x ", pc, instr)
 
     // Execute the instruction and return a tuple for the result:
-    // (ALU result, writeBack, next PC)
+    //   (ALU result, writeBack, next PC)
     val result = opcode match {
       case AluImm => (alu(funct3, sraSub, rs1Val, imm), true, pcNext)
       case Alu => (alu(funct3, sraSub, rs1Val, rs2Val), true, pcNext)
@@ -177,19 +190,9 @@ class SimRV(mem: Array[Int]) {
       case AuiPc => (pc + imm, true, pcNext)
       case Jal => (pc + 4, true, pc + imm)
       case JalR => (pc + 4, true, (rs1Val + imm) & 0xfffffffe)
-      case SCall => {
-        // test a0 (x10) for test condition: 1 = ok
-        // but FlexPRET examples use x1 -- maybe change those examples later
-        if (reg(1) == 1) {
-          println("Test passed")
-        } else {
-          println("Test failed with return code " + reg(1))
-        }
-        (0, false, pcNext)
-      }
-      case _ => {
-        throw new Exception("Opcode " + opcode + " not (yet) implemented")
-      }
+      case SCall =>
+        scall(); (0, false, pcNext)
+      case _ => throw new Exception("Opcode " + opcode + " not (yet) implemented")
     }
 
     if (rd != 0 && result._2) {
@@ -199,14 +202,18 @@ class SimRV(mem: Array[Int]) {
     val oldPc = pc
     pc = result._3
 
-    pc != oldPc // detect endless loop to stop simulation
+    iCnt += 1
+    
+    pc != oldPc && iCnt < 100 // detect endless loop to stop simulation
   }
 
   while (execute(mem(pc >> 2))) {
     print("regs: ")
-    for (i <- 0 to 16) {
-      printf("%08x ", reg(i))
-    }
+    //    for (i <- 0 to 8) {
+    //      printf("%08x ", reg(i))
+    //    }
+    //    println
+    reg.foreach(printf("%08x ", _))
     println
   }
 
@@ -228,9 +235,10 @@ class SimRV(mem: Array[Int]) {
 object SimRV extends App {
   println("Hello RISC-V World")
 
-  val mem = new Array[Int](1024)
+  val mem = new Array[Int](1024*128)
 
-  val code = Util.readBin("/Users/martin/source/wildcat/asm/a.bin")
+  // val code = Util.readBin("/Users/martin/source/wildcat/asm/a.bin")
+  val code = Util.readHex("/Users/martin/source/wildcat/asm/a.hex")
 
   for (i <- 0 until code.length) {
     mem(i) = code(i)

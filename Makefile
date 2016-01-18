@@ -1,5 +1,10 @@
 #
-# Building a Hello World Chisel without too much sbt/scala/... stuff
+# Makefile (work in progress) for Wildcat, a RISC-V implementation.
+#
+# Include user makefile for local configurations, e.g., path to RISC-V tools
+-include config.mk
+RISCV?=$(HOME)/data/repository/rocket-chip/riscv-tools
+
 #
 # sbt looks for default into a folder ./project and . for build.sdt and Build.scala
 # sbt creates per default a ./target folder
@@ -26,8 +31,17 @@ hdl:
 cpp:
 	$(SBT) "run-main hello.HelloMain --backend c --compile --targetDir generated"
 
-# get the test cases from Sodor as simple hex files
+# Assume RISC-V tools are built and installed.
+# Set the path here or outside.
+TEST_DIR=$(RISCV)/riscv-tests/isa
 test:
+	cp $(TEST_DIR)/rv32ui-p-add.hex asm/a.hex
+
+	
+
+# get the test cases from Sodor as simple hex files
+# not really used (yet)
+test-sodor:
 	-rm -rf riscv-sodor
 	git clone https://github.com/ucb-bar/riscv-sodor.git
 	cp -r riscv-sodor/install/riscv-tests/ tests
