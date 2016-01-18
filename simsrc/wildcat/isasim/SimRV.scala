@@ -146,7 +146,7 @@ class SimRV(mem: Array[Int]) {
       funct3 match {
         case LSB => throw new Exception("B implementation needed")
         case LSH => throw new Exception("H implementation needed")
-        case LSW => mem((base + displ) >> 2)
+        case LSW => mem(((base + displ) >> 2) & 0x3ff)
         case LBU => throw new Exception("BU implementation needed")
         case LHU => throw new Exception("HU implementation needed")
       }
@@ -156,7 +156,9 @@ class SimRV(mem: Array[Int]) {
       funct3 match {
         case LSB => throw new Exception("B implementation needed")
         case LSH => throw new Exception("H implementation needed")
-        case LSW => mem((base + displ) >> 2) = value
+        case LSW => {
+          mem(((base + displ) >> 2) & 0x3ff) = value
+        }
         case LBU => throw new Exception("BU implementation needed")
         case LHU => throw new Exception("HU implementation needed")
       }
@@ -179,6 +181,10 @@ class SimRV(mem: Array[Int]) {
       case Load => (load(funct3, rs1Val, imm), true, pcNext)
       case Store => store(funct3, rs1Val, imm, rs2Val); (0 , false, pcNext)
       case AuiPc => (pc + imm, true, pcNext)
+      case Jal => {
+        println(pc + " " + imm + " " + ((pc + imm) & 0xfffffffe))
+        (pc + 4, true, (pc + imm) & 0xfffffffe)
+      }
       case SCall => {
         // test a0 (x10) for test condition: 1 = ok
         // but FlexPRET examples use x1 -- maybe change those examples later
