@@ -12,6 +12,7 @@ object Opcode {
   val AuiPc = 0x17
   val Jal = 0x6f
   val JalR = 0x67
+  val Fence = 0x0f
   val SCall = 0x73
 }
 

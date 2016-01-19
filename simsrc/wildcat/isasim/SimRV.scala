@@ -21,14 +21,17 @@ import BranchFunct._
 import LoadStoreFunct._
 import InstrType._
 
-class SimRV(mem: Array[Int]) {
+class SimRV(mem: Array[Int], start: Int) {
 
   // That's the state of the processor.
   // That's it, nothing else (except memory ;-)
-  var pc = 0x200 // RISC-V tests start at 0x200
+  var pc = start // RISC-V tests start at 0x200
   var reg = new Array[Int](32)
   reg(0) = 0
-  
+
+  // stop on a test end
+  var run = true;
+
   // some statistics
   var iCnt = 0
 
@@ -58,7 +61,7 @@ class SimRV(mem: Array[Int]) {
         case AuiPc => U
         case Jal => UJ
         case JalR => I
-        case SCall => R
+        case SCall => I
         case _ => R
       }
 
@@ -159,13 +162,19 @@ class SimRV(mem: Array[Int]) {
       }
     }
 
-    def scall(): Unit = {
-      // test a0 (x10) for test condition: 1 = ok
-      // but FlexPRET examples use x1 -- maybe change those examples later
-      if (reg(1) == 1) {
-        println("Test passed")
-      } else {
-        println("Test failed with return code " + reg(1))
+    def scall(): Int = {
+      imm & 0xfff match {
+        case 0xf10 => 0 // mhartid
+        case 0x000 =>
+          // test x28 for test condition: 1 = ok
+          if (reg(28) == 1) {
+            println("Test passed")
+          } else {
+            println("Test failed with return code " + reg(1))
+          }
+          run = false
+          0
+        case _ => 0 // this gets us around _start in the test cases
       }
     }
 
@@ -190,8 +199,8 @@ class SimRV(mem: Array[Int]) {
       case AuiPc => (pc + imm, true, pcNext)
       case Jal => (pc + 4, true, pc + imm)
       case JalR => (pc + 4, true, (rs1Val + imm) & 0xfffffffe)
-      case SCall =>
-        scall(); (0, false, pcNext)
+      case Fence => (0, false, pcNext)
+      case SCall => (scall(), true, pcNext)
       case _ => throw new Exception("Opcode " + opcode + " not (yet) implemented")
     }
 
@@ -203,46 +212,31 @@ class SimRV(mem: Array[Int]) {
     pc = result._3
 
     iCnt += 1
-    
-    pc != oldPc && iCnt < 100 // detect endless loop to stop simulation
+
+    pc != oldPc && run // detect endless loop to stop simulation
   }
 
   while (execute(mem(pc >> 2))) {
     print("regs: ")
-    //    for (i <- 0 to 8) {
-    //      printf("%08x ", reg(i))
-    //    }
-    //    println
     reg.foreach(printf("%08x ", _))
     println
   }
 
 }
 
-/* 
- * TODO: grab the precompiled tests form sodor and run them.
- * Or better use the riscv-test code.
- * 
- * Test result signaling in riscv-test
- * 
- * #undef RVTEST_PASS
-#define RVTEST_PASS li a0, 1; scall
-
-#undef RVTEST_FAIL
-#define RVTEST_FAIL sll a0, TESTNUM, 1; 1:beqz a0, 1b; or a0, a0, 1; scall;
- */
-
 object SimRV extends App {
   println("Hello RISC-V World")
 
-  val mem = new Array[Int](1024*128)
+  val mem = new Array[Int](1024 * 128)
 
-  // val code = Util.readBin("/Users/martin/source/wildcat/asm/a.bin")
-  val code = Util.readHex("/Users/martin/source/wildcat/asm/a.hex")
+  val (code, start) = if (false) {
+    (Util.readBin("/Users/martin/source/wildcat/asm/a.bin"), 0)
+  } else
+    (Util.readHex("/Users/martin/source/wildcat/asm/a.hex"), 0x200)
 
   for (i <- 0 until code.length) {
     mem(i) = code(i)
   }
 
-  new SimRV(mem)
+  new SimRV(mem, start)
 }
