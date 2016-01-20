@@ -147,20 +147,33 @@ class SimRV(mem: Array[Int], start: Int) {
     }
 
     def store(funct3: Int, base: Int, displ: Int, value: Int): Unit = {
-      val addr = (((base + displ) & 0xfffff) >> 2) // 1 MB wrap around
+      val addr = ((base + displ) & 0xfffff) // 1 MB wrap around
+      val wordAddr = addr >>> 2
       funct3 match {
-        case LSB => throw new Exception("B implementation needed")
-        case LSH => throw new Exception("H implementation needed")
+        case LSB => {
+          val mask = (addr & 0x03) match {
+            case 0 => 0xffffff00
+            case 1 => 0xffff00ff
+            case 2 => 0xff00ffff
+            case 3 => 0x00ffffff
+          }
+          mem(wordAddr) = (mem(wordAddr) & mask) | ((value & 0xff) << (8 * (addr & 0x03)))
+        }
+        case LSH => {
+          val mask = (addr & 0x03) match {
+            case 0 => 0xffff0000
+            case 2 => 0x0000ffff
+          }
+          mem(wordAddr) = (mem(wordAddr) & mask) | ((value & 0xffff) << (8 * (addr & 0x03)))
+        }
         case LSW => {
           // very primitive IO simulation
-          if ((base + displ) == 0xf0000000) {
+          if (addr == 0xf0000000) {
             println("out: " + value.toChar)
           } else {
-            mem(addr) = value
+            mem(wordAddr) = value
           }
         }
-        case LBU => throw new Exception("BU implementation needed")
-        case LHU => throw new Exception("HU implementation needed")
       }
     }
 
