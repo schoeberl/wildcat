@@ -64,7 +64,6 @@ class SimRV(mem: Array[Int], start: Int) {
         case SCall => I
         case _ => R
       }
-
       // subfields of the instruction 
       val instr7 = (instr >> 7) & 0x01
       val instr11_8 = (instr >> 8) & 0x0f
@@ -107,7 +106,7 @@ class SimRV(mem: Array[Int], start: Int) {
     val imm = genImm()
 
     // single bit on extended function
-    val sraSub = funct7 == SRA_SUB
+    val sraSub = funct7 == SRA_SUB && opcode != AluImm
 
     def alu(funct3: Int, sraSub: Boolean, op1: Int, op2: Int): Int = {
       val shamt = op2 & 0x1f
@@ -136,16 +135,19 @@ class SimRV(mem: Array[Int], start: Int) {
     }
 
     def load(funct3: Int, base: Int, displ: Int): Int = {
+      val addr = ((base + displ) & 0xfffff) // 1 MB wrap around
+      val data = mem(addr >>> 2)
       funct3 match {
-        case LSB => throw new Exception("B implementation needed")
-        case LSH => throw new Exception("H implementation needed")
-        case LSW => mem(((base + displ) >> 2) & 0x3ff)
-        case LBU => throw new Exception("BU implementation needed")
-        case LHU => throw new Exception("HU implementation needed")
+        case LSB => (((data >> (8 * (addr & 0x03))) & 0xff) << 24) >> 24
+        case LSH => (((data >> (8 * (addr & 0x03))) & 0xffff) << 16) >> 16
+        case LSW => data
+        case LBU => (data >> (8 * (addr & 0x03))) & 0xff
+        case LHU => (data >> (8 * (addr & 0x03))) & 0xffff
       }
     }
 
     def store(funct3: Int, base: Int, displ: Int, value: Int): Unit = {
+      val addr = (((base + displ) & 0xfffff) >> 2) // 1 MB wrap around
       funct3 match {
         case LSB => throw new Exception("B implementation needed")
         case LSH => throw new Exception("H implementation needed")
@@ -154,7 +156,7 @@ class SimRV(mem: Array[Int], start: Int) {
           if ((base + displ) == 0xf0000000) {
             println("out: " + value.toChar)
           } else {
-            mem(((base + displ) >> 2) & 0x3ff) = value
+            mem(addr) = value
           }
         }
         case LBU => throw new Exception("BU implementation needed")
@@ -227,7 +229,7 @@ class SimRV(mem: Array[Int], start: Int) {
 object SimRV extends App {
   println("Hello RISC-V World")
 
-  val mem = new Array[Int](1024 * 128)
+  val mem = new Array[Int](1024 * 256) // 1 MB, also check masking in load and store
 
   val (code, start) = if (false) {
     (Util.readBin("/Users/martin/source/wildcat/asm/a.bin"), 0)
