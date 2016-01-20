@@ -14,6 +14,11 @@ RISCV?=$(HOME)/data/repository/rocket-chip/riscv-tools
 
 SBT = sbt
 
+HW_ARGS = --targetDir generated --backend v
+TEST_ARGS = --genHarness --test --backend c --compile --targetDir generated
+TEST_ARGS_VCD = --genHarness --test --backend c --compile --vcd --targetDir generated
+
+
 all:
 	echo "Select your make target"
 
@@ -33,6 +38,13 @@ hdl:
 # Generate C++ code (simulation)
 cpp:
 	$(SBT) "run-main hello.HelloMain --backend c --compile --targetDir generated"
+
+hw:
+	$(SBT) "run-main wildcat.pipeline.WildcatMain $(HW_ARGS)"
+
+test-hw:
+	$(SBT) "run-main wildcat.pipeline.WildcatTester $(TEST_ARGS_VCD)"
+	gtkwave generated/Wildcat.vcd --save=wildcat.gtkw
 
 # Assume RISC-V tools are built and installed.
 # Set the path here or outside.
