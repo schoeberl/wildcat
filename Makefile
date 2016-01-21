@@ -47,31 +47,23 @@ test-hw:
 	gtkwave generated/Wildcat.vcd --save=wildcat.gtkw
 
 # Assume RISC-V tools are built and installed.
-# Set the path here or outside.
+# Set the path here or in config.mk.
 TEST_DIR=$(RISCV)/riscv-tests/isa
 test:
-	cp $(TEST_DIR)/rv32ui-p-lhu.hex asm/a.hex
-	sbt run wildcat.isasim.SimRV
+	cp $(TEST_DIR)/rv32ui-p-xori.hex asm/a.hex
+	sbt "run-main wildcat.isasim.SimRV"
 
 # passed tests (simulation):
 # add addi and andi auipc beq bge bgeu blt bltu bne fence_i j jal jalr
-# lb lbu ld lh lhu
-# sb sh
+# lb lbu ld lh lhu lui lw or ori sb sh simple sll slli slt slti sra
+# srai srl srli sub sw xor xori
 # 
 # failed:
 # amo* as this is A extension
-# div divu divuw divw as this is M extension
+# div divu divuw divw mul mulh mulhsu mulhu mulw as this is M extension
 
 # rv32ui tests available:
-# add addi amoadd_w amoand_w amomax_w amomaxu_w amomin_w amominu_w amoor_w amoswap_w and andi auipc beq bge bgeu blt bltu bne div divu divuw divw fence_i j jal jalr lb lbu ld lh lhu lui lw lwu mul mulh mulhsu mulhu mulw or ori rem remu sb sh simple sll slli slt slti sra srai srl srli sub sw xor xori	
-
-# get the test cases from Sodor as simple hex files
-# not really used (yet)
-test-sodor:
-	-rm -rf riscv-sodor
-	git clone https://github.com/ucb-bar/riscv-sodor.git
-	cp -r riscv-sodor/install/riscv-tests/ tests
-	rm -rf riscv-sodor
+# add addi amoadd_w amoand_w amomax_w amomaxu_w amomin_w amominu_w amoor_w amoswap_w and andi auipc beq bge bgeu blt bltu bne div divu divuw divw fence_i j jal jalr lb lbu ld lh lhu lui lw mul mulh mulhsu mulhu mulw or ori rem remu sb sh simple sll slli slt slti sra srai srl srli sub sw xor xori	
 
 
 

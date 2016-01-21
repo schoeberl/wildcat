@@ -105,8 +105,8 @@ class SimRV(mem: Array[Int], start: Int) {
 
     val imm = genImm()
 
-    // single bit on extended function
-    val sraSub = funct7 == SRA_SUB && opcode != AluImm
+    // single bit on extended function - this is not nice
+    val sraSub = funct7 == SRA_SUB && (opcode == Alu || (opcode == AluImm && funct3 == SRL_SRA)) 
 
     def alu(funct3: Int, sraSub: Boolean, op1: Int, op2: Int): Int = {
       val shamt = op2 & 0x1f
