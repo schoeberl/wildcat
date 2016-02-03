@@ -106,7 +106,7 @@ class SimRV(mem: Array[Int], start: Int) {
     val imm = genImm()
 
     // single bit on extended function - this is not nice
-    val sraSub = funct7 == SRA_SUB && (opcode == Alu || (opcode == AluImm && funct3 == SRL_SRA)) 
+    val sraSub = funct7 == SRA_SUB && (opcode == Alu || (opcode == AluImm && funct3 == SRL_SRA))
 
     def alu(funct3: Int, sraSub: Boolean, op1: Int, op2: Int): Int = {
       val shamt = op2 & 0x1f
@@ -199,7 +199,7 @@ class SimRV(mem: Array[Int], start: Int) {
     // next pc
     val pcNext = pc + 4
 
-    printf("pc: %04x instr: %08x ", pc, instr)
+    printf("     pc: %04x instr: %08x ", pc, instr)
 
     // Execute the instruction and return a tuple for the result:
     //   (ALU result, writeBack, next PC)
@@ -239,19 +239,32 @@ class SimRV(mem: Array[Int], start: Int) {
 
 }
 
-object SimRV extends App {
-  println("Hello RISC-V World")
+object SimRV {
 
-  val mem = new Array[Int](1024 * 256) // 1 MB, also check masking in load and store
+  def main(args: Array[String]): Unit = {
 
-  val (code, start) = if (false) {
-    (Util.readBin("/Users/martin/source/wildcat/asm/a.bin"), 0)
-  } else
-    (Util.readHex("/Users/martin/source/wildcat/asm/a.hex"), 0x200)
+    if (args.length == 0) {
+      throw new Exception("A program parameter is missing")
+    }
+    
+    println("Hello RISC-V World with "+args(0))
 
-  for (i <- 0 until code.length) {
-    mem(i) = code(i)
+    val mem = new Array[Int](1024 * 256) // 1 MB, also check masking in load and store
+
+    
+    
+    val (code, start) = if (args(0).endsWith(".bin")) {
+      (Util.readBin(args(0)), 0)
+    } else if (args(0).endsWith(".hex")){
+      (Util.readHex(args(0)), 0x200)      
+    } else {
+      throw new Exception("Unknown file extension")
+    }
+
+    for (i <- 0 until code.length) {
+      mem(i) = code(i)
+    }
+
+    new SimRV(mem, start)
   }
-
-  new SimRV(mem, start)
 }

@@ -5,22 +5,25 @@
 -include config.mk
 RISCV?=$(HOME)/data/repository/rocket-chip/riscv-tools
 
-#
-# sbt looks for default into a folder ./project and . for build.sdt and Build.scala
-# sbt creates per default a ./target folder
-
 # Using sbt with a .jar file in the repository. Better install sbt
 # SBT = java -Xmx1024M -Xss8M -XX:MaxPermSize=128M -jar sbt/sbt-launch.jar
 
 SBT = sbt
 
+all:
+	echo "Select your make target"
+
+run:
+	sbt "run-main wildcat.isasim.SimRV asm/a.bin"
+
+
+#############################################
+# Below for future work - please ignore
+#############################################
+
 HW_ARGS = --targetDir generated --backend v
 TEST_ARGS = --genHarness --test --backend c --compile --targetDir generated
 TEST_ARGS_VCD = --genHarness --test --backend c --compile --vcd --targetDir generated
-
-
-all:
-	echo "Select your make target"
 
 # This generates the Verilog and C++ files by invoking main from
 # class HelloMain in package hello.
