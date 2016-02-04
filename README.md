@@ -1,7 +1,8 @@
-# wildcat
-An implementation of RISC-V
+# Wildcat
 
-This repository currently contains a ISA simulator of the RISC-V instruction
+An implementation of RISC-V.
+
+This repository currently contains an ISA simulator of the RISC-V instruction
 set. Concrete the 32-bit integer version.
 
 Minimal SW prerequisites are a version of git and sbt.
@@ -11,7 +12,7 @@ To start with wildcat either fork the project or clone it from here with:
     $ git clone https://github.com/schoeberl/wildcat
     $ cd wildcat
 
-Here you can start the ISA simulator with a simple example:
+Here you can start the ISA simulator executing a simple program with
 
     $ sbt "run-main wildcat.isasim.SimRV bin/test.bin"
 
