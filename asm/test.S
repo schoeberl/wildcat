@@ -9,3 +9,9 @@
 	addi	x2, x0, 0xfc
 	or	x3, x1, x2
 	and	x3, x1, x2
+
+# notify success to the simulator
+
+        addi x28, x0, 1
+        ecall
+1:      beq   x0, x0, 1b
