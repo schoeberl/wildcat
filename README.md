@@ -4,17 +4,19 @@ An implementation of RISC-V
 This repository currently contains a ISA simulator of the RISC-V instruction
 set. Concrete the 32-bit integer version.
 
-To start with wildcat either fork the project or clone it with
+Minimal SW prerequisites are a version of git and sbt.
+
+To start with wildcat either fork the project or clone it from here with:
 
     $ git clone https://github.com/schoeberl/wildcat
     $ cd wildcat
 
-Here you can start the ISA simulator with a simple example with
+Here you can start the ISA simulator with a simple example:
 
     $ sbt "run-main wildcat.isasim.SimRV bin/test.bin"
 
-That will execute the already assembler assembler program asm/test.S
-from bin/test.bin and print out a register dump for each instruction.
+That command will execute the already assembled assembler program asm/test.S
+as bin/test.bin and print out a register dump for each instruction.
 
 To assemble other programs or compile C programs you need to install
 the [RISC-V tools](https://github.com/riscv/riscv-tools).
