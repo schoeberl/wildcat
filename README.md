@@ -22,6 +22,13 @@ as bin/test.bin and print out a register dump for each instruction.
 To assemble other programs or compile C programs you need to install
 the [RISC-V tools](https://github.com/riscv/riscv-tools).
 
+## Resources
+
+There are several RISC-V projects around. As a starting point for point:
+
+ * [Rocket Chip](https://github.com/ucb-bar/rocket-chip) the Berkeley processor including the tools (e.g., compiler)
+ * [YARVI](https://github.com/tommythorn/yarvi) a RISC-V implementation in Verilog. Probably the first public available implementation that is synthesizabe for an FPGA.
+
 ## Notes
 
 Why wildcat? The day before starting this project I was running
