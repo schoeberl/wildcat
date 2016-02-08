@@ -24,10 +24,10 @@ the [RISC-V tools](https://github.com/riscv/riscv-tools).
 
 ## Resources
 
-There are several RISC-V projects around. As a starting point for point:
+There are several RISC-V projects around. As a starting point:
 
  * [Rocket Chip](https://github.com/ucb-bar/rocket-chip) the Berkeley processor including the tools (e.g., compiler)
- * [YARVI](https://github.com/tommythorn/yarvi) a RISC-V implementation in Verilog. Probably the first public available implementation that is synthesizabe for an FPGA.
+ * [YARVI](https://github.com/tommythorn/yarvi) a RISC-V implementation in Verilog. Probably the first publicly available implementation that is synthesizabe for an FPGA.
 
 ## Notes
 
