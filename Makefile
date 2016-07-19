@@ -1,5 +1,5 @@
 #
-# Makefile (work in progress) for Wildcat, a RISC-V implementation.
+# Makefile (work in progress) for Wildcat, a RISC-V simulator and implementation.
 #
 # Include user makefile for local configurations, e.g., path to RISC-V tools
 -include config.mk
@@ -10,11 +10,11 @@ RISCV?=$(HOME)/data/repository/rocket-chip/riscv-tools
 
 SBT = sbt
 
-all:
-	echo "Select your make target"
+#all:
+#	echo "Select your make target"
 
 run:
-	sbt "run-main wildcat.isasim.SimRV asm/a.bin"
+	sbt "run-main wildcat.isasim.SimRV bin/test.bin"
 
 
 #############################################
