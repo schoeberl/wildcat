@@ -16,8 +16,10 @@ class SimpleParser extends RegexParsers {
   
   def freq: Parser[WordFreq] = word ~ number ^^ { case wd ~ fr => WordFreq(wd, fr) }
 
+  def reg: Parser[String] = """x(\d\d?)""".r ^^ { _.toString }
   def comment: Parser[String] = """#.*""".r ^^ { _.toString }
-  def test: Parser[String] = label.? ~ word ~ comment.? ^^ { case l ~ wd ~ c => l + "---" + wd + ":::" + c }
+  def test: Parser[String] = label.? ~ word ~ reg.? ~ comment.? ~ reg.?  ^^
+    { case l ~ wd ~ r ~ c  => l + "---" + wd + "++++" + r + ":::" + c }
 }
 
 object TestParser extends SimpleParser {
