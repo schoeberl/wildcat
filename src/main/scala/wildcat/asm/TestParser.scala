@@ -8,21 +8,34 @@ case class WordFreq(word: String, count: Int) {
 
 }
 
-
 class SimpleParser extends RegexParsers {
 
   def word: Parser[String] = """[a-z]+""".r ^^ { _.toString }
   def number: Parser[Int] = """(0|[1-9]\d*)""".r ^^ { _.toInt }
-  def freq: Parser[WordFreq] = word ~ number ^^ { case wd ~ fr => WordFreq(wd,fr) }
+  def label: Parser[String] = """[a-z]+:""".r ^^ { _.toString }
+  
+  def freq: Parser[WordFreq] = word ~ number ^^ { case wd ~ fr => WordFreq(wd, fr) }
+
+  def comment: Parser[String] = """#.*""".r ^^ { _.toString }
+  def test: Parser[String] = label.? ~ word ~ comment.? ^^ { case l ~ wd ~ c => l + "---" + wd + ":::" + c }
 }
 
 object TestParser extends SimpleParser {
 
   def main(args: Array[String]) {
-    parse(freq, "johnny 42 lately") match {
-      case Success(matched,_) => println(matched)
-      case Failure(msg,_) => println("FAILURE: " + msg)
-      case Error(msg,_) => println("ERROR: " + msg)
+
+    val code = List(
+        "command",
+        "abc # this is a comment",
+        "label: xxx")
+
+    for (line <- code) {
+      parse(test, line) match {
+        case Success(matched, _) => println(matched)
+        case Failure(msg, _) => println("FAILURE: " + msg)
+        case Error(msg, _) => println("ERROR: " + msg)
+      }
     }
+
   }
 }

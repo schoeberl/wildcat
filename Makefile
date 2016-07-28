@@ -16,6 +16,9 @@ SBT = sbt
 run:
 	sbt "run-main wildcat.isasim.SimRV bin/test.bin"
 
+assemble:
+	sbt "run-main wildcat.asm.TestParser"
+
 
 #############################################
 # Below for future work - please ignore
