@@ -10,19 +10,28 @@ RISCV?=$(HOME)/data/repository/rocket-chip/riscv-tools
 
 SBT = sbt
 
-APP=test.s
+APP=asm/test.s
 # Use a different program, e.g., one from the CAE lab
 #APP=../../cae-lab/lab3/minimal.s
+# APP can be set from the command line, such as:
+# make app run APP=../cae-lab/lab3/minimal.s
 
 all:
 	echo "Select your make target"
 
 app:
-	make -C asm APP=$(APP)
-	cp asm/test.bin bin
+	riscv32-unknown-elf-as $(APP)
+	riscv32-unknown-elf-objdump -d a.out
+	riscv32-unknown-elf-objcopy -O binary -j .text a.out text.bin
+	riscv32-unknown-elf-objcopy -O binary -j .data a.out data.bin
+	cat text.bin data.bin > test.bin
+	hexdump -e '"%08x\n"' test.bin
+
+clean:
+	-rm *.out *.bin
 
 run:
-	sbt "run-main wildcat.isasim.SimRV bin/test.bin"
+	sbt "run-main wildcat.isasim.SimRV test.bin"
 
 
 # Just a start of an assembler in Scala
