@@ -13,7 +13,7 @@ object Opcode {
   val Jal = 0x6f
   val JalR = 0x67
   val Fence = 0x0f
-  val SCall = 0x73
+  val ECall = 0x73
 }
 
 object InstrType extends Enumeration {

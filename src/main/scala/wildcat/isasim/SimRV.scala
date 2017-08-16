@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, DTU
+ * Copyright (c) 2015-2017, DTU
  * Simplified BSD License
  */
 
@@ -61,7 +61,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
         case AuiPc => U
         case Jal => UJ
         case JalR => I
-        case SCall => I
+        case ECall => I
         case _ => R
       }
       // subfields of the instruction 
@@ -177,7 +177,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       }
     }
 
-    def scall(): Int = {
+    def ecall(): Int = {
       imm & 0xfff match {
         case 0xf10 => 0 // mhartid
         case 0x000 =>
@@ -215,7 +215,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       case Jal => (pc + 4, true, pc + imm)
       case JalR => (pc + 4, true, (rs1Val + imm) & 0xfffffffe)
       case Fence => (0, false, pcNext)
-      case SCall => (scall(), true, pcNext)
+      case ECall => (ecall(), true, pcNext)
       case _ => throw new Exception("Opcode " + opcode + " not (yet) implemented")
     }
 
