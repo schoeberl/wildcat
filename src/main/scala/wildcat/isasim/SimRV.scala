@@ -21,7 +21,7 @@ import BranchFunct._
 import LoadStoreFunct._
 import InstrType._
 
-class SimRV(mem: Array[Int], start: Int) {
+class SimRV(mem: Array[Int], start: Int, stop: Int) {
 
   // That's the state of the processor.
   // That's it, nothing else (except memory ;-)
@@ -228,10 +228,13 @@ class SimRV(mem: Array[Int], start: Int) {
 
     iCnt += 1
 
-    pc != oldPc && run // detect endless loop to stop simulation
+    println(pc + " " + stop)
+    pc != oldPc && run && pc < stop // detect endless loop or go beyond code to stop simulation
   }
 
-  while (execute(mem(pc >> 2))) {
+  var cont = true
+  while (cont) {
+    cont = execute(mem(pc >> 2))
     print("regs: ")
     reg.foreach(printf("%08x ", _))
     println
@@ -264,7 +267,9 @@ object SimRV {
     for (i <- 0 until code.length) {
       mem(i) = code(i)
     }
+    
+    val stop = start+code.length*4
 
-    new SimRV(mem, start)
+    new SimRV(mem, start, stop)
   }
 }

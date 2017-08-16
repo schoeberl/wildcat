@@ -10,12 +10,22 @@ RISCV?=$(HOME)/data/repository/rocket-chip/riscv-tools
 
 SBT = sbt
 
-#all:
-#	echo "Select your make target"
+APP=test.s
+# Use a different program, e.g., one from the CAE lab
+#APP=../../cae-lab/lab3/minimal.s
+
+all:
+	echo "Select your make target"
+
+app:
+	make -C asm APP=$(APP)
+	cp asm/test.bin bin
 
 run:
 	sbt "run-main wildcat.isasim.SimRV bin/test.bin"
 
+
+# Just a start of an assembler in Scala
 assemble:
 	sbt "run-main wildcat.asm.TestParser"
 
