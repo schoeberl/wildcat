@@ -1,6 +1,6 @@
 # Wildcat
 
-An implementation of RISC-V.
+An implementation of RISC-V for education.
 
 This repository currently contains an ISA simulator of the RISC-V instruction
 set. Concrete the 32-bit integer version.
@@ -14,13 +14,24 @@ To start with wildcat either fork the project or clone it from here with:
 
 Here you can start the ISA simulator executing a simple program with
 
-    sbt "run-main wildcat.isasim.SimRV bin/test.bin"
+    sbt "run-main wildcat.isasim.SimRV"
 
-That command will execute the already assembled assembler program asm/test.S
-as bin/test.bin and print out a register dump for each instruction.
+That command will execute the already assembled tiny program included
+as constants in the simulator.
 
 To assemble other programs or compile C programs you need to install
 the [RISC-V tools](https://github.com/riscv/riscv-tools).
+
+Assemble assembler files and simulate them with
+```
+make app run
+```
+which executes `asm/test.s` a small program, which exits with a test pass
+code (from probably an old test convention). To run other programs
+use the environment variable APP. E.g.:
+```
+make app run APP=../cae-lab/lab3/minimal.s
+```
 
 Quickstart to install the tools on Ubuntu:
 
@@ -31,9 +42,11 @@ Quickstart to install the tools on Ubuntu:
     export RISCV=$HOME/riscv-tools/local
     ./build.sh
 
-Than add the tools to your PATH in .bashrc with:
+Than add the tools to your PATH in .bashrc or .profile with:
 
     export PATH=$PATH:$HOME/riscv-tools/local/bin
+
+See also: [RISC-V Ubuntu Setup](https://github.com/schoeberl/cae-lab#vm-and-tool-installation)
 
 ## Resources
 
@@ -42,11 +55,13 @@ There are several RISC-V projects around. As a starting point:
  * [Rocket Chip](https://github.com/ucb-bar/rocket-chip) the Berkeley processor including the tools (e.g., compiler)
  * [YARVI](https://github.com/tommythorn/yarvi) a RISC-V implementation in Verilog. Probably the first publicly available implementation that is synthesizabe for an FPGA.
 
-## Notes
+## Why Wildcat?
 
-Why wildcat? The day before starting this project I was running
-in the Wildcat Canyon in Tilden park. Very nice area.
+The day before starting this project I was running
+in the Wildcat Canyon in Tilden park. A very nice area.
 
 ## Note Collection
+
+Scribbles related to RISC-V projects and tools:
 
  * [Collection of Notes](doc)

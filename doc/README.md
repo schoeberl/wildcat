@@ -19,7 +19,7 @@ However, following uses have been observed:
    from the MIPS simulators SPIM and MARS.
  * Current ISA tests use a0 and ecall for pass/fail, including a failed test case number.
    A value of 1 is pass, fail is the test number multiplied by 2 added 1.
-   Probably spike implements this semantics.
+   Probably spike implements this semantic.
  * What else in ecall is implemented in spike?
  * In a (newlib) compiled C program clib functions (such as file IO) call
    `__internal_syscall`, which itself (after rotation of registers `a0`-`a7`)
@@ -41,7 +41,8 @@ Here some observations:
    However, spike starts at 0x1000 and executes 5 boostrap instructions.
    Assume those are hardcoded into spike.
  * Compiling a C program (with newlib) has a start address (`_start`) at 0x00010074.
-   Assume that the proxy kernel is loaded at 0x8000000.
+   Assume that the proxy kernel is loaded at 0x8000000 and simply gets the start
+  address from the .elf file.
 
 
    
