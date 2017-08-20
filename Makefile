@@ -27,11 +27,16 @@ app:
 	cat text.bin data.bin > test.bin
 	hexdump -e '"%08x\n"' test.bin
 
-clean:
-	-rm *.out *.bin
-
 run:
 	sbt "run-main wildcat.isasim.SimRV test.bin"
+
+elf:
+	sbt "run-main wildcat.isasim.ElfUtil a.out"
+
+clean:
+	-rm *.out *.bin
+	-rm -rf target
+
 
 
 # Just a start of an assembler in Scala

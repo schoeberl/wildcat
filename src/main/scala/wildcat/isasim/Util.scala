@@ -12,6 +12,7 @@
 
 package wildcat.isasim
 
+import java.nio.file.{ Files, Paths }
 import scala.io.Source
 
 object Util {
@@ -22,10 +23,8 @@ object Util {
   def readBin(fileName: String): Array[Int] = {
 
     println("Reading " + fileName)
-    // maybe find a more elegant way to read a binary file
-    val source = Source.fromFile(fileName)(scala.io.Codec.ISO8859)
-    val byteArray = source.map(_.toByte).toArray
-    source.close()
+
+    val byteArray = Files.readAllBytes(Paths.get(fileName))
 
     // use an array to convert input
     val arr = new Array[Int](math.max(1, byteArray.length / 4))
@@ -63,9 +62,9 @@ object Util {
     var i = 0
     for (l <- lines) {
       for (j <- 0 until 4) {
-        val s = l.substring((3-j) * 8, (3-j) * 8 + 8)
+        val s = l.substring((3 - j) * 8, (3 - j) * 8 + 8)
         // Integer parsing does not like hex strings with MSB set
-        arr(i*4+j) = java.lang.Long.parseLong(s, 16).toInt
+        arr(i * 4 + j) = java.lang.Long.parseLong(s, 16).toInt
       }
       i += 1
     }
