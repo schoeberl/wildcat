@@ -22,6 +22,19 @@ class ElfUtil(fileName: String) {
     data(0) == 127 && data(1) == 'E' &&
       data(2) == 'L' && data(3) == 'F'
   }
+
+  require(isElf, "Not an ELF file")
+  require(data(4) == 1, "Only 32-bit supported")
+  val littleEndian = data(5) == 1
+  
+  def getShort(pos: Int): Short = {
+    if (littleEndian) {
+      ((data(pos).toShort & 0xff) + ((data(pos+1)<<8))).toShort
+    } else {
+      ((data(pos+1).toShort & 0xff) + ((data(pos)<<8))).toShort      
+    }
+  }
+  println("Type: "+getShort(0x10))
 }
 
 object ElfUtil {
