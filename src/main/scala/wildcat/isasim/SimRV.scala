@@ -249,7 +249,7 @@ object SimRV {
     val mem = new Array[Int](1024 * 256) // 1 MB, also check masking in load and store
 
     val (code, start) =
-      if (args.length == 0) {
+      if (args.isEmpty) {
         // No program given, do something very minimal
         (Array(0x00200093, //	addi x1 x0 2
           0x00300113, //	addi x2 x0 3
