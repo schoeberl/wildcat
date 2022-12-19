@@ -14,7 +14,7 @@ To start with wildcat either fork the project or clone it from here with:
 
 Here you can start the ISA simulator executing a simple program with
 
-    sbt "run-main wildcat.isasim.SimRV"
+    sbt "runMain wildcat.isasim.SimRV"
 
 That command will execute the already assembled tiny program included
 as constants in the simulator.

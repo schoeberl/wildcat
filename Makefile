@@ -3,7 +3,8 @@
 #
 # Include user makefile for local configurations, e.g., path to RISC-V tools
 -include config.mk
-RISCV?=$(HOME)/data/repository/rocket-chip/riscv-tools
+#RISCV?=$(HOME)/data/repository/rocket-chip/riscv-tools
+RISCV?=/opt/riscv/bin
 
 # Using sbt with a .jar file in the repository. Better install sbt
 # SBT = java -Xmx1024M -Xss8M -XX:MaxPermSize=128M -jar sbt/sbt-launch.jar
@@ -28,10 +29,10 @@ app:
 	hexdump -e '"%08x\n"' test.bin
 
 run:
-	sbt "run-main wildcat.isasim.SimRV test.bin"
+	sbt "runMain wildcat.isasim.SimRV test.bin"
 
 elf:
-	sbt "run-main wildcat.isasim.ElfUtil a.out"
+	sbt "runMain wildcat.isasim.ElfUtil a.out"
 
 clean:
 	-rm *.out *.bin
