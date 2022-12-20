@@ -179,7 +179,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
 
     def ecall(): Int = {
       imm & 0xfff match {
-        case 0xf10 => 0 // mhartid
+        case 0xf10 => 0 // hartid
         case 0x000 =>
           // test x28 for test condition: 1 = ok
           if (reg(28) == 1) {

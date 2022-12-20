@@ -25,11 +25,11 @@ app:
 	riscv32-unknown-elf-objdump -d a.out
 	riscv32-unknown-elf-objcopy -O binary -j .text a.out text.bin
 	riscv32-unknown-elf-objcopy -O binary -j .data a.out data.bin
-	cat text.bin data.bin > test.bin
-	hexdump -e '"%08x\n"' test.bin
+	cat text.bin data.bin > a.bin
+	hexdump -e '"%08x\n"' a.bin
 
 run:
-	sbt "runMain wildcat.isasim.SimRV test.bin"
+	sbt "runMain wildcat.isasim.SimRV a.bin"
 
 elf:
 	sbt "runMain wildcat.isasim.ElfUtil a.out"
@@ -38,11 +38,6 @@ clean:
 	-rm *.out *.bin
 	-rm -rf target
 
-
-
-# Just a start of an assembler in Scala
-assemble:
-	sbt "run-main wildcat.asm.TestParser"
 
 
 #############################################
