@@ -17,7 +17,7 @@ class FetchIO extends Bundle {
 }
 class DecodeIO extends Bundle {
   val fedec = Input(new FeDec())
-  val decedx = Output(new DecEx())
+  val decex = Output(new DecEx())
 
 }
 /*
