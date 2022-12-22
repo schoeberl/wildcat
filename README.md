@@ -33,7 +33,20 @@ use the environment variable APP. E.g.:
 make app run APP=../cae-lab/lab3/minimal.s
 ```
 
-Quickstart to install the tools on Ubuntu:
+### Tools on MacOS
+
+Use brew to install gcc:
+
+```
+brew tap riscv-software-src/riscv 
+brew install riscv-gnu-toolchain --with-NOmultilib
+```
+
+### Quickstart to install the tools on Ubuntu:
+
+Should be installed with apt-get.
+
+Following is compiling the tools from the source:
 
     sudo apt-get install autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc
     git clone https://github.com/riscv/riscv-tools.git
