@@ -20,11 +20,12 @@ APP=asm/test.s
 all:
 	echo "Select your make target"
 
+
 app:
-	riscv32-unknown-elf-as $(APP)
-	riscv32-unknown-elf-objdump -d a.out
-	riscv32-unknown-elf-objcopy -O binary -j .text a.out text.bin
-	riscv32-unknown-elf-objcopy -O binary -j .data a.out data.bin
+	riscv64-unknown-elf-as -march rv32i $(APP)
+	riscv64-unknown-elf-objdump -d a.out
+	riscv64-unknown-elf-objcopy -O binary -j .text a.out text.bin
+	riscv64-unknown-elf-objcopy -O binary -j .data a.out data.bin
 	cat text.bin data.bin > a.bin
 	hexdump -e '"%08x\n"' a.bin
 
