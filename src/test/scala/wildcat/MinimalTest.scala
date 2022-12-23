@@ -9,6 +9,7 @@ class MinimalTest extends AnyFlatSpec with ChiselScalatestTester {
   "Minimal" should "have single cycle timing" in {
     test(new Wildcat()) {
       d => {
+        d.clock.step(3)
 
       }
 

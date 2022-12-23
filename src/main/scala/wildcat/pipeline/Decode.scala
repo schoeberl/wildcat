@@ -6,4 +6,5 @@ class Decode extends Module {
 
   io.decex.pc := io.fedec.pc
   io.decex.instr := io.fedec.instr
+  printf("%x instruction: %x\n", io.decex.pc, io.decex.instr)
 }

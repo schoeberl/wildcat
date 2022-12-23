@@ -17,7 +17,12 @@ import chisel3._
  */
 class Wildcat extends Module {
 
-  val fetch = Module(new Fetch())
+  val code = Array(0x00200093, //	addi x1 x0 2
+    0x00300113, //	addi x2 x0 3
+    0x002081b3 // add x3 x1 x2
+  )
+
+  val fetch = Module(new Fetch(code))
   val decode = Module(new Decode())
 
   fetch.io.fedec <> decode.io.fedec
