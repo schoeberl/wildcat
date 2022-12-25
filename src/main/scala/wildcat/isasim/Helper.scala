@@ -13,8 +13,8 @@
 
 package wildcat.isasim
 
-import Opcode._
-import AluFunct._
+import wildcat.Opcode._
+import wildcat.AluFunct._
 object Helper {
 
   def genAlu(opc: Int, funct: Int, rs1: Int, rs2: Int, imm: Int, rd: Int) = {

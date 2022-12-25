@@ -14,12 +14,12 @@
 
 package wildcat.isasim
 
-import Opcode._
-import AluFunct._
-import AluFunct7._
-import BranchFunct._
-import LoadStoreFunct._
-import InstrType._
+import wildcat.Opcode._
+import wildcat.AluFunct._
+import wildcat.AluFunct7._
+import wildcat.BranchFunct._
+import wildcat.LoadStoreFunct._
+import wildcat.InstrType._
 
 class SimRV(mem: Array[Int], start: Int, stop: Int) {
 

@@ -1,4 +1,4 @@
-package wildcat.isasim
+package wildcat
 
 // TODO: have named constants shared with the hardware
 

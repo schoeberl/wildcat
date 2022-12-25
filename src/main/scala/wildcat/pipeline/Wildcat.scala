@@ -17,9 +17,9 @@ import chisel3._
  */
 class Wildcat extends Module {
 
-  val code = Array(0x00200093, //	addi x1 x0 2
-    0x00300113, //	addi x2 x0 3
-    0x002081b3 // add x3 x1 x2
+  val code = Array(0xffd00093L, //	addi x1 x0 -3
+    0x00300113L, //	addi x2 x0 3
+    0x002081b3L // add x3 x1 x2
   )
 
   // Four pipeline stages
