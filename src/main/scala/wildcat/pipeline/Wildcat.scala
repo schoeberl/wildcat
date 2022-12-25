@@ -22,8 +22,14 @@ class Wildcat extends Module {
     0x002081b3 // add x3 x1 x2
   )
 
+  // Four pipeline stages
   val fetch = Module(new Fetch(code))
   val decode = Module(new Decode())
+  val execute = Module(new Execute())
+  val writeback = Module(new WriteBack())
 
   fetch.io.fedec <> decode.io.fedec
+  decode.io.decex <> execute.io.decex
+  execute.io.exwb <> writeback.io.exwb
+  decode.io.wbdec <> writeback.io.wbdec
 }
