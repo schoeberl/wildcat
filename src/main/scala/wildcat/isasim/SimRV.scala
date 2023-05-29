@@ -7,9 +7,6 @@
  * A simple ISA simulator of RISC-V.
  * 
  * Author: Martin Schoeberl (martin@jopdesign.com)
- * 
- * TODO: should live in the same world as Chisel source,
- * but compile errors make it less convenient.
  */
 
 package wildcat.isasim
