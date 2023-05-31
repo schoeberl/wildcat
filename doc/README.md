@@ -24,6 +24,7 @@ However, following uses have been observed:
  * In a (newlib) compiled C program clib functions (such as file IO) call
    `__internal_syscall`, which itself (after rotation of registers `a0`-`a7`)
    executes `ecall`. Does this go to the proxy kernel (pk)?
+ * RISC-V tests at https://github.com/riscv-software-src/riscv-tests
 
 ## Memory Layout
 

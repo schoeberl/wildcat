@@ -6,14 +6,12 @@
 #RISCV?=$(HOME)/data/repository/rocket-chip/riscv-tools
 RISCV?=/opt/riscv/bin
 
-# Using sbt with a .jar file in the repository. Better install sbt
-# SBT = java -Xmx1024M -Xss8M -XX:MaxPermSize=128M -jar sbt/sbt-launch.jar
-
 SBT = sbt
 
-APP=asm/test.s
+#APP=asm/test.s
+APP=asm/riscv-v1_addi.s
 # Use a different program, e.g., one from the CAE lab
-#APP=../../cae-lab/lab3/minimal.s
+# APP=../../cae-lab/lab3/minimal.s
 # APP can be set from the command line, such as:
 # make app run APP=../cae-lab/lab3/minimal.s
 
@@ -36,8 +34,8 @@ elf:
 	sbt "runMain wildcat.isasim.ElfUtil a.out"
 
 clean:
-	-rm *.out *.bin
-	-rm -rf target
+	git clean -fd
+	rm -rf ./idea
 
 
 

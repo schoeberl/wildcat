@@ -179,6 +179,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
         case 0xf10 => 0 // hartid
         case 0x000 =>
           // test x28 for test condition: 1 = ok
+          assert(reg(28) == 1)
           if (reg(28) == 1) {
             println("Test passed")
           } else {
