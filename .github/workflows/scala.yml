@@ -28,7 +28,8 @@ jobs:
         distribution: 'temurin'
         cache: 'sbt'
     - name: Setup GCC
-      run: sudo apt install gcc-riscv64-linux-gnu
+      run: sudo apt-get update
+      run: sudo apt-get install -y gcc-riscv64-linux-gnu
     - name: Run tests
       run: sbt test
       # Optional: This step uploads information to the GitHub dependency graph and unblocking Dependabot alerts for the repository
