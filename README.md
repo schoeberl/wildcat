@@ -1,3 +1,6 @@
+
+![build status](https://github.com/schoeberl/wildcat/actions/workflows/scala.yml/badge.svg)
+
 # Wildcat
 
 An implementation of RISC-V for education.
