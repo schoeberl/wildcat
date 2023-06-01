@@ -44,9 +44,11 @@ brew install riscv-gnu-toolchain --with-NOmultilib
 
 ### Quickstart to install the tools on Ubuntu:
 
-Should be installed with apt-get.
+Should be installed with apt-get:
 
-Following is compiling the tools from the source:
+    sudo apt install gcc-riscv64-linux-gnu
+
+If you want to compiler them from source, here are some notes:
 
     sudo apt-get install autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc
     git clone https://github.com/riscv/riscv-tools.git
