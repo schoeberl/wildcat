@@ -44,9 +44,11 @@ brew install riscv-gnu-toolchain --with-NOmultilib
 
 ### Quickstart to install the tools on Ubuntu:
 
-Should be installed with apt-get:
+Should be best installed with apt-get:
 
-    sudo apt install gcc-riscv64-linux-gnu
+    sudo apt-get install -y gcc-riscv64-unknown-elf
+
+#### Build from source
 
 If you want to compiler them from source, here are some notes:
 
@@ -57,7 +59,7 @@ If you want to compiler them from source, here are some notes:
     export RISCV=$HOME/riscv-tools/local
     ./build.sh
 
-Than add the tools to your PATH in .bashrc or .profile with:
+Then add the tools to your PATH in .bashrc or .profile with:
 
     export PATH=$PATH:$HOME/riscv-tools/local/bin
 
