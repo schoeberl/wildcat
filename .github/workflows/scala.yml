@@ -27,8 +27,9 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         cache: 'sbt'
-    - name: Setup GCC
+    - name: apt-get update
       run: sudo apt-get update
+    - name: Setup GCC
       run: sudo apt-get install -y gcc-riscv64-linux-gnu
     - name: Run tests
       run: sbt test
