@@ -246,20 +246,7 @@ object SimRV {
 
     val mem = new Array[Int](1024 * 256) // 1 MB, also check masking in load and store
 
-    val (code, start) =
-      if (args.isEmpty) {
-        // No program given, do something very minimal
-        (Array(0x00200093, //	addi x1 x0 2
-          0x00300113, //	addi x2 x0 3
-          0x002081b3 // add x3 x1 x2
-          ), 0)
-      } else if (args(0).endsWith(".bin")) {
-        (Util.readBin(args(0)), 0)
-      } else if (args(0).endsWith(".hex")) {
-        (Util.readHex(args(0)), 0x200)
-      } else {
-        throw new Exception("Unknown file extension")
-      }
+    val (code, start) = Util.getCode(args)
 
     for (i <- 0 until code.length) {
       mem(i) = code(i)
@@ -267,6 +254,8 @@ object SimRV {
 
     val stop = start + code.length * 4
 
+    // TODO: do we really want ot ba able to start at an arbitrary address?
+    // Read in RV spec
     new SimRV(mem, start, stop)
   }
 }

@@ -45,5 +45,10 @@ Here some observations:
    Assume that the proxy kernel is loaded at 0x8000000 and simply gets the start
   address from the .elf file.
 
+## Some Links
+
+ * Online assembler: <https://riscvasm.lucasteske.dev/>
+ * Carlos' assmebler: https://github.com/carlosedp/riscvassembler
+
 
    

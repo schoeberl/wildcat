@@ -15,7 +15,7 @@ import chisel3._
  * Author: Martin Schoeberl (martin@jopdesign.com)
  *
  */
-class Wildcat extends Module {
+class Wildcat() extends Module {
 
   val code = Array(0xffd00093L, //	addi x1 x0 -3
     0x00300113L, //	addi x2 x0 3
