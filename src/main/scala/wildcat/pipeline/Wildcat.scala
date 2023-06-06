@@ -1,6 +1,7 @@
 package wildcat.pipeline
 
 import chisel3._
+import wildcat.isasim.Util
 
 /*
  * Copyright (c) 2015-2022, DTU
@@ -15,12 +16,9 @@ import chisel3._
  * Author: Martin Schoeberl (martin@jopdesign.com)
  *
  */
-class Wildcat() extends Module {
+class Wildcat(args: Array[String]) extends Module {
 
-  val code = Array(0xffd00093L, //	addi x1 x0 -3
-    0x00300113L, //	addi x2 x0 3
-    0x002081b3L // add x3 x1 x2
-  )
+  val (code, start) = Util.getCode(args)
 
   // Four pipeline stages
   val fetch = Module(new Fetch(code))

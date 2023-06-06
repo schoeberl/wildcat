@@ -12,7 +12,8 @@
 
 package wildcat.isasim
 
-import java.nio.file.{ Files, Paths }
+import java.io.File
+import java.nio.file.{Files, Paths}
 import scala.io.Source
 
 object Util {
@@ -88,5 +89,9 @@ object Util {
         throw new Exception("Unknown file extension")
       }
     (code, start)
+  }
+
+  def getAsmFiles() = {
+    new File("asm").listFiles.filter(_.isFile).toList.filter(_.getName.endsWith(".s"))
   }
 }

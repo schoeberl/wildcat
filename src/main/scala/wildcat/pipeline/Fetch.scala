@@ -1,7 +1,7 @@
 package wildcat.pipeline
 
 import chisel3._
-class Fetch(code: Array[Long]) extends Module {
+class Fetch(code: Array[Int]) extends Module {
   val io = IO(new FetchIO())
 
   val imem = VecInit(code.map(_.U(32.W)))
