@@ -1,7 +1,7 @@
 package wildcat.pipeline
 
 import chisel3._
-import wildcat.isasim.Util
+import wildcat.Util
 
 /*
  * Copyright (c) 2015-2022, DTU

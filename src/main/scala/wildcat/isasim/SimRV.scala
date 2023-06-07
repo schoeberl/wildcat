@@ -17,6 +17,7 @@ import wildcat.AluFunct7._
 import wildcat.BranchFunct._
 import wildcat.LoadStoreFunct._
 import wildcat.InstrType._
+import wildcat.Util
 
 class SimRV(mem: Array[Int], start: Int, stop: Int) {
 

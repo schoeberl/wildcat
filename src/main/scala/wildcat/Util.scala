@@ -5,12 +5,12 @@
 
 /*
  * Utility functions for the ISA simulator and pipeline of RISC-V.
- * 
+ *
  * Author: Martin Schoeberl (martin@jopdesign.com)
- * 
+ *
  */
 
-package wildcat.isasim
+package wildcat
 
 import java.io.File
 import java.nio.file.{Files, Paths}
