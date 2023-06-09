@@ -12,5 +12,7 @@ addCompilerPlugin("edu.berkeley.cs" %% "chisel3-plugin" % chiselVersion cross Cr
 libraryDependencies += "edu.berkeley.cs" %% "chisel3" % chiselVersion
 libraryDependencies += "edu.berkeley.cs" %% "chiseltest" % "0.5.5"
 
+Test / parallelExecution := false
+
 // library name
 name := "wildcat"
