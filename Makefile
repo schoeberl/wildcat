@@ -3,8 +3,6 @@
 #
 # Include user makefile for local configurations, e.g., path to RISC-V tools
 -include config.mk
-#RISCV?=$(HOME)/data/repository/rocket-chip/riscv-tools
-RISCV?=/opt/riscv/bin
 
 SBT = sbt
 
@@ -17,7 +15,6 @@ APP=asm/riscv-v1_addi.s
 
 all:
 	echo "Select your make target"
-
 
 app:
 	riscv64-unknown-elf-as -march rv32i $(APP)
@@ -32,6 +29,9 @@ run:
 
 elf:
 	sbt "runMain wildcat.isasim.ElfUtil a.out"
+
+comp:
+	make -C c
 
 clean:
 	git clean -fd

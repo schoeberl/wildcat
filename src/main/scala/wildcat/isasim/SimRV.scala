@@ -145,7 +145,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     }
 
     def store(funct3: Int, base: Int, displ: Int, value: Int): Unit = {
-      val addr = ((base + displ) & 0xfffff) // 1 MB wrap around
+      val addr = base + displ
       val wordAddr = addr >>> 2
       funct3 match {
         case LSB => {
@@ -227,7 +227,6 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
 
     iCnt += 1
 
-    println(pc + " " + stop)
     pc != oldPc && run && pc < stop // detect endless loop or go beyond code to stop simulation
   }
 
