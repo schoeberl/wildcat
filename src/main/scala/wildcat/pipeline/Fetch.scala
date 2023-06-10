@@ -4,7 +4,7 @@ import chisel3._
 class Fetch(code: Array[Int]) extends Module {
   val io = IO(new FetchIO())
 
-  val imem = VecInit(code.map(_.U(32.W)))
+  val imem = VecInit(code.map(_.S(32.W).asUInt))
   val pcReg = RegInit(0.U(30.W))
 
   pcReg := pcReg + 1.U // counting in words

@@ -10,7 +10,7 @@ class SimulatorTest extends AnyFlatSpec {
   val files = Util.getAsmFiles()
   for (f <- files) {
     s"Simulator $f" should "pass" in {
-      "make app".!
+      s"make app APP=$f".!
       SimRV.main(Array("a.bin"))
     }
   }
