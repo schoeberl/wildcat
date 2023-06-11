@@ -13,7 +13,7 @@ class SingleTest extends AnyFlatSpec with ChiselScalatestTester {
     s"make app APP=$f".!
     test(new Wildcat(Array("a.bin"))) {
       d => {
-        d.clock.step(3)
+        d.clock.step(20)
       }
     }
   }

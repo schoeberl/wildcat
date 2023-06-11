@@ -22,15 +22,6 @@ object InstrType extends Enumeration {
   val R, I, S, SB, U, UJ = Value
 }
 
-object InstrTypeChisel {
-  val R = 0.U
-  val I = 1.U
-  val S = 2.U
-  val SB = 3.U
-  val U = 4.U
-  val UJ = 5.U
-}
-
 object AluFunct7 {
   val DEFAULT = 0x00
   val SRA_SUB = 0x20

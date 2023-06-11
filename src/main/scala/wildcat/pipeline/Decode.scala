@@ -4,7 +4,7 @@ import chisel3._
 import chisel3.util._
 
 import wildcat.Opcode._
-import wildcat.InstrTypeChisel._
+import wildcat.InstrType._
 
 class Decode extends Module {
   val io = IO(new DecodeIO)
@@ -35,18 +35,18 @@ class Decode extends Module {
   val func3 = instr(14, 12)
   val func7 = instr(31, 25)
 
-  val instrType = WireDefault(R)
+  val instrType = WireDefault(R.id.U)
   switch (opcode) {
-    is (AluImm.U) { instrType := I }
-    is (Alu.U) { instrType := R }
-    is (Branch.U) { instrType := SB }
-    is (Load.U) { instrType := I }
-    is (Store.U) { instrType := S }
-    is (Lui.U) { instrType := U }
-    is (AuiPc.U) { instrType := U }
-    is (Jal.U) { instrType := UJ }
-    is (JalR.U) { instrType := I }
-    is (ECall.U) { instrType := I }
+    is (AluImm.U) { instrType := I.id.U }
+    is (Alu.U) { instrType := R.id.U }
+    is (Branch.U) { instrType := SB.id.U }
+    is (Load.U) { instrType := I.id.U }
+    is (Store.U) { instrType := S.id.U }
+    is (Lui.U) { instrType := U.id.U }
+    is (AuiPc.U) { instrType := U.id.U }
+    is (Jal.U) { instrType := UJ.id.U }
+    is (JalR.U) { instrType := I.id.U }
+    is (ECall.U) { instrType := I.id.U }
   }
 
   // Address calculation for load/store (if 3 or 4 stages pipeline)
