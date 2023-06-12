@@ -9,6 +9,6 @@ class Fetch(code: Array[Int]) extends Module {
 
   pcReg := pcReg + 4.U
 
-  io.fedec.pc := RegNext(pcReg, 0.U)
-  io.fedec.instr := RegNext(imem(pcReg), 0x00000033.U) // nop on reset
+  io.fedec.pc := pcReg
+  io.fedec.instr := imem(pcReg(31, 2))
 }

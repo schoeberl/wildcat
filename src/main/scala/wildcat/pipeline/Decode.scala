@@ -11,7 +11,9 @@ class Decode extends Module {
 
 
   val instr = io.fedec.instr
-  val instrReg = RegNext(instr)
+  // pipe registers
+  val instrReg = RegNext(instr, 0x00000033.U) // nop on reset
+  val pcReg = RegNext(io.fedec.pc, 0.U)
 
   // Register file
   val regMem = SyncReadMem(32, UInt(32.W), SyncReadMem.WriteFirst)
@@ -26,14 +28,10 @@ class Decode extends Module {
     regMem.write(io.wbdec.regNr, io.wbdec.data)
   }
 
-  // Immediates
-  val iimm = Wire(SInt(32.W))
-  iimm := instr(31, 20).asSInt
-
   // Decode
-  val opcode = instr(6, 0)
-  val func3 = instr(14, 12)
-  val func7 = instr(31, 25)
+  val opcode = instrReg(6, 0)
+  val func3 = instrReg(14, 12)
+  val func7 = instrReg(31, 25)
 
   val instrType = WireDefault(R.id.U)
   switch (opcode) {
@@ -48,10 +46,18 @@ class Decode extends Module {
     is (JalR.U) { instrType := I.id.U }
     is (ECall.U) { instrType := I.id.U }
   }
+  // Immediates
+  val imm = Wire(SInt(32.W))
+  imm := instrReg(31, 20).asSInt
 
   // Address calculation for load/store (if 3 or 4 stages pipeline)
 
-  io.decex.pc := RegNext(io.fedec.pc)
-  io.decex.instr := RegNext(io.fedec.instr)
-  printf("%x instruction: %x %x\n", io.decex.pc, io.decex.instr, iimm)
+  io.decex.pc := pcReg
+  io.decex.instr := instrReg
+  io.decex.rs1 := RegNext(rs1)
+  io.decex.rs2 := RegNext(rs2)
+  io.decex.rd := RegNext(rd)
+  io.decex.imm := imm
+  printf("%x: instruction: %x rs1: %x rs2: %x rd: %x imm: %x\n", io.decex.pc, io.decex.instr, io.decex.rs1,
+    io.decex.rs2, io.decex.rd, io.decex.imm)
 }
