@@ -12,8 +12,12 @@ class Decode extends Module {
 
   val instr = io.fedec.instr
   // pipe registers
-  val instrReg = RegNext(instr, 0x00000033.U) // nop on reset
-  val pcReg = RegNext(io.fedec.pc, 0.U)
+  val instrReg = RegInit(0x00000033.U) // nop on reset
+  val pcReg = RegInit(0.U)
+  when (!io.stall) {
+    instrReg := instr
+    pcReg := io.fedec.pc
+  }
 
   // Register file
   val regMem = SyncReadMem(32, UInt(32.W), SyncReadMem.WriteFirst)
@@ -24,7 +28,7 @@ class Decode extends Module {
 
   val rs1Val = Mux(rs1 =/= 0.U, regMem.read(rs1), 0.U)
   val rs2Val = Mux(rs2 =/= 0.U, regMem.read(rs2), 0.U)
-  when (io.wbdec.valid) {
+  when(io.wbdec.valid) {
     regMem.write(io.wbdec.regNr, io.wbdec.data)
   }
 
@@ -34,29 +38,76 @@ class Decode extends Module {
   val func7 = instrReg(31, 25)
 
   val instrType = WireDefault(R.id.U)
-  switch (opcode) {
-    is (AluImm.U) { instrType := I.id.U }
-    is (Alu.U) { instrType := R.id.U }
-    is (Branch.U) { instrType := SB.id.U }
-    is (Load.U) { instrType := I.id.U }
-    is (Store.U) { instrType := S.id.U }
-    is (Lui.U) { instrType := U.id.U }
-    is (AuiPc.U) { instrType := U.id.U }
-    is (Jal.U) { instrType := UJ.id.U }
-    is (JalR.U) { instrType := I.id.U }
-    is (ECall.U) { instrType := I.id.U }
+  switch(opcode) {
+    is(AluImm.U) {
+      instrType := I.id.U
+    }
+    is(Alu.U) {
+      instrType := R.id.U
+    }
+    is(Branch.U) {
+      instrType := SB.id.U
+    }
+    is(Load.U) {
+      instrType := I.id.U
+    }
+    is(Store.U) {
+      instrType := S.id.U
+    }
+    is(Lui.U) {
+      instrType := U.id.U
+    }
+    is(AuiPc.U) {
+      instrType := U.id.U
+    }
+    is(Jal.U) {
+      instrType := UJ.id.U
+    }
+    is(JalR.U) {
+      instrType := I.id.U
+    }
+    is(ECall.U) {
+      instrType := I.id.U
+    }
   }
   // Immediates
   val imm = Wire(SInt(32.W))
   imm := instrReg(31, 20).asSInt
 
+  switch(instrType) {
+    is(I.id.U) {
+      imm := (Fill(20, instrReg(31)) ## instrReg(31, 20)).asSInt
+    }
+    is(S.id.U) {
+      imm := (Fill(20, instrReg(31)) ## instrReg(31, 25) ## instrReg(11, 7)).asSInt
+    }
+    is(SB.id.U) {
+      imm := (Fill(19, instrReg(31)) ## instrReg(7) ## instrReg(30, 25) ## instrReg(11, 8) ## 0.U).asSInt
+    }
+    is(U.id.U) {
+      imm := (instrReg(31, 12) ## Fill(12, 0.U)).asSInt
+    }
+    is(UJ.id.U) {
+      imm := (Fill(11, instrReg(31)) ## instrReg(19, 12) ## instrReg(20) ## instrReg(30, 21) ## 0.U).asSInt
+    }
+  }
+
   // Address calculation for load/store (if 3 or 4 stages pipeline)
 
   io.decex.pc := pcReg
   io.decex.instr := instrReg
-  io.decex.rs1 := RegNext(rs1)
-  io.decex.rs2 := RegNext(rs2)
-  io.decex.rd := RegNext(rd)
+  // TODO: add stall signal
+  val rs1Reg = Reg(UInt(5.W))
+  val rs2Reg = Reg(UInt(5.W))
+  val rdReg = Reg(UInt(5.W))
+  when(!io.stall) {
+    rs1Reg := rs1
+    rs2Reg := rs2
+    rdReg := rd
+  }
+  io.decex.rs1 := rs1Reg
+  io.decex.rs2 := rs2Reg
+  io.decex.rd := rdReg
   io.decex.imm := imm
   printf("%x: instruction: %x rs1: %x rs2: %x rd: %x imm: %x\n", io.decex.pc, io.decex.instr, io.decex.rs1,
     io.decex.rs2, io.decex.rd, io.decex.imm)

@@ -32,11 +32,15 @@ class WbDec extends Bundle {
 
 class FetchIO extends Bundle {
   val fedec = Output(new FeDec())
+  val stall = Input(Bool())
+  val pcIn = Input(UInt(32.W))
+  val loadPc = Input(Bool())
 }
 class DecodeIO extends Bundle {
   val fedec = Input(new FeDec())
   val decex = Output(new DecEx())
   val wbdec = Input(new WbDec())
+  val stall = Input(Bool())
 }
 
 class ExecuteIO extends Bundle {
