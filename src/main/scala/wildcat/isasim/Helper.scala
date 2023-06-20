@@ -14,7 +14,7 @@
 package wildcat.isasim
 
 import wildcat.Opcode._
-import wildcat.AluFunct._
+import wildcat.AluFunct3._
 object Helper {
 
   def genAlu(opc: Int, funct: Int, rs1: Int, rs2: Int, imm: Int, rd: Int) = {
@@ -23,10 +23,10 @@ object Helper {
   }
 
   val code = Array(
-    Helper.genAlu(AluImm, ADD_SUB, 0, 0, 0x0f, 0),
-    Helper.genAlu(AluImm, ADD_SUB, 0, 0, 0x11, 1),
-    Helper.genAlu(AluImm, ADD_SUB, 1, 0, 0x22, 2),
-    Helper.genAlu(Alu, ADD_SUB, 1, 2, 0, 3))
+    Helper.genAlu(AluImm, F3_ADD_SUB, 0, 0, 0x0f, 0),
+    Helper.genAlu(AluImm, F3_ADD_SUB, 0, 0, 0x11, 1),
+    Helper.genAlu(AluImm, F3_ADD_SUB, 1, 0, 0x22, 2),
+    Helper.genAlu(Alu, F3_ADD_SUB, 1, 2, 0, 3))
 
   // This would be immediate generation more for a programming language than
   // for hardware where shift has no cost, but multiplexing.

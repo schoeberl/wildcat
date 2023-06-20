@@ -12,7 +12,7 @@
 package wildcat.isasim
 
 import wildcat.Opcode._
-import wildcat.AluFunct._
+import wildcat.AluFunct3._
 import wildcat.AluFunct7._
 import wildcat.BranchFunct._
 import wildcat.LoadStoreFunct._
@@ -104,20 +104,20 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     val imm = genImm()
 
     // single bit on extended function - this is not nice
-    val sraSub = funct7 == SRA_SUB && (opcode == Alu || (opcode == AluImm && funct3 == SRL_SRA))
+    val sraSub = funct7 == SRA_SUB && (opcode == Alu || (opcode == AluImm && funct3 == F3_SRL_SRA))
 
     def alu(funct3: Int, sraSub: Boolean, op1: Int, op2: Int): Int = {
       val shamt = op2 & 0x1f
 
       funct3 match {
-        case ADD_SUB => if (sraSub) op1 - op2 else op1 + op2
-        case SLL => op1 << shamt
-        case SLT => if (op1 < op2) 1 else 0
-        case SLTU => if ((op1 < op2) ^ (op1 < 0) ^ (op2 < 0)) 1 else 0
-        case XOR => op1 ^ op2
-        case SRL_SRA => if (sraSub) op1 >> shamt else op1 >>> shamt
-        case OR => op1 | op2
-        case AND => op1 & op2
+        case F3_ADD_SUB => if (sraSub) op1 - op2 else op1 + op2
+        case F3_SLL => op1 << shamt
+        case F3_SLT => if (op1 < op2) 1 else 0
+        case F3_SLTU => if ((op1 < op2) ^ (op1 < 0) ^ (op2 < 0)) 1 else 0
+        case F3_XOR => op1 ^ op2
+        case F3_SRL_SRA => if (sraSub) op1 >> shamt else op1 >>> shamt
+        case F3_OR => op1 | op2
+        case F3_AND => op1 & op2
       }
     }
 

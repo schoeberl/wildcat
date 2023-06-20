@@ -22,20 +22,25 @@ object InstrType extends Enumeration {
   val R, I, S, SB, U, UJ = Value
 }
 
+object AluType extends Enumeration {
+  type AluType = Value
+  val ADD, SUB, SLL, SLT, SLTU, XOR, SRL, SRA, OR, AND = Value
+}
+
 object AluFunct7 {
   val DEFAULT = 0x00
   val SRA_SUB = 0x20
 }
 
-object AluFunct {
-  val ADD_SUB = 0x00 // no SUB in I-type
-  val SLL = 0x01
-  val SLT = 0x02
-  val SLTU = 0x03
-  val XOR = 0x04
-  val SRL_SRA = 0x05
-  val OR = 0x06
-  val AND = 0x07
+object AluFunct3 {
+  val F3_ADD_SUB = 0x00 // no SUB in I-type
+  val F3_SLL = 0x01
+  val F3_SLT = 0x02
+  val F3_SLTU = 0x03
+  val F3_XOR = 0x04
+  val F3_SRL_SRA = 0x05
+  val F3_OR = 0x06
+  val F3_AND = 0x07
 }
 
 object BranchFunct {
