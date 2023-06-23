@@ -5,7 +5,7 @@ import chisel3.util._
 
 import wildcat.AluType._
 object Common {
-// TODO: something missing?
+// TODO: something missing? Looks OK now. Wait for the tests.
   def alu(op: UInt, a: UInt, b: UInt): UInt = {
     val res = Wire(UInt(32.W))
     res := DontCare

@@ -5,6 +5,8 @@ import chisel3.util._
 
 import wildcat.Opcode._
 import wildcat.InstrType._
+import wildcat.AluType._
+import wildcat.AluFunct3._
 
 class Decode extends Module {
   val io = IO(new DecodeIO)
@@ -92,10 +94,47 @@ class Decode extends Module {
     }
   }
 
-  // Address calculation for load/store (if 3 or 4 stages pipeline)
+  // Decode ALU control signals
+val aluOp = WireDefault(ADD.id.U)
+  switch(func3) {
+    is(F3_ADD_SUB.U) {
+      when(func7 === 0.U) {
+        aluOp := ADD.id.U
+      }.otherwise {
+        aluOp := SUB.id.U
+      }
+    }
+    is(F3_SLL.U) {
+      aluOp := SLL.id.U
+    }
+    is(F3_SLT.U) {
+      aluOp := SLT.id.U
+    }
+    is(F3_SLTU.U) {
+      aluOp := SLTU.id.U
+    }
+    is(F3_XOR.U) {
+      aluOp := XOR.id.U
+    }
+    is(F3_SRL_SRA.U) {
+      when(func7 === 0.U) {
+        aluOp := SRL.id.U
+      }.otherwise {
+        aluOp := SRA.id.U
+      }
+    }
+    is(F3_OR.U) {
+      aluOp := OR.id.U
+    }
+    is(F3_AND.U) {
+      aluOp := AND.id.U
+    }
+  }
 
+
+  // Address calculation for load/store (if 3 or 4 stages pipeline)
   io.decex.pc := pcReg
-  io.decex.instr := instrReg
+  io.decex.aluOp := aluOp
   // TODO: add stall signal
   val rs1Reg = Reg(UInt(5.W))
   val rs2Reg = Reg(UInt(5.W))
@@ -109,6 +148,6 @@ class Decode extends Module {
   io.decex.rs2 := rs2Reg
   io.decex.rd := rdReg
   io.decex.imm := imm
-  printf("%x: instruction: %x rs1: %x rs2: %x rd: %x imm: %x\n", io.decex.pc, io.decex.instr, io.decex.rs1,
+  printf("%x: instruction: %x rs1: %x rs2: %x rd: %x imm: %x\n", io.decex.pc, io.decex.aluOp, io.decex.rs1,
     io.decex.rs2, io.decex.rd, io.decex.imm)
 }

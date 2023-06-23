@@ -8,12 +8,13 @@ class FeDec extends Bundle {
 }
 
 class DecEx extends Bundle {
-  val instr = UInt(32.W)
+  // val instr = UInt(32.W)
   val pc = UInt(32.W)
   val rs1 = UInt(5.W)
   val rs2 = UInt(5.W)
   val rd = UInt(5.W)
   val imm = SInt(32.W)
+  val aluOp = UInt()
 }
 
 class ExWb extends Bundle {
