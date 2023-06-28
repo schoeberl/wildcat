@@ -11,7 +11,7 @@ class SingleTest extends AnyFlatSpec with ChiselScalatestTester {
   val f = "asm/test.s"
   s"Single $f" should "pass" in {
     s"make app APP=$f".!
-    test(new Wildcat(Array("a.bin"))) {
+    test(new Wildcat(Array("a.bin"))).withAnnotations(Seq(WriteVcdAnnotation)) {
       d => {
         d.clock.step(20)
       }

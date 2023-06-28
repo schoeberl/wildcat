@@ -7,5 +7,5 @@ import chisel3._
  */
 class WriteBack extends Module {
   val io = IO(new WriteBackIO)
-  io.wbdec <> io.exwb
+  io.wbdec <> io.memwb
 }

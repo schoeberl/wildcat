@@ -28,21 +28,36 @@ class Decode extends Module {
   val rs2 = instr(24, 20)
   val rd = instr(11, 7)
 
+  /*
   val rs1Val = Mux(rs1 =/= 0.U, regMem.read(rs1), 0.U)
   val rs2Val = Mux(rs2 =/= 0.U, regMem.read(rs2), 0.U)
   when(io.wbdec.valid) {
     regMem.write(io.wbdec.regNr, io.wbdec.data)
   }
+   */
+  // The register version
+  val regs = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
+  val rs1Val = Mux(rs1 =/= 0.U, regs(rs1), 0.U)
+  val rs2Val = Mux(rs2 =/= 0.U, regs(rs2), 0.U)
+  when(io.wbdec.valid) {
+    regs(io.wbdec.regNr) := io.wbdec.data
+  }
+  for (i <- 0 until 3) {
+    printf("reg %d: %x ", i.U, regs(i))
+  }
+  printf("\n")
 
   // Decode
   val opcode = instrReg(6, 0)
   val func3 = instrReg(14, 12)
   val func7 = instrReg(31, 25)
+  val isImm = WireDefault(false.B)
 
   val instrType = WireDefault(R.id.U)
   switch(opcode) {
     is(AluImm.U) {
       instrType := I.id.U
+      isImm := true.B
     }
     is(Alu.U) {
       instrType := R.id.U
@@ -95,7 +110,7 @@ class Decode extends Module {
   }
 
   // Decode ALU control signals
-val aluOp = WireDefault(ADD.id.U)
+  val aluOp = WireDefault(ADD.id.U)
   switch(func3) {
     is(F3_ADD_SUB.U) {
       when(func7 === 0.U) {
@@ -148,6 +163,7 @@ val aluOp = WireDefault(ADD.id.U)
   io.decex.rs2 := rs2Reg
   io.decex.rd := rdReg
   io.decex.imm := imm
+  io.decex.isImm := isImm
   printf("%x: instruction: %x rs1: %x rs2: %x rd: %x imm: %x\n", io.decex.pc, io.decex.aluOp, io.decex.rs1,
     io.decex.rs2, io.decex.rd, io.decex.imm)
 }

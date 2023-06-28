@@ -15,15 +15,21 @@ class DecEx extends Bundle {
   val rd = UInt(5.W)
   val imm = SInt(32.W)
   val aluOp = UInt()
+  val isImm = Bool()
 }
 
-class ExWb extends Bundle {
+class ExMem extends Bundle {
 
   val data = UInt(32.W)
   val regNr = UInt(5.W)
   val valid = Bool()
 }
 
+class MemWb extends Bundle {
+  val data = UInt(32.W)
+  val regNr = UInt(5.W)
+  val valid = Bool()
+}
 class WbDec extends Bundle {
 
   val data = UInt(32.W)
@@ -46,10 +52,14 @@ class DecodeIO extends Bundle {
 
 class ExecuteIO extends Bundle {
   val decex = Input(new DecEx())
-  val exwb = Output(new ExWb())
+  val exmem = Output(new ExMem())
 }
 
+class MemeoryIO extends Bundle {
+  val exmem = Input(new ExMem())
+  val memwb = Output(new WbDec())
+}
 class WriteBackIO extends Bundle {
-  val exwb = Input(new ExWb())
+  val memwb = Input(new ExMem())
   val wbdec = Output(new WbDec())
 }
