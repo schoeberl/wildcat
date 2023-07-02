@@ -45,6 +45,11 @@ Here some observations:
    Assume that the proxy kernel is loaded at 0x8000000 and simply gets the start
   address from the .elf file.
 
+## Software Traps
+
+ * Unaligned memory access can be trapped and handled in SW (Berkeley cores do/did this)
+   * Same can be done for floting point emulation
+
 ## Some Links
 
  * Online assembler: <https://riscvasm.lucasteske.dev/>

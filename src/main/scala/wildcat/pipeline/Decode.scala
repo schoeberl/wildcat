@@ -28,14 +28,14 @@ class Decode extends Module {
   val rs2 = instr(24, 20)
   val rd = instr(11, 7)
 
-  /*
   val rs1Val = Mux(rs1 =/= 0.U, regMem.read(rs1), 0.U)
   val rs2Val = Mux(rs2 =/= 0.U, regMem.read(rs2), 0.U)
   when(io.wbdec.valid) {
     regMem.write(io.wbdec.regNr, io.wbdec.data)
   }
-   */
-  // The register version
+
+  // The register version needs an input pipe register
+  /*
   val regs = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
   val rs1Val = Mux(rs1 =/= 0.U, regs(rs1), 0.U)
   val rs2Val = Mux(rs2 =/= 0.U, regs(rs2), 0.U)
@@ -46,6 +46,8 @@ class Decode extends Module {
     printf("reg %d: %x ", i.U, regs(i))
   }
   printf("\n")
+
+   */
 
   // Decode
   val opcode = instrReg(6, 0)
@@ -110,12 +112,12 @@ class Decode extends Module {
   }
 
   // Decode ALU control signals
+  // could be done nicer
   val aluOp = WireDefault(ADD.id.U)
   switch(func3) {
     is(F3_ADD_SUB.U) {
-      when(func7 === 0.U) {
-        aluOp := ADD.id.U
-      }.otherwise {
+      aluOp := ADD.id.U
+      when(opcode =/= AluImm.U && func7 =/= 0.U) {
         aluOp := SUB.id.U
       }
     }
