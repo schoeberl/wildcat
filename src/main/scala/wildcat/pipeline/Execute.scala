@@ -4,7 +4,10 @@ import chisel3._
 import wildcat.pipeline.Common._
 
 class Execute extends Module {
-  val io = IO(new ExecuteIO)
+  val io = IO(new Bundle {
+    val decex = Input(new DecEx())
+    val exmem = Output(new ExMem())
+  })
 
   val decReg = RegNext(io.decex)
   val val2 = Mux(decReg.isImm, decReg.imm.asUInt, decReg.rs2)
@@ -12,4 +15,8 @@ class Execute extends Module {
   io.exmem.valid := true.B
   io.exmem.regNr := decReg.rd
   io.exmem.data := res
+
+  // dummy connections
+  io.exmem.addr := 0.U
+  io.exmem.ena := false.B
 }

@@ -2,7 +2,12 @@ package wildcat.pipeline
 
 import chisel3._
 class Fetch(code: Array[Int]) extends Module {
-  val io = IO(new FetchIO())
+  val io = IO(new Bundle {
+    val fedec = Output(new FeDec())
+    val stall = Input(Bool())
+    val pcIn = Input(UInt(32.W))
+    val loadPc = Input(Bool())
+  })
 
   val imem = VecInit(code.map(_.S(32.W).asUInt))
   val pcReg = RegInit(0.U(32.W))

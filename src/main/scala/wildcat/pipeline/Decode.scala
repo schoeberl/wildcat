@@ -9,7 +9,12 @@ import wildcat.AluType._
 import wildcat.AluFunct3._
 
 class Decode extends Module {
-  val io = IO(new DecodeIO)
+  val io = IO(new Bundle{
+    val fedec = Input(new FeDec())
+    val decex = Output(new DecEx())
+    val wbdec = Input(new WbDec())
+    val stall = Input(Bool())
+  })
 
 
   val instr = io.fedec.instr
