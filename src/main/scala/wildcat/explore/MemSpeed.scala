@@ -24,7 +24,7 @@ class MemSpeed extends Module {
     mem.write(wra, wrd)
   }
 
-  io.rdData := rdd
+  io.rdData := RegNext(rdd)
 }
 
 object MemSpeed extends App {
