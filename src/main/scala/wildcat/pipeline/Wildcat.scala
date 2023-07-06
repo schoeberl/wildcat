@@ -17,6 +17,9 @@ import wildcat.Util
  *
  */
 class Wildcat(args: Array[String]) extends Module {
+  val io = IO(new Bundle {
+    val debug = Output(UInt(32.W))
+  })
 
   val (code, start) = Util.getCode(args)
 
@@ -37,4 +40,10 @@ class Wildcat(args: Array[String]) extends Module {
   fetch.io.stall := false.B
   fetch.io.loadPc := false.B
   fetch.io.pcIn := 0.U
+
+  io.debug := writeback.io.wbdec.data
+}
+
+object Wildcat extends App {
+  emitVerilog(new Wildcat(Array("a.bin")), Array("--target-dir", "generated"))
 }
