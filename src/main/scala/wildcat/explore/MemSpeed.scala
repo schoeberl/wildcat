@@ -10,7 +10,6 @@ class MemSpeed extends Module {
     val wrEna = Input(Bool())
   })
 
-//  val mem = SyncReadMem(32, UInt(32.W), SyncReadMem.WriteFirst)
   val mem = SyncReadMem(1024, UInt(32.W), SyncReadMem.WriteFirst)
 
   val rda = io.rdAddr

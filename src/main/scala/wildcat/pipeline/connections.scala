@@ -31,6 +31,8 @@ class MemWb extends Bundle {
   val data = UInt(32.W)
   val regNr = UInt(5.W)
   val valid = Bool()
+  val memData = UInt(32.W)
+  val isMem = Bool()
 }
 class WbDec extends Bundle {
 

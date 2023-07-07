@@ -10,10 +10,9 @@ class WriteBack extends Module {
     val memwb = Input(new MemWb())
     val wbdec = Output(new WbDec())
   })
-  // io.wbdec <> io.memwb
-
-  // dummy connection, Mux is missing
-  io.wbdec.data := RegNext(io.memwb.data)
-  io.wbdec.regNr := RegNext(io.memwb.regNr)
-  io.wbdec.valid := RegNext(io.memwb.valid)
+  // needs stall and maybe flash
+  val pipeReg = RegNext(io.memwb, init = 0.U.asTypeOf(new MemWb()))
+  io.wbdec.data := Mux(pipeReg.isMem, pipeReg.memData, pipeReg.data)
+  io.wbdec.regNr := pipeReg.regNr
+  io.wbdec.valid := pipeReg.valid
 }
