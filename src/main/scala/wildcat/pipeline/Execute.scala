@@ -7,13 +7,14 @@ class Execute extends Module {
   val io = IO(new Bundle {
     val decex = Input(new DecEx())
     val exmem = Output(new ExMem())
+    val stall = Input(Bool())
   })
 
-  val decReg = RegNext(io.decex)
-  val val2 = Mux(decReg.isImm, decReg.imm.asUInt, decReg.rs2)
-  val res = alu(decReg.aluOp, decReg.rs1, val2)
+  val decexReg = RegNext(io.decex)
+  val val2 = Mux(decexReg.isImm, decexReg.imm.asUInt, decexReg.rs2)
+  val res = alu(decexReg.aluOp, decexReg.rs1, val2)
   io.exmem.valid := true.B
-  io.exmem.regNr := decReg.rd
+  io.exmem.regNr := decexReg.rd
   io.exmem.data := res
 
   // dummy connections

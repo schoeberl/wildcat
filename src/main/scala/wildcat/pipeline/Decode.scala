@@ -157,18 +157,9 @@ class Decode extends Module {
   // Address calculation for load/store (if 3 or 4 stages pipeline)
   io.decex.pc := pcReg
   io.decex.aluOp := aluOp
-  // TODO: add stall signal
-  val rs1Reg = Reg(UInt(5.W))
-  val rs2Reg = Reg(UInt(5.W))
-  val rdReg = Reg(UInt(5.W))
-  when(!io.stall) {
-    rs1Reg := rs1
-    rs2Reg := rs2
-    rdReg := rd
-  }
-  io.decex.rs1 := rs1Reg
-  io.decex.rs2 := rs2Reg
-  io.decex.rd := rdReg
+  io.decex.rs1 := instrReg(19, 15)
+  io.decex.rs2 := instrReg(24, 20)
+  io.decex.rd := instrReg(11, 7)
   io.decex.imm := imm
   io.decex.isImm := isImm
   printf("%x: instruction: %x rs1: %x rs2: %x rd: %x imm: %x\n", io.decex.pc, io.decex.aluOp, io.decex.rs1,

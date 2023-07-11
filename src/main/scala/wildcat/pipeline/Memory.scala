@@ -7,10 +7,11 @@ class Memory extends Module {
   val io = IO(new Bundle {
     val exmem = Input(new ExMem())
     val memwb = Output(new MemWb())
+    val stall = Input(Bool())
   })
 
   // needs stall and maybe flash
-  val pipeReg = RegNext(io.exmem, init = 0.U.asTypeOf(new ExMem()))
+  val exmemReg = RegNext(io.exmem, init = 0.U.asTypeOf(new ExMem()))
   val mem = SyncReadMem(32, UInt(32.W), SyncReadMem.WriteFirst)
 
   val memRead = mem.read(io.exmem.addr)
@@ -20,7 +21,7 @@ class Memory extends Module {
 
   io.memwb.isMem := true.B
   io.memwb.memData := memRead
-  io.memwb.regNr := pipeReg.regNr
-  io.memwb.data := pipeReg.data
-  io.memwb.valid := pipeReg.valid
+  io.memwb.regNr := exmemReg.regNr
+  io.memwb.data := exmemReg.data
+  io.memwb.valid := exmemReg.valid
 }

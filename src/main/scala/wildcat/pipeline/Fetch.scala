@@ -7,6 +7,7 @@ class Fetch(code: Array[Int]) extends Module {
     val stall = Input(Bool())
     val pcIn = Input(UInt(32.W))
     val loadPc = Input(Bool())
+    val flash = Input(Bool())
   })
 
   val imem = VecInit(code.map(_.S(32.W).asUInt))

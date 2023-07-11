@@ -1,0 +1,54 @@
+[*]
+[*] GTKWave Analyzer v3.3.107 (w)1999-2020 BSI
+[*] Tue Jul 11 16:04:17 2023
+[*]
+[dumpfile] "/Users/martin/source/wildcat/test_run_dir/Single_asmtests_should_pass/Wildcat.vcd"
+[dumpfile_mtime] "Tue Jul 11 16:02:19 2023"
+[dumpfile_size] 19155
+[savefile] "/Users/martin/source/wildcat/pipe.gtkw"
+[timestart] 0
+[size] 1293 600
+[pos] -1 -1
+*-4.945026 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] Wildcat.
+[sst_width] 198
+[signals_width] 219
+[sst_expanded] 1
+[sst_vpaned_height] 164
+@28
+Wildcat.clock
+Wildcat.reset
+@200
+-Fetch
+@22
+Wildcat.fetch.pcReg[31:0]
+Wildcat.fetch.io_fedec_instr[31:0]
+@200
+-Decode
+@22
+Wildcat.decode.pcReg[31:0]
+Wildcat.decode.instrReg[31:0]
+@200
+-Execute
+@22
+Wildcat.execute.decexReg_aluOp[3:0]
+Wildcat.execute.decexReg_imm[31:0]
+@28
+Wildcat.execute.decexReg_isImm
+@22
+Wildcat.execute.decexReg_rs1[4:0]
+Wildcat.execute.decexReg_rs2[4:0]
+@200
+-Memory
+@22
+Wildcat.memory.exmemReg_data[31:0]
+@200
+-Writeback
+@22
+Wildcat.writeback.memwbReg_data[31:0]
+@28
+Wildcat.writeback.memwbReg_isMem
+@22
+Wildcat.writeback.memwbReg_memData[31:0]
+[pattern_trace] 1
+[pattern_trace] 0

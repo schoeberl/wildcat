@@ -9,10 +9,11 @@ class WriteBack extends Module {
   val io = IO(new Bundle {
     val memwb = Input(new MemWb())
     val wbdec = Output(new WbDec())
+    val stall = Input(Bool())
   })
   // needs stall and maybe flash
-  val pipeReg = RegNext(io.memwb, init = 0.U.asTypeOf(new MemWb()))
-  io.wbdec.data := Mux(pipeReg.isMem, pipeReg.memData, pipeReg.data)
-  io.wbdec.regNr := pipeReg.regNr
-  io.wbdec.valid := pipeReg.valid
+  val memwbReg = RegNext(io.memwb, init = 0.U.asTypeOf(new MemWb()))
+  io.wbdec.data := Mux(memwbReg.isMem, memwbReg.memData, memwbReg.data)
+  io.wbdec.regNr := memwbReg.regNr
+  io.wbdec.valid := memwbReg.valid
 }

@@ -36,10 +36,14 @@ class Wildcat(args: Array[String]) extends Module {
   memory.io.memwb <> writeback.io.memwb
   decode.io.wbdec <> writeback.io.wbdec
 
-  decode.io.stall := false.B
   fetch.io.stall := false.B
   fetch.io.loadPc := false.B
   fetch.io.pcIn := 0.U
+  fetch.io.flash := false.B
+  decode.io.stall := false.B
+  execute.io.stall := false.B
+  memory.io.stall := false.B
+  writeback.io.stall := false.B
 
   io.debug := writeback.io.wbdec.data
 }
