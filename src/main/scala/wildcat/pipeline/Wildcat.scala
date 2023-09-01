@@ -4,7 +4,7 @@ import chisel3._
 import wildcat.Util
 
 /*
- * Copyright (c) 2015-2022, DTU
+ * Copyright (c) 2015-2023, DTU
  * Simplified BSD License
  */
 

@@ -41,6 +41,7 @@ clean:
 
 #############################################
 # Below for future work - please ignore
+# Probably old stuff that needs to be removed
 #############################################
 
 HW_ARGS = --targetDir generated --backend v
@@ -55,20 +56,11 @@ TEST_ARGS_VCD = --genHarness --test --backend c --compile --vcd --targetDir gene
 # The first two arguments are consumed by sbt, the rest is
 # forwarded to the Scala/Chisel main().
 
-
-# Generate Verilog code
-hdl:
-	$(SBT) "run-main hello.HelloMain --targetDir generated --backend v"
-
-# Generate C++ code (simulation)
-cpp:
-	$(SBT) "run-main hello.HelloMain --backend c --compile --targetDir generated"
-
 hw:
-	$(SBT) "run-main wildcat.pipeline.WildcatMain $(HW_ARGS)"
+	$(SBT) "runMain wildcat.pipeline.WildcatMain $(HW_ARGS)"
 
 test-hw:
-	$(SBT) "run-main wildcat.pipeline.WildcatTester $(TEST_ARGS_VCD)"
+	$(SBT) "runMain wildcat.pipeline.WildcatTester $(TEST_ARGS_VCD)"
 	gtkwave generated/Wildcat.vcd --save=wildcat.gtkw
 
 # Assume RISC-V tools are built and installed.
