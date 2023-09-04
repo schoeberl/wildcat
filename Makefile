@@ -16,6 +16,9 @@ APP=asm/riscv-v1_addi.s
 all:
 	echo "Select your make target"
 
+work:
+	sbt "testOnly wildcat.SingleTest"
+
 app:
 	riscv64-unknown-elf-as -march rv32i $(APP)
 	riscv64-unknown-elf-objdump -d a.out

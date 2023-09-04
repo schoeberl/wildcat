@@ -11,8 +11,8 @@ class Execute extends Module {
   })
 
   val decexReg = RegNext(io.decex)
-  val val2 = Mux(decexReg.isImm, decexReg.imm.asUInt, decexReg.rs2)
-  val res = alu(decexReg.aluOp, decexReg.rs1, val2)
+  val val2 = Mux(decexReg.isImm, decexReg.imm.asUInt, decexReg.rs2Val)
+  val res = alu(decexReg.aluOp, decexReg.rs1Val, val2)
   io.exmem.valid := true.B
   io.exmem.regNr := decexReg.rd
   io.exmem.data := res

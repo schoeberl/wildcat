@@ -33,26 +33,27 @@ class Decode extends Module {
   val rs2 = instr(24, 20)
   val rd = instr(11, 7)
 
+  /*
   val rs1Val = Mux(rs1 =/= 0.U, regMem.read(rs1), 0.U)
   val rs2Val = Mux(rs2 =/= 0.U, regMem.read(rs2), 0.U)
   when(io.wbdec.valid) {
     regMem.write(io.wbdec.regNr, io.wbdec.data)
   }
+  */
 
   // The register version needs an input pipe register
-  /*
+  val rs1Reg = RegNext(rs1)
+  val rs2Reg = RegNext(rs2)
   val regs = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
-  val rs1Val = Mux(rs1 =/= 0.U, regs(rs1), 0.U)
-  val rs2Val = Mux(rs2 =/= 0.U, regs(rs2), 0.U)
+  val rs1Val = Mux(rs1Reg =/= 0.U, regs(rs1Reg), 0.U)
+  val rs2Val = Mux(rs2Reg =/= 0.U, regs(rs2Reg), 0.U)
   when(io.wbdec.valid) {
     regs(io.wbdec.regNr) := io.wbdec.data
   }
-  for (i <- 0 until 3) {
+  for (i <- 0 until 5) {
     printf("reg %d: %x ", i.U, regs(i))
   }
   printf("\n")
-
-   */
 
   // Decode
   val opcode = instrReg(6, 0)
@@ -160,6 +161,8 @@ class Decode extends Module {
   io.decex.rs1 := instrReg(19, 15)
   io.decex.rs2 := instrReg(24, 20)
   io.decex.rd := instrReg(11, 7)
+  io.decex.rs1Val := rs1Val
+  io.decex.rs2Val := rs2Val
   io.decex.imm := imm
   io.decex.isImm := isImm
   printf("%x: instruction: %x rs1: %x rs2: %x rd: %x imm: %x\n", io.decex.pc, io.decex.aluOp, io.decex.rs1,

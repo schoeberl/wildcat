@@ -13,6 +13,8 @@ class DecEx extends Bundle {
   val rs1 = UInt(5.W)
   val rs2 = UInt(5.W)
   val rd = UInt(5.W)
+  val rs1Val = UInt(32.W)
+  val rs2Val = UInt(32.W)
   val imm = SInt(32.W)
   val aluOp = UInt()
   val isImm = Bool()

@@ -19,7 +19,7 @@ class Memory extends Module {
     mem.write(io.exmem.addr, io.exmem.data)
   }
 
-  io.memwb.isMem := true.B
+  io.memwb.isMem := false.B
   io.memwb.memData := memRead
   io.memwb.regNr := exmemReg.regNr
   io.memwb.data := exmemReg.data
