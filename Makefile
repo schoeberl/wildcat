@@ -30,6 +30,12 @@ app:
 run:
 	sbt "runMain wildcat.isasim.SimRV a.bin"
 
+test:
+	sbt test
+
+sim-test:
+	sbt "testOnly wildcat.SimulatorTest"
+
 elf:
 	sbt "runMain wildcat.isasim.ElfUtil a.out"
 
@@ -69,7 +75,7 @@ test-hw:
 # Assume RISC-V tools are built and installed.
 # Set the path here or in config.mk.
 TEST_DIR=$(RISCV)/riscv-tests/isa
-test:
+test-old:
 	cp $(TEST_DIR)/rv32ui-p-xori.hex asm/a.hex
 	sbt "run-main wildcat.isasim.SimRV"
 

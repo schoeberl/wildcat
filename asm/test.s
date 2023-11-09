@@ -4,7 +4,7 @@
 
 
 	addi	x1, x0, 0x111
-	addi	x2, x1, 0x222
+	addi	x2, x0, 0x222
 # missing forwarding
 	nop
 	nop
@@ -14,9 +14,8 @@
 	addi	x2, x0, 0xfc
 	or	x3, x1, x2
 	and	x3, x1, x2
+	addi x28, x3, -11
 
 # notify success to the simulator
-
-        addi x28, x0, 1
-        ecall
-1:      beq   x0, x0, 1b
+    ecall
+1:  beq   x0, x0, 1b

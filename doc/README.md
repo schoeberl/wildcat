@@ -48,7 +48,7 @@ Here some observations:
 ## Software Traps
 
  * Unaligned memory access can be trapped and handled in SW (Berkeley cores do/did this)
-   * Same can be done for floting point emulation
+   * Same can be done for floating point emulation
 
 ## Some Links
 
