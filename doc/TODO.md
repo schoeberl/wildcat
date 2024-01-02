@@ -12,3 +12,5 @@
  * maybe do also: RegInit(0.U.asTypeOf(new IF_ID))
  * Checkout: https://github.com/SpinalHDL/VexRiscv (has a lot of info)
  * unaligned access is not too hard with byte-wise access
+   * or trap on unaligned access)
+ * Explore compiler options
