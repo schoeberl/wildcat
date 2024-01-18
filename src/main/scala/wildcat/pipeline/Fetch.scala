@@ -10,7 +10,7 @@ class Fetch(code: Array[Int]) extends Module {
     val flash = Input(Bool())
   })
 
-  val imem = VecInit(code.map(_.S(32.W).asUInt))
+  val imem = VecInit(code.toIndexedSeq.map(_.S(32.W).asUInt))
   val pcReg = RegInit(0.U(32.W))
 
   when (!io.stall) {

@@ -4,6 +4,7 @@
  * Get a testing setup for the simulator
  * Get a testing setup for the hardware implementation
  * Rescue RISC-V test fromm my local copy of sodor in data/repositories
+   * Can be found in the inital commit of FlexPRET
    * also test from https://github.com/mortbopet/Ripes (same os the above?)
    * And the student project from CAE: where did he get the tests from?
    * Also the tests on Helena
@@ -14,3 +15,5 @@
  * unaligned access is not too hard with byte-wise access
    * or trap on unaligned access)
  * Explore compiler options
+ * Explore https://inst.eecs.berkeley.edu/~cs250/fa10/ (for chip design course)
+ * https://inst.eecs.berkeley.edu/~cs250/fa10/handouts/tut3-riscv.pdf

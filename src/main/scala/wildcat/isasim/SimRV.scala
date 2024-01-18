@@ -235,7 +235,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     cont = execute(mem(pc >> 2))
     print("regs: ")
     reg.foreach(printf("%08x ", _))
-    println
+    println()
   }
 
 }
