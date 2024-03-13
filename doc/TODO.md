@@ -17,3 +17,6 @@
  * Explore compiler options
  * Explore https://inst.eecs.berkeley.edu/~cs250/fa10/ (for chip design course)
  * https://inst.eecs.berkeley.edu/~cs250/fa10/handouts/tut3-riscv.pdf
+ * Checkout https://github.com/ucb-bar/riscv-mini
+ * Checkout https://github.com/bobbl/rudolv (Joerg Mische), might be close to Wildcat plan
+ * List of RV cores with IDs: https://github.com/riscv/riscv-isa-manual/blob/latex/marchid.md
