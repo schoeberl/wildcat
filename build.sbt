@@ -12,6 +12,8 @@ addCompilerPlugin("edu.berkeley.cs" %% "chisel3-plugin" % chiselVersion cross Cr
 libraryDependencies += "edu.berkeley.cs" %% "chisel3" % chiselVersion
 libraryDependencies += "edu.berkeley.cs" %% "chiseltest" % "0.5.5"
 
+libraryDependencies += "net.fornwall" % "jelf" % "0.9.0"
+
 Test / parallelExecution := false
 
 // library name

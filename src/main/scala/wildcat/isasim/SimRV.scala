@@ -11,6 +11,8 @@
 
 package wildcat.isasim
 
+import net.fornwall.jelf.ElfFile
+
 import wildcat.Opcode._
 import wildcat.AluFunct3._
 import wildcat.AluFunct7._

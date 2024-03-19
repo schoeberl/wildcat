@@ -3,7 +3,7 @@
  * Check ALU with the decoding
  * Get a testing setup for the simulator
  * Get a testing setup for the hardware implementation
- * Rescue RISC-V test fromm my local copy of sodor in data/repositories
+ * Rescue RISC-V test from my local copy of sodor in data/repositories
    * Can be found in the inital commit of FlexPRET
    * also test from https://github.com/mortbopet/Ripes (same os the above?)
    * And the student project from CAE: where did he get the tests from?
@@ -20,3 +20,6 @@
  * Checkout https://github.com/ucb-bar/riscv-mini
  * Checkout https://github.com/bobbl/rudolv (Joerg Mische), might be close to Wildcat plan
  * List of RV cores with IDs: https://github.com/riscv/riscv-isa-manual/blob/latex/marchid.md
+ * Ibex is 2 stages: https://ibex-core.readthedocs.io/en/latest/03_reference/pipeline_details.html
+ * Checkout random instruction generator: https://ibex-core.readthedocs.io/en/latest/03_reference/pipeline_details.html
+

@@ -94,4 +94,8 @@ object Util {
   def getAsmFiles() = {
     new File("asm").listFiles.filter(_.isFile).toList.filter(_.getName.endsWith(".s"))
   }
+
+  def getSimpleTests(path: String) = {
+    new File(path).listFiles.filter(_.isFile).toList.filter(_.getName.endsWith("addpos.bin"))
+  }
 }
