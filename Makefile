@@ -16,6 +16,9 @@ APP=asm/riscv-v1_addi.s
 all:
 	echo "Select your make target"
 
+risc-v-lab:
+	git clone git@github.com:schoeberl/risc-v-lab.git
+
 work:
 	sbt "testOnly wildcat.SingleTest"
 
@@ -30,7 +33,7 @@ app:
 run:
 	sbt "runMain wildcat.isasim.SimRV a.bin"
 
-test:
+test: risc-v-lab
 	sbt test
 
 sim-test:

@@ -16,12 +16,7 @@ import wildcat.Util
  * Author: Martin Schoeberl (martin@jopdesign.com)
  *
  */
-class FiveCats(args: Array[String]) extends Module {
-  val io = IO(new Bundle {
-    val debug = Output(UInt(32.W))
-  })
-
-  val (code, start) = Util.getCode(args)
+class FiveCats(args: Array[String]) extends Wildcat(args) {
 
   // Five pipeline stages
   val fetch = Module(new Fetch(code))

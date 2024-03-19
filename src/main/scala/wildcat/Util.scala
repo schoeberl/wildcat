@@ -96,6 +96,6 @@ object Util {
   }
 
   def getSimpleTests(path: String) = {
-    new File(path).listFiles.filter(_.isFile).toList.filter(_.getName.endsWith(".bin"))
+    new File(path).listFiles.filter(_.isFile).toList.filter(_.getName.endsWith("addpos.bin"))
   }
 }

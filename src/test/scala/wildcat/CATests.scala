@@ -15,7 +15,7 @@ import scala.sys.process._
  */
 class CATests extends AnyFlatSpec with ChiselScalatestTester {
 
-  val files = Util.getSimpleTests("../risc-v-lab/tests/simple")
+  val files = Util.getSimpleTests("risc-v-lab/tests/simple")
 
   class TestTop(args: Array[String]) extends Module {
     val io = IO(new Bundle {
