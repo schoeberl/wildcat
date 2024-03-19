@@ -16,7 +16,7 @@ import wildcat.Util
  * Author: Martin Schoeberl (martin@jopdesign.com)
  *
  */
-class Wildcat(args: Array[String]) extends Module {
+class FiveCats(args: Array[String]) extends Module {
   val io = IO(new Bundle {
     val debug = Output(UInt(32.W))
   })
@@ -48,6 +48,6 @@ class Wildcat(args: Array[String]) extends Module {
   io.debug := writeback.io.wbdec.data
 }
 
-object Wildcat extends App {
-  emitVerilog(new Wildcat(Array("a.bin")), Array("--target-dir", "generated"))
+object FiveCats extends App {
+  emitVerilog(new FiveCats(Array("a.bin")), Array("--target-dir", "generated"))
 }

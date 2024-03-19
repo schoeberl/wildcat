@@ -5,7 +5,7 @@ import chiseltest._
 import chisel3.util.experimental.BoringUtils
 
 import org.scalatest.flatspec.AnyFlatSpec
-import wildcat.pipeline.Wildcat
+import wildcat.pipeline.FiveCats
 
 import scala.sys.process._
 
@@ -21,7 +21,7 @@ class CATests extends AnyFlatSpec with ChiselScalatestTester {
     val io = IO(new Bundle {
       val regFile = Output(Vec(32,UInt(32.W)))
     })
-    val wc = Module(new Wildcat(args))
+    val wc = Module(new FiveCats(args))
     io.regFile := DontCare
     BoringUtils.bore(wc.decode.regs, Seq(io.regFile))
   }
