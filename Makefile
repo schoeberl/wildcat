@@ -17,7 +17,7 @@ all:
 	echo "Select your make target"
 
 risc-v-lab:
-	git clone git@github.com:schoeberl/risc-v-lab.git
+	git clone https://github.com/schoeberl/risc-v-lab.git
 
 work:
 	sbt "testOnly wildcat.SingleTest"
@@ -48,6 +48,7 @@ comp:
 clean:
 	git clean -fd
 	rm -rf ./idea
+	rm -rf ./risv-v-lab
 
 
 
