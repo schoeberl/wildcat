@@ -2,6 +2,23 @@
 
 Some notes collected along exploring RISC-V.
 
+## Pipeline Organizations
+
+ * single cycle (= simulator, or tiny programs)
+ * sequential (like processors from the last century)
+ * 2 stages (load and store will stall)
+ * 3 stages
+ * EX and MEM can be in parallel
+ * EX can include decode
+ * 4 stages: standard without the WB
+ * 5 stages: mostly useless WB (just a Mux)
+
+## Module Organization
+
+ * An instruction memory/cache can contain a counter for the PC with autoincrement
+   - just reset it on a jump or branch (like IBEX)
+   - Or keep it classic with a pc-next input
+
 ## ECALL
 
 `ecall` is an instruction to call out to a supervisor or operating system:
@@ -53,7 +70,7 @@ Here some observations:
 ## Some Links
 
  * Online assembler: <https://riscvasm.lucasteske.dev/>
- * Carlos' assmebler: https://github.com/carlosedp/riscvassembler
+ * Carlos' assembler: https://github.com/carlosedp/riscvassembler
 
 
    
