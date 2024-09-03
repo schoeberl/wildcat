@@ -24,7 +24,7 @@ work:
 
 app:
 	riscv64-unknown-elf-as -march rv32i $(APP)
-	riscv64-unknown-elf-objdump -d a.out
+#	riscv64-unknown-elf-objdump -d a.out
 	riscv64-unknown-elf-objcopy -O binary -j .text a.out text.bin
 	riscv64-unknown-elf-objcopy -O binary -j .data a.out data.bin
 	cat text.bin data.bin > a.bin
