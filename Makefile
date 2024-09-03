@@ -28,7 +28,7 @@ app:
 	riscv64-unknown-elf-objcopy -O binary -j .text a.out text.bin
 	riscv64-unknown-elf-objcopy -O binary -j .data a.out data.bin
 	cat text.bin data.bin > a.bin
-	hexdump -e '"%08x\n"' a.bin
+#	hexdump -e '"%08x\n"' a.bin
 
 run:
 	sbt "runMain wildcat.isasim.SimRV a.bin"
@@ -48,7 +48,7 @@ comp:
 clean:
 	git clean -fd
 	rm -rf ./idea
-	rm -rf ./risv-v-lab
+	rm -rf ./risc-v-lab
 
 
 

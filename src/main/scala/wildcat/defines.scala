@@ -1,8 +1,5 @@
 package wildcat
 
-import chisel3._
-
-
 object Opcode {
   val AluImm = 0x13
   val Alu = 0x33
