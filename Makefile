@@ -45,6 +45,16 @@ elf:
 comp:
 	make -C c
 
+# TODO: update the hw target
+
+BOARD?=altde2-115
+# synthesize with Quartus
+synth:
+	quartus_map quartus/$(BOARD)/Wildcat
+	quartus_fit quartus/$(BOARD)/Wildcat
+	quartus_asm quartus/$(BOARD)/Wildcat
+	quartus_sta quartus/$(BOARD)/Wildcat
+
 clean:
 	git clean -fd
 	rm -rf ./idea
