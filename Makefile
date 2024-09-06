@@ -46,6 +46,8 @@ comp:
 	make -C c
 
 # TODO: update the hw target
+hw:
+	$(SBT) "runMain wildcat.three.ThreeTop"
 
 BOARD?=altde2-115
 # synthesize with Quartus
@@ -80,7 +82,7 @@ TEST_ARGS_VCD = --genHarness --test --backend c --compile --vcd --targetDir gene
 # The first two arguments are consumed by sbt, the rest is
 # forwarded to the Scala/Chisel main().
 
-hw:
+hw-old:
 	$(SBT) "runMain wildcat.pipeline.WildcatMain $(HW_ARGS)"
 
 test-hw:
