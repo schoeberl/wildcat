@@ -69,6 +69,10 @@ Here some observations:
  * Unaligned memory access can be trapped and handled in SW (Berkeley cores do/did this)
    * Same can be done for floating point emulation
 
+## Further to Explore
+
+ * Branch predictor idea from Tommy: ```pc == bp_addr ? bp_target : pc + 4``` and setting those on any taken branch
+
 ## Some Links
 
  * Online assembler: <https://riscvasm.lucasteske.dev/>

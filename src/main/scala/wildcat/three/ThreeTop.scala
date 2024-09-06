@@ -31,3 +31,7 @@ class ThreeTop(args: Array[String]) extends Module {
 
   io.dummy := imem.io.data
 }
+
+object ThreeTop extends App {
+  emitVerilog(new ThreeTop(Array.empty[String]), Array("--target-dir", "generated"))
+}

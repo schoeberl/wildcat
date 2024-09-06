@@ -48,6 +48,7 @@ comp:
 clean:
 	git clean -fd
 	rm -rf ./idea
+	rm -rf ./idea
 	rm -rf ./risc-v-lab
 
 
