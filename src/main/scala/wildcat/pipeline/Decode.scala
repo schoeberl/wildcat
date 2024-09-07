@@ -2,12 +2,9 @@ package wildcat.pipeline
 
 import chisel3._
 import chisel3.util._
-
 import wildcat.Opcode._
-import wildcat.InstrType._
 import wildcat.AluType._
 import wildcat.AluFunct3._
-
 import wildcat.common.Functions._
 
 class Decode extends Module {
@@ -63,67 +60,10 @@ class Decode extends Module {
   val func7 = instrReg(31, 25)
   val isImm = WireDefault(false.B)
 
-  val instrType = WireDefault(R.id.U)
-  switch(opcode) {
-    is(AluImm.U) {
-      instrType := I.id.U
-      isImm := true.B
-    }
-    is(Alu.U) {
-      instrType := R.id.U
-    }
-    is(Branch.U) {
-      instrType := SB.id.U
-    }
-    is(Load.U) {
-      instrType := I.id.U
-    }
-    is(Store.U) {
-      instrType := S.id.U
-    }
-    is(Lui.U) {
-      instrType := U.id.U
-    }
-    is(AuiPc.U) {
-      instrType := U.id.U
-    }
-    is(Jal.U) {
-      instrType := UJ.id.U
-    }
-    is(JalR.U) {
-      instrType := I.id.U
-    }
-    is(ECall.U) {
-      instrType := I.id.U
-    }
-  }
+  isImm := opcode === AluImm.U
 
-
+  val instrType = getInstrType(opcode)
   val imm = genImm(instrReg, instrType)
-  /*
-  // Immediates
-  val imm = Wire(SInt(32.W))
-  imm := instrReg(31, 20).asSInt
-
-  switch(instrType) {
-    is(I.id.U) {
-      imm := (Fill(20, instrReg(31)) ## instrReg(31, 20)).asSInt
-    }
-    is(S.id.U) {
-      imm := (Fill(20, instrReg(31)) ## instrReg(31, 25) ## instrReg(11, 7)).asSInt
-    }
-    is(SB.id.U) {
-      imm := (Fill(19, instrReg(31)) ## instrReg(7) ## instrReg(30, 25) ## instrReg(11, 8) ## 0.U).asSInt
-    }
-    is(U.id.U) {
-      imm := (instrReg(31, 12) ## Fill(12, 0.U)).asSInt
-    }
-    is(UJ.id.U) {
-      imm := (Fill(11, instrReg(31)) ## instrReg(19, 12) ## instrReg(20) ## instrReg(30, 21) ## 0.U).asSInt
-    }
-  }
-
-   */
 
   // Decode ALU control signals
   // could be done nicer

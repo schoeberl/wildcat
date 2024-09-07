@@ -3,9 +3,47 @@ package wildcat.common
 import chisel3._
 import chisel3.util._
 import wildcat.InstrType._
+import wildcat.Opcode._
 
 
 object Functions {
+
+  def getInstrType(opcode: UInt) = {
+    val instrType = WireDefault(R.id.U)
+    switch(opcode) {
+      is(AluImm.U) {
+        instrType := I.id.U
+      }
+      is(Alu.U) {
+        instrType := R.id.U
+      }
+      is(Branch.U) {
+        instrType := SB.id.U
+      }
+      is(Load.U) {
+        instrType := I.id.U
+      }
+      is(Store.U) {
+        instrType := S.id.U
+      }
+      is(Lui.U) {
+        instrType := U.id.U
+      }
+      is(AuiPc.U) {
+        instrType := U.id.U
+      }
+      is(Jal.U) {
+        instrType := UJ.id.U
+      }
+      is(JalR.U) {
+        instrType := I.id.U
+      }
+      is(ECall.U) {
+        instrType := I.id.U
+      }
+    }
+    instrType
+  }
 
   def genImm(instruction: UInt, instrType: UInt): SInt = {
 
