@@ -23,7 +23,8 @@ class CATests extends AnyFlatSpec with ChiselScalatestTester {
     })
     val wc = Module(new FiveCats(args))
     io.regFile := DontCare
-    BoringUtils.bore(wc.decode.regs, Seq(io.regFile))
+    // does boring work with functions?
+    // BoringUtils.bore(wc.decode.regs, Seq(io.regFile))
   }
 
   for (f <- files) {

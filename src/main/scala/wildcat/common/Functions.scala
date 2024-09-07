@@ -117,4 +117,32 @@ object Functions {
 
     imm
   }
+
+  // TODO: do also a SyncReadMem version
+  // val regMem = SyncReadMem(32, UInt(32.W), SyncReadMem.WriteFirst)
+  /*
+val rs1Val = Mux(rs1 =/= 0.U, regMem.read(rs1), 0.U)
+val rs2Val = Mux(rs2 =/= 0.U, regMem.read(rs2), 0.U)
+when(io.wbdec.valid) {
+  regMem.write(io.wbdec.regNr, io.wbdec.data)
+}
+*/
+
+  def registerFile(rs1: UInt, rs2: UInt, rd: UInt, wrData: UInt, wrEna: Bool) = {
+
+    // The FF version needs an input pipe register
+    // to be compatible with a memory version
+    // But this does then not work for the single cycle implementation
+    // TODO: internal forwarding
+    val rs1Reg = RegNext(rs1)
+    val rs2Reg = RegNext(rs2)
+    val regs = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
+    // following Mux can be avoided when using regs with reset and mask on wen
+    val rs1Val = Mux(rs1Reg =/= 0.U, regs(rs1Reg), 0.U)
+    val rs2Val = Mux(rs2Reg =/= 0.U, regs(rs2Reg), 0.U)
+    when(wrEna) {
+      regs(rd) := wrData
+    }
+    (rs1Val, rs2Val)
+  }
 }

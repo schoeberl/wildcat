@@ -21,34 +21,10 @@ class Decode extends Module {
     pcReg := io.fedec.pc
   }
 
-  // Register file
-  val regMem = SyncReadMem(32, UInt(32.W), SyncReadMem.WriteFirst)
-
   val rs1 = instr(19, 15)
   val rs2 = instr(24, 20)
   val rd = instr(11, 7)
-
-  /*
-  val rs1Val = Mux(rs1 =/= 0.U, regMem.read(rs1), 0.U)
-  val rs2Val = Mux(rs2 =/= 0.U, regMem.read(rs2), 0.U)
-  when(io.wbdec.valid) {
-    regMem.write(io.wbdec.regNr, io.wbdec.data)
-  }
-  */
-
-  // The register version needs an input pipe register
-  val rs1Reg = RegNext(rs1)
-  val rs2Reg = RegNext(rs2)
-  val regs = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
-  val rs1Val = Mux(rs1Reg =/= 0.U, regs(rs1Reg), 0.U)
-  val rs2Val = Mux(rs2Reg =/= 0.U, regs(rs2Reg), 0.U)
-  when(io.wbdec.valid) {
-    regs(io.wbdec.regNr) := io.wbdec.data
-  }
-  for (i <- 0 until 5) {
-    // printf("reg %d: %x ", i.U, regs(i))
-  }
-  printf("\n")
+  val (rs1Val, rs2Val) = registerFile(rs1, rs2, rd, io.wbdec.data, io.wbdec.valid)
 
   val (instrType, isImm) = getInstrType(instrReg)
   val imm = getImm(instrReg, instrType)
@@ -57,7 +33,7 @@ class Decode extends Module {
   // Address calculation for load/store (if 3 or 4 stages pipeline)
   io.decex.pc := pcReg
   io.decex.aluOp := aluOp
-  io.decex.rs1 := instrReg(19, 15)
+  io.decex.rs1 := instrReg(19, 15) // TODO: this duplication is not nice
   io.decex.rs2 := instrReg(24, 20)
   io.decex.rd := instrReg(11, 7)
   io.decex.rs1Val := rs1Val
