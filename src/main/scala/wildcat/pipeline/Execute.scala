@@ -1,7 +1,7 @@
 package wildcat.pipeline
 
 import chisel3._
-import wildcat.pipeline.Common._
+import wildcat.common.Functions._
 
 class Execute extends Module {
   val io = IO(new Bundle {
