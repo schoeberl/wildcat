@@ -2,17 +2,23 @@ package wildcat.common
 
 import chisel3._
 import chisel3.util._
+import wildcat.AluFunct3._
+import wildcat.AluType._
 import wildcat.InstrType._
 import wildcat.Opcode._
 
 
 object Functions {
 
-  def getInstrType(opcode: UInt) = {
+  def getInstrType(instruction: UInt) = {
+
+    val isImm = WireDefault(false.B)
+    val opcode = instruction(6, 0)
     val instrType = WireDefault(R.id.U)
     switch(opcode) {
       is(AluImm.U) {
         instrType := I.id.U
+        isImm := true.B
       }
       is(Alu.U) {
         instrType := R.id.U
@@ -42,10 +48,52 @@ object Functions {
         instrType := I.id.U
       }
     }
-    instrType
+    (instrType, isImm)
   }
 
-  def genImm(instruction: UInt, instrType: UInt): SInt = {
+  def getAluOp(instruction: UInt): UInt = {
+
+    val opcode = instruction(6, 0)
+    val func3 = instruction(14, 12)
+    val func7 = instruction(31, 25)
+
+    val aluOp = WireDefault(ADD.id.U)
+    switch(func3) {
+      is(F3_ADD_SUB.U) {
+        aluOp := ADD.id.U
+        when(opcode =/= AluImm.U && func7 =/= 0.U) {
+          aluOp := SUB.id.U
+        }
+      }
+      is(F3_SLL.U) {
+        aluOp := SLL.id.U
+      }
+      is(F3_SLT.U) {
+        aluOp := SLT.id.U
+      }
+      is(F3_SLTU.U) {
+        aluOp := SLTU.id.U
+      }
+      is(F3_XOR.U) {
+        aluOp := XOR.id.U
+      }
+      is(F3_SRL_SRA.U) {
+        when(func7 === 0.U) {
+          aluOp := SRL.id.U
+        }.otherwise {
+          aluOp := SRA.id.U
+        }
+      }
+      is(F3_OR.U) {
+        aluOp := OR.id.U
+      }
+      is(F3_AND.U) {
+        aluOp := AND.id.U
+      }
+    }
+    aluOp
+  }
+  def getImm(instruction: UInt, instrType: UInt): SInt = {
 
     val imm = Wire(SInt(32.W))
     imm := instruction(31, 20).asSInt

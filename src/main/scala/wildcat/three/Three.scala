@@ -13,9 +13,8 @@ import wildcat.common._
  */
 class Three() extends Wildcat() {
 
-  // TODO: is this really needed?
   // The ROM has a register that is reset to 0, therefore clock cycle 1 is the first instruction.
-  // Probably needed if we want to start from a different address.
+  // Needed if we want to start from a different address.
   val pcReg = RegInit(-4.S(32.W).asUInt)
   val pcNext = pcReg + 4.U
   pcReg := pcNext

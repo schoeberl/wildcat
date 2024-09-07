@@ -1,10 +1,6 @@
 package wildcat.pipeline
 
 import chisel3._
-import chisel3.util._
-import wildcat.Opcode._
-import wildcat.AluType._
-import wildcat.AluFunct3._
 import wildcat.common.Functions._
 
 class Decode extends Module {
@@ -54,54 +50,9 @@ class Decode extends Module {
   }
   printf("\n")
 
-  // Decode
-  val opcode = instrReg(6, 0)
-  val func3 = instrReg(14, 12)
-  val func7 = instrReg(31, 25)
-  val isImm = WireDefault(false.B)
-
-  isImm := opcode === AluImm.U
-
-  val instrType = getInstrType(opcode)
-  val imm = genImm(instrReg, instrType)
-
-  // Decode ALU control signals
-  // could be done nicer
-  val aluOp = WireDefault(ADD.id.U)
-  switch(func3) {
-    is(F3_ADD_SUB.U) {
-      aluOp := ADD.id.U
-      when(opcode =/= AluImm.U && func7 =/= 0.U) {
-        aluOp := SUB.id.U
-      }
-    }
-    is(F3_SLL.U) {
-      aluOp := SLL.id.U
-    }
-    is(F3_SLT.U) {
-      aluOp := SLT.id.U
-    }
-    is(F3_SLTU.U) {
-      aluOp := SLTU.id.U
-    }
-    is(F3_XOR.U) {
-      aluOp := XOR.id.U
-    }
-    is(F3_SRL_SRA.U) {
-      when(func7 === 0.U) {
-        aluOp := SRL.id.U
-      }.otherwise {
-        aluOp := SRA.id.U
-      }
-    }
-    is(F3_OR.U) {
-      aluOp := OR.id.U
-    }
-    is(F3_AND.U) {
-      aluOp := AND.id.U
-    }
-  }
-
+  val (instrType, isImm) = getInstrType(instrReg)
+  val imm = getImm(instrReg, instrType)
+  val aluOp = getAluOp(instrReg)
 
   // Address calculation for load/store (if 3 or 4 stages pipeline)
   io.decex.pc := pcReg
