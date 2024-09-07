@@ -12,6 +12,7 @@
    * They are also at: https://github.com/YosysHQ/picorv32/tree/master/tests
    * Build see: https://github.com/YosysHQ/picorv32/blob/f00a88c36eaab478b64ee27d8162e421049bcc66/Makefile#L121
  * maybe do also: RegInit(0.U.asTypeOf(new IF_ID))
+ * Throw an exception when simulator test fails
  * Checkout: https://github.com/SpinalHDL/VexRiscv (has a lot of info)
  * unaligned access is not too hard with byte-wise access
    * or trap on unaligned access

@@ -200,7 +200,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     // next pc
     val pcNext = pc + 4
 
-    printf("     pc: %04x instr: %08x ", pc, instr)
+    // printf("     pc: %04x instr: %08x ", pc, instr)
 
     // Execute the instruction and return a tuple for the result:
     //   (ALU result, writeBack, next PC)
@@ -235,9 +235,9 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
   var cont = true
   while (cont) {
     cont = execute(mem(pc >> 2))
-    print("regs: ")
-    reg.foreach(printf("%08x ", _))
-    println()
+    // print("regs: ")
+    // reg.foreach(printf("%08x ", _))
+    // println()
   }
 
 }

@@ -8,6 +8,8 @@ import wildcat.InstrType._
 import wildcat.AluType._
 import wildcat.AluFunct3._
 
+import wildcat.common.Functions._
+
 class Decode extends Module {
   val io = IO(new Bundle{
     val fedec = Input(new FeDec())
@@ -51,7 +53,7 @@ class Decode extends Module {
     regs(io.wbdec.regNr) := io.wbdec.data
   }
   for (i <- 0 until 5) {
-    printf("reg %d: %x ", i.U, regs(i))
+    // printf("reg %d: %x ", i.U, regs(i))
   }
   printf("\n")
 
@@ -95,6 +97,10 @@ class Decode extends Module {
       instrType := I.id.U
     }
   }
+
+
+  val imm = genImm(instrReg, instrType)
+  /*
   // Immediates
   val imm = Wire(SInt(32.W))
   imm := instrReg(31, 20).asSInt
@@ -116,6 +122,8 @@ class Decode extends Module {
       imm := (Fill(11, instrReg(31)) ## instrReg(19, 12) ## instrReg(20) ## instrReg(30, 21) ## 0.U).asSInt
     }
   }
+
+   */
 
   // Decode ALU control signals
   // could be done nicer
@@ -165,6 +173,5 @@ class Decode extends Module {
   io.decex.rs2Val := rs2Val
   io.decex.imm := imm
   io.decex.isImm := isImm
-  printf("%x: instruction: %x rs1: %x rs2: %x rd: %x imm: %x\n", io.decex.pc, io.decex.aluOp, io.decex.rs1,
-    io.decex.rs2, io.decex.rd, io.decex.imm)
+  //printf("%x: instruction: %x rs1: %x rs2: %x rd: %x imm: %x\n", io.decex.pc, io.decex.aluOp, io.decex.rs1, io.decex.rs2, io.decex.rd, io.decex.imm)
 }

@@ -23,7 +23,7 @@ object Util {
    */
   def readBin(fileName: String): Array[Int] = {
 
-    println("Reading " + fileName)
+    // println("Reading " + fileName)
 
     val byteArray = Files.readAllBytes(Paths.get(fileName))
 
@@ -55,7 +55,7 @@ object Util {
    */
   def readHex(fileName: String): Array[Int] = {
 
-    println("Reading " + fileName)
+    // println("Reading " + fileName)
     val length = Source.fromFile(fileName).getLines().length
     val arr = new Array[Int](length * 4)
 
