@@ -46,11 +46,7 @@ comp:
 	make -C c
 
 hw:
-	$(SBT) "runMain wildcat.three.ThreeTop a.bin"
-
-hw-test:
-	$(SBT) "runMain wildcat.three.SynthTop"
-	mv generated/SynthTop.v generated/ThreeTop.v
+	$(SBT) "runMain wildcat.three.SynthTop a.bin"
 
 BOARD?=altde2-115
 # synthesize with Quartus

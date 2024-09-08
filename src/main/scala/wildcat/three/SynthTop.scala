@@ -29,7 +29,7 @@ class SynthTop(args: Array[String]) extends Module {
   imem.io.wrData := io.wrData
   imem.io.wrEnable := true.B
 
-  io.dummy := cpu.io.dmem.wrData
+  io.dummy := imem.io.rdData
 }
 
 object SynthTop extends App {
