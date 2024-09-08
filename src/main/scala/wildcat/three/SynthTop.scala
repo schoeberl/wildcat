@@ -27,9 +27,9 @@ class SynthTop(args: Array[String]) extends Module {
   // dummy write for synthesis tests
   imem.io.wrAddress := io.wrAddr
   imem.io.wrData := io.wrData
-  imem.io.wrEnable := true.B
+  imem.io.wrEnable := 15.U
 
-  io.dummy := imem.io.rdData
+  io.dummy := RegNext(cpu.io.dmem.wrData)
 }
 
 object SynthTop extends App {

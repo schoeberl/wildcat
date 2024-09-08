@@ -43,9 +43,8 @@ class Three() extends Wildcat() {
   val regs = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
   val rs1Reg = RegNext(rs1)
   val rs2Reg = RegNext(rs2)
-  // following Mux can be avoided when using regs with reset and mask on wen
-  val rs1Val = Mux(rs1Reg =/= 0.U, regs(rs1Reg), 0.U)
-  val rs2Val = Mux(rs2Reg =/= 0.U, regs(rs2Reg), 0.U)
+  val rs1Val = regs(rs1Reg)
+  val rs2Val = regs(rs2Reg)
 
 
 
@@ -86,6 +85,6 @@ class Three() extends Wildcat() {
   // dummy connections for now
   io.dmem.rdAddress := 0.U
   io.dmem.wrAddress := 0.U
-  io.dmem.wrData := RegNext(res) // to aovid optimizing everything away
+  io.dmem.wrData := RegNext(res) // to avoid optimizing everything away
   io.dmem.wrEnable := 0.U
 }
