@@ -29,7 +29,7 @@ class ThreeTop(args: Array[String]) extends Module {
   cpu.io.imem.data := imem.io.data
   cpu.io.imem.stall := imem.io.stall
 
-  io.dummy := imem.io.data
+  io.dummy := cpu.io.dmem.wrData
 }
 
 object ThreeTop extends App {
