@@ -137,14 +137,14 @@ when(io.wbdec.valid) {
     val rs1Reg = RegNext(rs1)
     val rs2Reg = RegNext(rs2)
     val regs = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
-    // following Mux can be avoided when using regs with reset and mask on wen
-    val rs1Val = Mux(rs1Reg =/= 0.U, regs(rs1Reg), 0.U)
-    val rs2Val = Mux(rs2Reg =/= 0.U, regs(rs2Reg), 0.U)
-    when(wrEna) {
+    val rs1Val = regs(rs1Reg)
+    val rs2Val = regs(rs2Reg)
+    when(wrEna && rd =/= 0.U) {
       regs(rd) := wrData
     }
     (rs1Val, rs2Val)
   }
+
   // TODO: something missing? Looks OK now. Wait for the tests.
   def alu(op: UInt, a: UInt, b: UInt): UInt = {
     val res = Wire(UInt(32.W))
