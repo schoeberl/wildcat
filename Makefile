@@ -6,8 +6,8 @@
 
 SBT = sbt
 
-#APP=asm/test.s
-APP=asm/riscv-v1_addi.s
+APP=asm/test.s
+#APP=asm/riscv-v1_addi.s
 # Use a different program, e.g., one from the CAE lab
 # APP=../../cae-lab/lab3/minimal.s
 # APP can be set from the command line, such as:
@@ -20,7 +20,7 @@ risc-v-lab:
 	git clone https://github.com/schoeberl/risc-v-lab.git
 
 work:
-	sbt "testOnly wildcat.SingleTest"
+	sbt "testOnly wildcat.SingleTest a.bin"
 
 app:
 	riscv64-unknown-elf-as -march rv32i $(APP)
@@ -45,9 +45,12 @@ elf:
 comp:
 	make -C c
 
-# TODO: update the hw target
 hw:
-	$(SBT) "runMain wildcat.three.ThreeTop"
+	$(SBT) "runMain wildcat.three.ThreeTop a.bin"
+
+hw-test:
+	$(SBT) "runMain wildcat.three.SynthTop"
+	mv generated/SynthTop.v generated/ThreeTop.v
 
 BOARD?=altde2-115
 # synthesize with Quartus

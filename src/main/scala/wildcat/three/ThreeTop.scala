@@ -19,6 +19,7 @@ class ThreeTop(args: Array[String]) extends Module {
     val dummy = Output(UInt(32.W))
   })
 
+  println(args(0))
   val (code, start) = Util.getCode(args)
 
   val cpu = Module(new Three())
@@ -33,5 +34,5 @@ class ThreeTop(args: Array[String]) extends Module {
 }
 
 object ThreeTop extends App {
-  emitVerilog(new ThreeTop(Array.empty[String]), Array("--target-dir", "generated"))
+  emitVerilog(new ThreeTop(args), Array("--target-dir", "generated"))
 }
