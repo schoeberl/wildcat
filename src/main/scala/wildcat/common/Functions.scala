@@ -128,21 +128,25 @@ when(io.wbdec.valid) {
 }
 */
 
-  def registerFile(rs1: UInt, rs2: UInt, rd: UInt, wrData: UInt, wrEna: Bool) = {
+  def registerFile(rs1: UInt, rs2: UInt, rd: UInt, wrData: UInt, wrEna: Bool, useMem: Boolean = true) = {
 
-    // The FF version needs an input pipe register
-    // to be compatible with a memory version
-    // But this does then not work for the single cycle implementation
-    // TODO: internal forwarding
-    val rs1Reg = RegNext(rs1)
-    val rs2Reg = RegNext(rs2)
-    val regs = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
-    val rs1Val = regs(rs1Reg)
-    val rs2Val = regs(rs2Reg)
-    when(wrEna && rd =/= 0.U) {
-      regs(rd) := wrData
+    if (useMem) {
+      val regs = SyncReadMem(32, UInt(32.W), SyncReadMem.WriteFirst)
+      val rs1Val = regs.read(rs1)
+      val rs2Val = regs.read(rs2)
+      when(wrEna && rd =/= 0.U) {
+        regs.write(rd, wrData)
+      }
+      (rs1Val, rs2Val)
+    } else {
+      val regs = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
+      val rs1Val = regs(RegNext(rs1))
+      val rs2Val = regs(RegNext(rs2))
+      when(wrEna && rd =/= 0.U) {
+        regs(rd) := wrData
+      }
+      (rs1Val, rs2Val)
     }
-    (rs1Val, rs2Val)
   }
 
   // TODO: something missing? Looks OK now. Wait for the tests.

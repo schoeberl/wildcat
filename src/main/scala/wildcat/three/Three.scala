@@ -14,8 +14,11 @@ import wildcat.common.Functions._
  */
 class Three() extends Wildcat() {
 
+  // some forward declarations
   val stall = false.B
   val res = Wire(UInt(32.W))
+  val dest = Wire(UInt(5.W))
+  val wrEna = true.B
 
   // Let's do following pipeline stages:
   // 0. PC generation
@@ -40,15 +43,7 @@ class Three() extends Wildcat() {
   val rs1 = instr(19, 15)
   val rs2 = instr(24, 20)
   val rd = instr(11, 7)
-  val regs = SyncReadMem(32, UInt(32.W), SyncReadMem.WriteFirst)
-  val rs1Val = regs.read(rs1)
-  val rs2Val = regs.read(rs2)
-  // val (rs1Val, rs2Val) = registerFile(rs1, rs2, rdXXX, res, true.B)
-  // dedicated register file is better for debugging
-  // memory version
-  // val regs = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
-  // val rs1Val = RegNext(regs(rs1))
-  // val rs2Val = RegNext(regs(rs2))
+  val (rs1Val, rs2Val) = registerFile(rs1, rs2, dest, res, wrEna, false)
 
   val (instrType, isImm) = getInstrType(instrReg)
   val imm = getImm(instrReg, instrType)
@@ -79,17 +74,7 @@ class Three() extends Wildcat() {
 
   // Execute
   res := alu(decExReg.aluOp, decExReg.rs1Val, decExReg.val2)
-  when(true.B) {
-    regs.write(decExReg.rd, res)
-  }
-
-  /*
-  val wrEna = true.B
-  when(wrEna && decExReg.rd =/= 0.U) {
-    regs(decExReg.rd) := res
-  }
-
-   */
+  dest := decExReg.rd
 
   // dummy connections for now
   io.dmem.rdAddress := 0.U
