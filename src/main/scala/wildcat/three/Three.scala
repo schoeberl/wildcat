@@ -41,12 +41,8 @@ class Three() extends Wildcat() {
   val rd = instr(11, 7)
   // val (rs1Val, rs2Val) = registerFile(rs1, rs2, rd, res, true.B)
   val regs = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
-  val rs1Reg = RegNext(rs1)
-  val rs2Reg = RegNext(rs2)
-  val rs1Val = regs(rs1Reg)
-  val rs2Val = regs(rs2Reg)
-
-
+  val rs1Val = RegNext(regs(rs1))
+  val rs2Val = RegNext(regs(rs2))
 
   val (instrType, isImm) = getInstrType(instrReg)
   val imm = getImm(instrReg, instrType)
