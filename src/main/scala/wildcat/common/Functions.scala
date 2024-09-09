@@ -118,16 +118,6 @@ object Functions {
     imm
   }
 
-  // TODO: do also a SyncReadMem version
-  // val regMem = SyncReadMem(32, UInt(32.W), SyncReadMem.WriteFirst)
-  /*
-val rs1Val = Mux(rs1 =/= 0.U, regMem.read(rs1), 0.U)
-val rs2Val = Mux(rs2 =/= 0.U, regMem.read(rs2), 0.U)
-when(io.wbdec.valid) {
-  regMem.write(io.wbdec.regNr, io.wbdec.data)
-}
-*/
-
   def registerFile(rs1: UInt, rs2: UInt, rd: UInt, wrData: UInt, wrEna: Bool, useMem: Boolean = true) = {
 
     if (useMem) {
@@ -139,6 +129,7 @@ when(io.wbdec.valid) {
       }
       (rs1Val, rs2Val)
     } else {
+      // TODO: internal forwarding
       val regs = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
       val rs1Val = regs(RegNext(rs1))
       val rs2Val = regs(RegNext(rs2))

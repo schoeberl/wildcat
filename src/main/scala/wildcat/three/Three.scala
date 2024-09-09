@@ -63,9 +63,9 @@ class Three() extends Wildcat() {
   decEx.valid := true.B
   decEx.pc := pcReg
   decEx.aluOp := aluOp
-  decEx.rs1 := rs1
-  decEx.rs2 := rs2
-  decEx.rd := rd
+  decEx.rs1 := instrReg(19, 15)
+  decEx.rs2 := instrReg(24, 20)
+  decEx.rd := instrReg(11, 7)
   decEx.rs1Val := rs1Val
   decEx.val2 := val2
 
