@@ -45,7 +45,7 @@ class Three() extends Wildcat() {
   // Decode and register read
   val pcRegReg = RegNext(pcReg)
   val instrReg = RegInit(0x00000033.U) // nop on reset
-  instrReg := instr
+  instrReg := Mux(doBranch, 0x00000033.U, instr)
   val rs1 = instr(19, 15)
   val rs2 = instr(24, 20)
   val rd = instr(11, 7)
@@ -55,8 +55,6 @@ class Three() extends Wildcat() {
   val imm = getImm(instrReg, instrType)
   val aluOp = getAluOp(instrReg)
   val val2 = Mux(isImm, imm.asUInt, rs2Val)
-  doBranch := compare(instrReg(14, 12), rs1Val, rs2Val) && instrReg(6, 0) === Branch.U
-  branchTarget := (pcRegReg.asSInt + imm).asUInt
 
   val decEx = Wire(new Bundle() {
     val valid = Bool()
@@ -67,15 +65,17 @@ class Three() extends Wildcat() {
     val rd = UInt(5.W)
     val rs1Val = UInt(32.W)
     val val2 = UInt(32.W)
+    val branchInstr = Bool()
   })
-  decEx.valid := true.B
-  decEx.pc := pcReg
+  decEx.valid := !doBranch
+  decEx.pc := pcRegReg
   decEx.aluOp := aluOp
   decEx.rs1 := instrReg(19, 15)
   decEx.rs2 := instrReg(24, 20)
   decEx.rd := instrReg(11, 7)
   decEx.rs1Val := rs1Val
   decEx.val2 := val2
+  decEx.branchInstr := instrReg(6, 0) === Branch.U
 
   // Execute
   val decExReg = RegInit(0.U.asTypeOf(decEx))
@@ -83,6 +83,10 @@ class Three() extends Wildcat() {
 
   res := alu(decExReg.aluOp, decExReg.rs1Val, decExReg.val2)
   dest := decExReg.rd
+
+  branchTarget := (decExReg.pc.asSInt + decExReg.val2.asSInt).asUInt
+  doBranch := compare(instrReg(14, 12), rs1Val, rs2Val) && decExReg.branchInstr && decExReg.valid
+  wrEna := decExReg.valid && !doBranch // and some more conditions
 
   // dummy connections for now
   io.dmem.rdAddress := 0.U

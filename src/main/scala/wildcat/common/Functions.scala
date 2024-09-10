@@ -26,6 +26,7 @@ object Functions {
       }
       is(Branch.U) {
         instrType := SB.id.U
+        isImm := true.B
       }
       is(Load.U) {
         instrType := I.id.U
