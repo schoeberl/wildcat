@@ -6,6 +6,7 @@ import wildcat.AluFunct3._
 import wildcat.AluType._
 import wildcat.InstrType._
 import wildcat.Opcode._
+import wildcat.BranchFunct._
 
 
 object Functions {
@@ -93,6 +94,46 @@ object Functions {
     }
     aluOp
   }
+  /*
+      def compare(funct3: Int, op1: Int, op2: Int): Boolean = {
+      funct3 match {
+        case BEQ => op1 == op2
+        case BNE => !(op1 == op2)
+        case BLT => op1 < op2
+        case BGE => op1 >= op2
+        case BLTU => (op1 < op2) ^ (op1 < 0) ^ (op2 < 0)
+        case BGEU => op1 == op2 || ((op1 > op2) ^ (op1 < 0) ^ (op2 < 0))
+      }
+    }
+   */
+  def compare(funct3: UInt, op1: UInt, op2: UInt): Bool = {
+    val res = Wire(Bool())
+    res := false.B
+    switch(funct3) {
+      is(BEQ.U) {
+        res := op1 === op2
+      }
+      is(BNE.U) {
+        res := op1 =/= op2
+      }
+      is(BLT.U) {
+        res := op1.asSInt < op2.asSInt
+      }
+      is(BGE.U) {
+        res := op1.asSInt >= op2.asSInt
+      }
+      // How did I come up with this?
+      // Better use Tommy's code.
+      is(BLTU.U) {
+        res := (op1 < op2) ^ (op1(31) ^ op2(31))
+      }
+      is(BGEU.U) {
+        res := op1 === op2 || (op1.asSInt > op2.asSInt)
+      }
+    }
+    res
+  }
+
   def getImm(instruction: UInt, instrType: UInt): SInt = {
 
     val imm = Wire(SInt(32.W))
@@ -118,6 +159,7 @@ object Functions {
     imm
   }
 
+  // Input direct from instruction fetch, the synchronous memory contains the pipeline register
   def registerFile(rs1: UInt, rs2: UInt, rd: UInt, wrData: UInt, wrEna: Bool, useMem: Boolean = true) = {
 
     if (useMem) {
@@ -139,6 +181,8 @@ object Functions {
       (rs1Val, rs2Val)
     }
   }
+
+
 
   // TODO: something missing? Looks OK now. Wait for the tests.
   def alu(op: UInt, a: UInt, b: UInt): UInt = {
