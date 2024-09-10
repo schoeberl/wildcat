@@ -64,7 +64,9 @@ class Three() extends Wildcat() {
     val rs2 = UInt(5.W)
     val rd = UInt(5.W)
     val rs1Val = UInt(32.W)
+    val rs2Val = UInt(32.W)
     val val2 = UInt(32.W)
+    val func3 = UInt(3.W)
     val branchInstr = Bool()
   })
   decEx.valid := !doBranch
@@ -74,7 +76,9 @@ class Three() extends Wildcat() {
   decEx.rs2 := instrReg(24, 20)
   decEx.rd := instrReg(11, 7)
   decEx.rs1Val := rs1Val
-  decEx.val2 := val2
+  decEx.rs2Val := rs2Val
+  decEx.val2 := val2 // imm or rs2Val
+  decEx.func3 := instrReg(14, 12)
   decEx.branchInstr := instrReg(6, 0) === Branch.U
 
   // Execute
@@ -85,7 +89,7 @@ class Three() extends Wildcat() {
   dest := decExReg.rd
 
   branchTarget := (decExReg.pc.asSInt + decExReg.val2.asSInt).asUInt
-  doBranch := compare(instrReg(14, 12), rs1Val, rs2Val) && decExReg.branchInstr && decExReg.valid
+  doBranch := compare(decExReg.func3, decExReg.rs1Val, decExReg.rs2Val) && decExReg.branchInstr && decExReg.valid
   wrEna := decExReg.valid && !doBranch // and some more conditions
 
   // dummy connections for now
