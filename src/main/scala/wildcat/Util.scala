@@ -88,6 +88,7 @@ object Util {
       } else {
         throw new Exception("Unknown file extension")
       }
+    code.foreach(x => println(f"$x%08x"))
     (code, start)
   }
 

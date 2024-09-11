@@ -1,30 +1,40 @@
 [*]
 [*] GTKWave Analyzer v3.4.0 (w)1999-2022 BSI
-[*] Sun Sep  8 20:11:05 2024
+[*] Tue Sep 10 23:29:06 2024
 [*]
-[dumpfile] "/Users/martin/source/wildcat/test_run_dir/Single_asmtests_should_pass/ThreeTop.vcd"
-[dumpfile_mtime] "Sun Sep  8 19:55:43 2024"
-[dumpfile_size] 17354
+[dumpfile] "/Users/martin/source/wildcat/test_run_dir/Single_asmriscvv1_addis_should_pass/ThreeTop.vcd"
+[dumpfile_mtime] "Tue Sep 10 23:17:41 2024"
+[dumpfile_size] 21180
 [savefile] "/Users/martin/source/wildcat/wildcat.gtkw"
 [timestart] 0
 [size] 1392 600
 [pos] -1 -1
-*-5.013163 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-4.512384 78 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] ThreeTop.
 [sst_width] 253
 [signals_width] 202
 [sst_expanded] 1
 [sst_vpaned_height] 158
+@28
+ThreeTop.cpu.clock
+ThreeTop.cpu.reset
 @22
 ThreeTop.cpu.pcReg[31:0]
+@23
+ThreeTop.imem.io_data[31:0]
+@22
 ThreeTop.cpu.pcNext[31:0]
 ThreeTop.cpu.instrReg[31:0]
-@23
-ThreeTop.cpu.decEx_rd[4:0]
+@200
+-
 @22
+ThreeTop.cpu.decEx_rd[4:0]
 ThreeTop.cpu.decEx_aluOp[3:0]
 ThreeTop.cpu.decEx_rs1Val[31:0]
 ThreeTop.cpu.decEx_val2[31:0]
+@200
+-
+@22
 ThreeTop.cpu.decExReg_aluOp[3:0]
 ThreeTop.cpu.decExReg_rs1Val[31:0]
 ThreeTop.cpu.decExReg_val2[31:0]
@@ -37,5 +47,6 @@ ThreeTop.cpu.regs_3[31:0]
 ThreeTop.cpu.regs_4[31:0]
 ThreeTop.cpu.regs_5[31:0]
 ThreeTop.cpu.regs_6[31:0]
+ThreeTop.cpu.regs_28[31:0]
 [pattern_trace] 1
 [pattern_trace] 0

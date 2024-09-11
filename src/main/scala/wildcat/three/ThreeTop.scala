@@ -19,7 +19,6 @@ class ThreeTop(args: Array[String]) extends Module {
     val dummy = Output(UInt(32.W))
   })
 
-  println(args(0))
   val (code, start) = Util.getCode(args)
 
   val cpu = Module(new Three())

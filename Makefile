@@ -20,7 +20,7 @@ risc-v-lab:
 	git clone https://github.com/schoeberl/risc-v-lab.git
 
 work:
-	sbt "testOnly wildcat.SingleTest a.bin"
+	sbt "testOnly wildcat.SingleTest"
 
 app:
 	riscv64-unknown-elf-as -march rv32i $(APP)

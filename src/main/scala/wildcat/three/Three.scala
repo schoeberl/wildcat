@@ -33,7 +33,8 @@ class Three() extends Wildcat() {
   // The ROM has a register that is reset to 0, therefore clock cycle 1 is the first instruction.
   // Needed if we want to start from a different address.
   // PC generation
-  val pcReg = RegInit(-4.S(32.W).asUInt)
+//  val pcReg = RegInit(-4.S(32.W).asUInt)
+  val pcReg = RegInit(0.S(32.W).asUInt) // keep it simpler for now with the pipe viewing
 
   val pcNext = Mux(doBranch, branchTarget, pcReg + 4.U)
   pcReg := pcNext
@@ -95,6 +96,6 @@ class Three() extends Wildcat() {
   // dummy connections for now
   io.dmem.rdAddress := 0.U
   io.dmem.wrAddress := 0.U
-  io.dmem.wrData := RegNext(res) // to avoid optimizing everything away
+  io.dmem.wrData := RegNext(RegNext(RegNext(res))) // to avoid optimizing everything away
   io.dmem.wrEnable := 0.U
 }
