@@ -1,6 +1,5 @@
 # TODO
 
- * Do the blinking LED
  * Check what the issue is in blink without nops
  * Parameter for single test
  * Somtimes we need r2 and the immediate in the same instruction, so val2 is not a solution
