@@ -1,7 +1,6 @@
 # TODO
 
  * Check what the issue is in blink without nops
- * Parameter for single test
  * Somtimes we need r2 and the immediate in the same instruction, so val2 is not a solution
  * ecall
  * Throw an exception when simulator test fails (maybe done)

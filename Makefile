@@ -17,7 +17,7 @@ all:
 	echo "Select your make target"
 
 work:
-	sbt "testOnly wildcat.SingleTest"
+	test=$(APP) sbt "testOnly wildcat.SingleTest"
 
 app:
 	riscv64-unknown-elf-as -march rv32i $(APP)
