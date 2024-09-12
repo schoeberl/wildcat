@@ -5,8 +5,7 @@ import wildcat.Util
 import wildcat.common._
 
 // Only for synthesis tests, dummy write to instruction memory
-class SynthTop(args: Array[String]) extends Module {
-
+class SynthTopFmax(args: Array[String]) extends Module {
   val io = IO(new Bundle {
     val dummy = Output(UInt(32.W))
     val wrData = Input(UInt(32.W))
@@ -32,6 +31,6 @@ class SynthTop(args: Array[String]) extends Module {
   io.dummy := RegNext(RegNext(cpu.io.dmem.wrData))
 }
 
-object SynthTop extends App {
-  emitVerilog(new SynthTop(Array.empty[String]), Array("--target-dir", "generated"))
+object SynthTopFmax extends App {
+  emitVerilog(new SynthTopFmax(Array.empty[String]), Array("--target-dir", "generated"))
 }

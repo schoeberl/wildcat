@@ -1,7 +1,7 @@
 #
 # Makefile (work in progress) for Wildcat, a RISC-V simulator and implementation.
 #
-# Include user makefile for local configurations, e.g., path to RISC-V tools
+# Include user makefile for local configurations
 -include config.mk
 
 SBT = sbt
@@ -16,9 +16,6 @@ APP=asm/test.s
 all:
 	echo "Select your make target"
 
-risc-v-lab:
-	git clone https://github.com/schoeberl/risc-v-lab.git
-
 work:
 	sbt "testOnly wildcat.SingleTest"
 
@@ -27,11 +24,14 @@ app:
 #	riscv64-unknown-elf-objdump -d a.out
 	riscv64-unknown-elf-objcopy -O binary -j .text a.out text.bin
 	riscv64-unknown-elf-objcopy -O binary -j .data a.out data.bin
-	cat text.bin data.bin > a.bin
+	cat text.bin data.bin > a.bin # this does not make much sense
 #	hexdump -e '"%08x\n"' a.bin
 
 run:
 	sbt "runMain wildcat.isasim.SimRV a.bin"
+
+risc-v-lab:
+	git clone https://github.com/schoeberl/risc-v-lab.git
 
 test: risc-v-lab
 	sbt test
@@ -39,13 +39,10 @@ test: risc-v-lab
 sim-test:
 	sbt "testOnly wildcat.SimulatorTest"
 
-elf:
-	sbt "runMain wildcat.isasim.ElfUtil a.out"
-
-comp:
-	make -C c
-
 hw:
+	$(SBT) "runMain wildcat.three.SynthTop a.bin"
+
+hw-fmax:
 	$(SBT) "runMain wildcat.three.SynthTop a.bin"
 
 BOARD?=altde2-115
@@ -61,6 +58,15 @@ clean:
 	rm -rf ./idea
 	rm -rf ./idea
 	rm -rf ./risc-v-lab
+
+#### not (yet) used
+elf:
+	sbt "runMain wildcat.isasim.ElfUtil a.out"
+
+comp:
+	make -C c
+
+
 
 
 

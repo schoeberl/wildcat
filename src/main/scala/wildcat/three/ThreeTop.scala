@@ -16,7 +16,6 @@ import wildcat.common._
 class ThreeTop(args: Array[String]) extends Module {
 
   val io = IO(new Bundle {
-    val dummy = Output(UInt(32.W))
     val led = Output(UInt(8.W))
   })
 
@@ -36,8 +35,6 @@ class ThreeTop(args: Array[String]) extends Module {
     ledReg := cpu.io.dmem.wrData(7, 0)
   }
   io.led := ledReg
-
-  io.dummy := cpu.io.dmem.wrData
 }
 
 object ThreeTop extends App {
