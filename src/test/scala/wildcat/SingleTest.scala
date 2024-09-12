@@ -16,7 +16,7 @@ class SingleTest extends AnyFlatSpec with ChiselScalatestTester {
 //    test(new FiveCats(Array("a.bin"))).withAnnotations(Seq(WriteVcdAnnotation)) {
     test(new ThreeTop(Array("a.bin"))).withAnnotations(Seq(WriteVcdAnnotation)) {
       d => {
-        d.clock.step(20)
+        d.clock.step(200)
       }
     }
   }

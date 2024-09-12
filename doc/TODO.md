@@ -1,14 +1,14 @@
 # TODO
 
- * Check hw resources again after dropping writ output
- * Do the blinking LED 
+ * Do the blinking LED
+ * Check what the issue is in blink without nops
  * Parameter for single test
  * Somtimes we need r2 and the immediate in the same instruction, so val2 is not a solution
  * ecall
  * Throw an exception when simulator test fails (maybe done)
+* Check ALU with the decoding (what did I mean?)
 
 # Further Reading
- * Check ALU with the decoding
  * Rescue RISC-V test from my local copy of sodor in data/repositories
    * Can be found in the inital commit of FlexPRET
    * also test from https://github.com/mortbopet/Ripes (same as the above?)

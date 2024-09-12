@@ -45,9 +45,27 @@ hw:
 hw-fmax:
 	$(SBT) "runMain wildcat.three.SynthTopFmax a.bin"
 
+# Synthesize and copy targets
+
+# does not work from Makefile, C & P into shell
+# Path for chipdesign1 (not helena)
+synpath:
+	source /home/shared/Xilinx/Vivado/2017.4/settings64.sh
+
+synth:
+	./vivado_synth -t ThreeTop -p xc7a100tcsg324-1 -x nexysA7.xdc -o build generated/ThreeTop.v
+
+cp-bit:
+	-mkdir build
+	scp masca@chipdesign1.compute.dtu.dk:~/source/leros/build/ThreeTop.bit build
+
+# Configure the Basys3 or NexysA7 board with open source tools
+config:
+	openocd -f 7series.txt
+
 BOARD?=altde2-115
 # synthesize with Quartus
-synth:
+qsynth:
 	quartus_map quartus/$(BOARD)/Wildcat
 	quartus_fit quartus/$(BOARD)/Wildcat
 	quartus_asm quartus/$(BOARD)/Wildcat

@@ -52,7 +52,8 @@ class Three() extends Wildcat() {
   val rd = instr(11, 7)
   val (rs1Val, rs2Val) = registerFile(rs1, rs2, dest, res, wrEna, false)
 
-  val (instrType, isImm, isStore) = getInstrType(instrReg)
+  // TODO: is it time for a structure (class or bundle?)
+  val (instrType, isImm, isStore, rfWrite) = getInstrType(instrReg)
   val imm = getImm(instrReg, instrType)
   val aluOp = getAluOp(instrReg)
   val val2 = Mux(isImm, imm.asUInt, rs2Val)
@@ -70,6 +71,7 @@ class Three() extends Wildcat() {
     val func3 = UInt(3.W)
     val branchInstr = Bool()
     val isStore = Bool()
+    val rfWrite = Bool()
   })
   decEx.valid := !doBranch
   decEx.pc := pcRegReg
@@ -83,6 +85,7 @@ class Three() extends Wildcat() {
   decEx.func3 := instrReg(14, 12)
   decEx.branchInstr := instrReg(6, 0) === Branch.U
   decEx.isStore := isStore
+  decEx.rfWrite := rfWrite
 
   // Execute
   val decExReg = RegInit(0.U.asTypeOf(decEx))

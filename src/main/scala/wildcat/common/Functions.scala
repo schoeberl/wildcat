@@ -15,15 +15,18 @@ object Functions {
 
     val isImm = WireDefault(false.B)
     val isStore = WireDefault(false.B)
+    val rfWrite = WireDefault(false.B)
     val opcode = instruction(6, 0)
     val instrType = WireDefault(R.id.U)
     switch(opcode) {
       is(AluImm.U) {
         instrType := I.id.U
         isImm := true.B
+        rfWrite := true.B
       }
       is(Alu.U) {
         instrType := R.id.U
+        rfWrite := true.B
       }
       is(Branch.U) {
         instrType := SB.id.U
@@ -31,6 +34,7 @@ object Functions {
       }
       is(Load.U) {
         instrType := I.id.U
+        rfWrite := true.B
       }
       is(Store.U) {
         instrType := S.id.U
@@ -38,6 +42,7 @@ object Functions {
       }
       is(Lui.U) {
         instrType := U.id.U
+        rfWrite := true.B
       }
       is(AuiPc.U) {
         instrType := U.id.U
@@ -47,12 +52,13 @@ object Functions {
       }
       is(JalR.U) {
         instrType := I.id.U
+        rfWrite := true.B
       }
       is(ECall.U) {
         instrType := I.id.U
       }
     }
-    (instrType, isImm, isStore)
+    (instrType, isImm, isStore, rfWrite)
   }
 
   def getAluOp(instruction: UInt): UInt = {
