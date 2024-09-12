@@ -53,7 +53,7 @@ synpath:
 	source /home/shared/Xilinx/Vivado/2017.4/settings64.sh
 
 synth:
-	./vivado_synth -t ThreeTop -p xc7a100tcsg324-1 -x nexysA7.xdc -o build generated/ThreeTop.v
+	./vivado_synth.sh -t ThreeTop -p xc7a100tcsg324-1 -x nexysA7.xdc -o build generated/ThreeTop.v
 
 cp-bit:
 	-mkdir build
