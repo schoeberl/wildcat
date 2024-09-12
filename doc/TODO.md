@@ -1,10 +1,11 @@
 # TODO
 
- * Check what the issue is in blink without nops
- * Somtimes we need r2 and the immediate in the same instruction, so val2 is not a solution
+ * register write needs more decoding, see blink.s with small values: counters go to -1
+ * Sometimes we need r2 and the immediate in the same instruction, so val2 is not a solution
  * ecall
  * Throw an exception when simulator test fails (maybe done)
-* Check ALU with the decoding (what did I mean?)
+ * Get testing going
+ * Check ALU with the decoding (what did I mean?)
 
 # Further Reading
  * Rescue RISC-V test from my local copy of sodor in data/repositories

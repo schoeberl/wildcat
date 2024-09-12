@@ -1,6 +1,7 @@
 #
 # Very simple assembler statements to get started
 #
+	nop
 	addi	x1, x0, 0x111
 	addi	x2, x0, 0x222
 # avoid forwarding

@@ -67,6 +67,7 @@ class Three() extends Wildcat() {
     val rd = UInt(5.W)
     val rs1Val = UInt(32.W)
     val rs2Val = UInt(32.W)
+    val isImm = Bool()
     val val2 = UInt(32.W)
     val func3 = UInt(3.W)
     val branchInstr = Bool()
@@ -80,7 +81,8 @@ class Three() extends Wildcat() {
   decEx.rs2 := instrReg(24, 20)
   decEx.rd := instrReg(11, 7)
   decEx.rs1Val := rs1Val
-  decEx.rs2Val := rs2Val
+  decEx.rs2Val := rs2Val // do I need this?
+  decEx.isImm := isImm
   decEx.val2 := val2 // imm or rs2Val
   decEx.func3 := instrReg(14, 12)
   decEx.branchInstr := instrReg(6, 0) === Branch.U
@@ -90,13 +92,29 @@ class Three() extends Wildcat() {
   // Execute
   val decExReg = RegInit(0.U.asTypeOf(decEx))
   decExReg := decEx
+  // Forwarding register
+  val exFwd = new Bundle() {
+    val valid = Bool()
+    val dest = UInt(5.W)
+    val res = UInt(32.W)
+  }
+  val exFwdReg = RegInit(0.U.asTypeOf(exFwd))
 
-  res := alu(decExReg.aluOp, decExReg.rs1Val, decExReg.val2)
+  // Forwarding
+  val v1 = Mux(exFwdReg.valid && exFwdReg.dest === decExReg.rs1, exFwdReg.res, decExReg.rs1Val)
+  val v2 = Mux(exFwdReg.valid && exFwdReg.dest === decExReg.rs2 && !decExReg.isImm, exFwdReg.res, decExReg.val2)
+
+  res := alu(decExReg.aluOp, v1, v2)
   dest := decExReg.rd
 
   branchTarget := (decExReg.pc.asSInt + decExReg.val2.asSInt).asUInt
   doBranch := compare(decExReg.func3, decExReg.rs1Val, decExReg.rs2Val) && decExReg.branchInstr && decExReg.valid
-  wrEna := decExReg.valid && !doBranch // and some more conditions
+  wrEna := decExReg.valid && !doBranch // and some more conditions - not an all instructions
+
+  // Forwarding register values
+  exFwdReg.valid := wrEna
+  exFwdReg.dest := dest
+  exFwdReg.res := res
 
   // almost dummy connections for now
   io.dmem.rdAddress := 0.U
