@@ -40,10 +40,10 @@ sim-test:
 	sbt "testOnly wildcat.SimulatorTest"
 
 hw:
-	$(SBT) "runMain wildcat.three.SynthTop a.bin"
+	$(SBT) "runMain wildcat.three.ThreeTop a.bin"
 
 hw-fmax:
-	$(SBT) "runMain wildcat.three.SynthTop a.bin"
+	$(SBT) "runMain wildcat.three.SynthTopFmax a.bin"
 
 BOARD?=altde2-115
 # synthesize with Quartus
