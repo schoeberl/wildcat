@@ -17,6 +17,7 @@ class ThreeTop(args: Array[String]) extends Module {
 
   val io = IO(new Bundle {
     val dummy = Output(UInt(32.W))
+    val led = Output(UInt(8.W))
   })
 
   val (code, start) = Util.getCode(args)
@@ -28,6 +29,13 @@ class ThreeTop(args: Array[String]) extends Module {
   imem.io.address := cpu.io.imem.address
   cpu.io.imem.data := imem.io.data
   cpu.io.imem.stall := imem.io.stall
+
+  // quick hack to get the LED output
+  val ledReg = RegInit(0.U(8.W))
+  when (cpu.io.dmem.wrEnable === 15.U && cpu.io.dmem.wrAddress === 0.U) {
+    ledReg := cpu.io.dmem.wrData(7, 0)
+  }
+  io.led := ledReg
 
   io.dummy := cpu.io.dmem.wrData
 }

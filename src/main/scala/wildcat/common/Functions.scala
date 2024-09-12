@@ -14,6 +14,7 @@ object Functions {
   def getInstrType(instruction: UInt) = {
 
     val isImm = WireDefault(false.B)
+    val isStore = WireDefault(false.B)
     val opcode = instruction(6, 0)
     val instrType = WireDefault(R.id.U)
     switch(opcode) {
@@ -33,6 +34,7 @@ object Functions {
       }
       is(Store.U) {
         instrType := S.id.U
+        isStore := true.B
       }
       is(Lui.U) {
         instrType := U.id.U
@@ -50,7 +52,7 @@ object Functions {
         instrType := I.id.U
       }
     }
-    (instrType, isImm)
+    (instrType, isImm, isStore)
   }
 
   def getAluOp(instruction: UInt): UInt = {

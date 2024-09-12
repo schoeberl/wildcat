@@ -29,7 +29,7 @@ class SynthTop(args: Array[String]) extends Module {
   imem.io.wrData := io.wrData
   imem.io.wrEnable := 15.U
 
-  io.dummy := RegNext(cpu.io.dmem.wrData)
+  io.dummy := RegNext(RegNext(cpu.io.dmem.wrData))
 }
 
 object SynthTop extends App {

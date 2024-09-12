@@ -1,28 +1,27 @@
 [*]
 [*] GTKWave Analyzer v3.4.0 (w)1999-2022 BSI
-[*] Tue Sep 10 23:29:06 2024
+[*] Thu Sep 12 03:49:31 2024
 [*]
-[dumpfile] "/Users/martin/source/wildcat/test_run_dir/Single_asmriscvv1_addis_should_pass/ThreeTop.vcd"
-[dumpfile_mtime] "Tue Sep 10 23:17:41 2024"
-[dumpfile_size] 21180
+[dumpfile] "/Users/martin/source/wildcat/test_run_dir/Single_asmblinks_should_pass/ThreeTop.vcd"
+[dumpfile_mtime] "Thu Sep 12 03:47:48 2024"
+[dumpfile_size] 23669
 [savefile] "/Users/martin/source/wildcat/wildcat.gtkw"
 [timestart] 0
 [size] 1392 600
 [pos] -1 -1
-*-4.512384 78 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-5.327515 78 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] ThreeTop.
 [sst_width] 253
 [signals_width] 202
 [sst_expanded] 1
 [sst_vpaned_height] 158
 @28
-ThreeTop.cpu.clock
-ThreeTop.cpu.reset
+ThreeTop.clock
+ThreeTop.reset
 @22
+ThreeTop.io_led[7:0]
 ThreeTop.cpu.pcReg[31:0]
-@23
 ThreeTop.imem.io_data[31:0]
-@22
 ThreeTop.cpu.pcNext[31:0]
 ThreeTop.cpu.instrReg[31:0]
 @200

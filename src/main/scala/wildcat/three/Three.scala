@@ -52,7 +52,7 @@ class Three() extends Wildcat() {
   val rd = instr(11, 7)
   val (rs1Val, rs2Val) = registerFile(rs1, rs2, dest, res, wrEna, false)
 
-  val (instrType, isImm) = getInstrType(instrReg)
+  val (instrType, isImm, isStore) = getInstrType(instrReg)
   val imm = getImm(instrReg, instrType)
   val aluOp = getAluOp(instrReg)
   val val2 = Mux(isImm, imm.asUInt, rs2Val)
@@ -69,6 +69,7 @@ class Three() extends Wildcat() {
     val val2 = UInt(32.W)
     val func3 = UInt(3.W)
     val branchInstr = Bool()
+    val isStore = Bool()
   })
   decEx.valid := !doBranch
   decEx.pc := pcRegReg
@@ -81,6 +82,7 @@ class Three() extends Wildcat() {
   decEx.val2 := val2 // imm or rs2Val
   decEx.func3 := instrReg(14, 12)
   decEx.branchInstr := instrReg(6, 0) === Branch.U
+  decEx.isStore := isStore
 
   // Execute
   val decExReg = RegInit(0.U.asTypeOf(decEx))
@@ -93,9 +95,9 @@ class Three() extends Wildcat() {
   doBranch := compare(decExReg.func3, decExReg.rs1Val, decExReg.rs2Val) && decExReg.branchInstr && decExReg.valid
   wrEna := decExReg.valid && !doBranch // and some more conditions
 
-  // dummy connections for now
+  // almost dummy connections for now
   io.dmem.rdAddress := 0.U
   io.dmem.wrAddress := 0.U
-  io.dmem.wrData := RegNext(RegNext(RegNext(res))) // to avoid optimizing everything away
-  io.dmem.wrEnable := 0.U
+  io.dmem.wrData := decExReg.rs2Val
+  io.dmem.wrEnable := Mux(decExReg.isStore, 15.U, 0.U)
 }

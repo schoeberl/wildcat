@@ -26,10 +26,11 @@ class Decode extends Module {
   val rd = instr(11, 7)
   val (rs1Val, rs2Val) = registerFile(rs1, rs2, rd, io.wbdec.data, io.wbdec.valid)
 
-  val (instrType, isImm) = getInstrType(instrReg)
+  val (instrType, isImm, isStore) = getInstrType(instrReg)
   val imm = getImm(instrReg, instrType)
   val aluOp = getAluOp(instrReg)
 
+  // TODO: there is no decoding going on here
   // Address calculation for load/store (if 3 or 4 stages pipeline)
   io.decex.pc := pcReg
   io.decex.aluOp := aluOp
