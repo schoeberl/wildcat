@@ -156,7 +156,6 @@ object Functions {
         imm := (Fill(11, instruction(31)) ## instruction(19, 12) ## instruction(20) ## instruction(30, 21) ## 0.U).asSInt
       }
     }
-
     imm
   }
 
@@ -172,7 +171,7 @@ object Functions {
       }
       (rs1Val, rs2Val)
     } else {
-      // TODO: internal forwarding
+      // non need for forwarding as read address is delayed
       val regs = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
       val rs1Val = regs(RegNext(rs1))
       val rs2Val = regs(RegNext(rs2))

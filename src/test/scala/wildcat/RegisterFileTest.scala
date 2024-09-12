@@ -21,13 +21,12 @@ class RegisterFileTest extends AnyFlatSpec with ChiselScalatestTester {
 
     if (version == 0) {
       val regs = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
-
       when(io.wrEna && io.wrAddr =/= 0.U) {
         regs(io.wrAddr) := io.wrData
       }
-
-      io.rdData1 := regs(io.rdAddr1)
-      io.rdData2 := regs(io.rdAddr2)
+      // A read shall not be plain combinational
+      io.rdData1 := regs(RegNext(io.rdAddr1))
+      io.rdData2 := regs(RegNext(io.rdAddr2))
     } else if (version == 1) {
       val (rs1Val, rs2Val) = registerFile(io.rdAddr1, io.rdAddr2, io.wrAddr, io.wrData, io.wrEna, false)
       io.rdData1 := rs1Val
@@ -87,12 +86,35 @@ class RegisterFileTest extends AnyFlatSpec with ChiselScalatestTester {
     d.io.rdAddr1.poke(1.U)
     d.clock.step(1)
     d.io.rdData1.expect(123.U)
+
+    // it should take one clock cycle to read the new value
+    d.io.rdAddr1.poke(1.U)
+    d.io.rdData1.expect(123.U)
+    d.io.wrData.poke(321.U)
+    d.io.wrEna.poke(true.B)
+    d.io.rdData1.expect(123.U)
+    d.clock.step(1)
+    d.io.rdData1.expect(321.U)
+
+
+    d.io.wrAddr.poke(3.U)
+    d.io.wrData.poke(1234.U)
+    d.clock.step(1)
+    // more on one clock cycle read
+    d.io.rdData1.expect(321.U)
+    d.io.rdAddr1.poke(3.U)
+    d.io.rdData1.expect(321.U)
+    d.clock.step(1)
+    d.io.rdData1.expect(1234.U)
+
+
+
   }
   // val rfs = List(Module(new RegisterFile()), Module(new RegisterFile2()))
 
   //for (rf <- rfs) {
 
-  "RegisterFile plain" should "pass" in {
+  "RegisterFile reference" should "pass" in {
     test(new RegisterFile(0))(doTest(_))
   }
   "RegisterFile FF" should "pass" in {
