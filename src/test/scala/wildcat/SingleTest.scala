@@ -9,8 +9,8 @@ import scala.sys.process._
 
 class SingleTest extends AnyFlatSpec with ChiselScalatestTester {
 
-  // val f = "asm/riscv-v1_addi.s"
-  val f = "asm/blink.s"
+  // val f = "asm/app/blink.s"
+  val f = "asm/riscv-v1_addi.s"
   s"Single $f" should "pass" in {
     s"make app APP=$f".!
 //    test(new FiveCats(Array("a.bin"))).withAnnotations(Seq(WriteVcdAnnotation)) {
