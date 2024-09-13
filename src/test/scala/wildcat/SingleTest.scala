@@ -12,9 +12,9 @@ import scala.sys.process._
 class SingleTest() extends AnyFlatSpec with ChiselScalatestTester {
 
 
-  val f = Properties.envOrElse("test", "asm/app/blink.s")
+  val f = Properties.envOrElse("test", "asm/apps/blink.s")
   println(s"Running test $f")
-  // val f = "asm/app/blink.s"
+  // val f = "asm/apps/blink.s"
   // val f = "asm/riscv-v1_addi.s"
   s"Single $f" should "pass" in {
     s"make app APP=$f".!
