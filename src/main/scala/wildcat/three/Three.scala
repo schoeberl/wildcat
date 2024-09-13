@@ -56,7 +56,6 @@ class Three() extends Wildcat() {
   val (instrType, isImm, isStore, rfWrite) = getInstrType(instrReg)
   val imm = getImm(instrReg, instrType)
   val aluOp = getAluOp(instrReg)
-  val val2 = Mux(isImm, imm.asUInt, rs2Val)
 
   val decEx = Wire(new Bundle() {
     val valid = Bool()
@@ -67,12 +66,13 @@ class Three() extends Wildcat() {
     val rd = UInt(5.W)
     val rs1Val = UInt(32.W)
     val rs2Val = UInt(32.W)
+    val immVal = UInt(32.W)
     val isImm = Bool()
-    val val2 = UInt(32.W)
     val func3 = UInt(3.W)
     val branchInstr = Bool()
     val isStore = Bool()
     val rfWrite = Bool()
+    val instr = UInt(32.W) // for debugging
   })
   decEx.valid := !doBranch
   decEx.pc := pcRegReg
@@ -81,17 +81,19 @@ class Three() extends Wildcat() {
   decEx.rs2 := instrReg(24, 20)
   decEx.rd := instrReg(11, 7)
   decEx.rs1Val := rs1Val
-  decEx.rs2Val := rs2Val // do I need this?
+  decEx.rs2Val := rs2Val
+  decEx.immVal := imm.asUInt
   decEx.isImm := isImm
-  decEx.val2 := val2 // imm or rs2Val
   decEx.func3 := instrReg(14, 12)
   decEx.branchInstr := instrReg(6, 0) === Branch.U
   decEx.isStore := isStore
   decEx.rfWrite := rfWrite
+  decEx.instr := instrReg
 
   // Execute
   val decExReg = RegInit(0.U.asTypeOf(decEx))
   decExReg := decEx
+  printf("ins %x \n", decExReg.instr)
   // Forwarding register
   val exFwd = new Bundle() {
     val valid = Bool()
@@ -102,14 +104,15 @@ class Three() extends Wildcat() {
 
   // Forwarding
   val v1 = Mux(exFwdReg.valid && exFwdReg.dest === decExReg.rs1, exFwdReg.res, decExReg.rs1Val)
-  val v2 = Mux(exFwdReg.valid && exFwdReg.dest === decExReg.rs2 && !decExReg.isImm, exFwdReg.res, decExReg.val2)
+  val v2 = Mux(exFwdReg.valid && exFwdReg.dest === decExReg.rs2, exFwdReg.res, decExReg.rs2Val)
 
-  res := alu(decExReg.aluOp, v1, v2)
+  val val2 = Mux(decExReg.isImm, decExReg.immVal, v2)
+
+  res := alu(decExReg.aluOp, v1, val2)
   dest := decExReg.rd
-
-  branchTarget := (decExReg.pc.asSInt + decExReg.val2.asSInt).asUInt
-  doBranch := compare(decExReg.func3, decExReg.rs1Val, decExReg.rs2Val) && decExReg.branchInstr && decExReg.valid
-  wrEna := decExReg.valid && !doBranch // and some more conditions - not an all instructions
+  branchTarget := (decExReg.pc.asSInt + decExReg.immVal.asSInt).asUInt
+  doBranch := compare(decExReg.func3, v1, v2) && decExReg.branchInstr && decExReg.valid
+  wrEna := decExReg.valid && decExReg.rfWrite && !doBranch
 
   // Forwarding register values
   exFwdReg.valid := wrEna

@@ -1,7 +1,8 @@
 # TODO
 
- * register write needs more decoding, see blink.s with small values: counters go to -1
+ * Why does the inner loop take 4 clock cycles and why is counter -1?
  * Sometimes we need r2 and the immediate in the same instruction, so val2 is not a solution
+ * What are the tyoes ov immediate values?
  * ecall
  * Throw an exception when simulator test fails (maybe done)
  * Get testing going
