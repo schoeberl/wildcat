@@ -1,8 +1,6 @@
 # TODO
 
- * Why does the inner loop take 4 clock cycles and why is counter -1?
- * Sometimes we need r2 and the immediate in the same instruction, so val2 is not a solution
- * What are the tyoes ov immediate values?
+ * What are the types of immediate values? mostly signed or mostly unsigned?
  * ecall
  * Throw an exception when simulator test fails (maybe done)
  * Get testing going
@@ -14,7 +12,7 @@
    * also test from https://github.com/mortbopet/Ripes (same as the above?)
    * Look into YARVI for tests, they are committed
    * And the student project from CAE: where did he get the tests from?
-   * Also the tests on Helena
+   * Look also into the tests on Helena
    * They are also at: https://github.com/YosysHQ/picorv32/tree/master/tests
    * Build see: https://github.com/YosysHQ/picorv32/blob/f00a88c36eaab478b64ee27d8162e421049bcc66/Makefile#L121
  * Checkout: https://github.com/SpinalHDL/VexRiscv (has a lot of info)

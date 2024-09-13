@@ -71,6 +71,12 @@ qsynth:
 	quartus_asm quartus/$(BOARD)/Wildcat
 	quartus_sta quartus/$(BOARD)/Wildcat
 
+# need to change sign in into nix with
+# nix-shell shell.nix
+openlane:
+	openlane wildcat.json
+	openlane --last-run --flow openinklayout wildcat.json
+
 clean:
 	git clean -fd
 	rm -rf ./idea
