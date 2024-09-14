@@ -28,11 +28,11 @@ class RegisterFileTest extends AnyFlatSpec with ChiselScalatestTester {
       io.rdData1 := regs(RegNext(io.rdAddr1))
       io.rdData2 := regs(RegNext(io.rdAddr2))
     } else if (version == 1) {
-      val (rs1Val, rs2Val) = registerFile(io.rdAddr1, io.rdAddr2, io.wrAddr, io.wrData, io.wrEna, false)
+      val (rs1Val, rs2Val, debugRegs) = registerFile(io.rdAddr1, io.rdAddr2, io.wrAddr, io.wrData, io.wrEna, false)
       io.rdData1 := rs1Val
       io.rdData2 := rs2Val
     } else {
-      val (rs1Val, rs2Val) = registerFile(io.rdAddr1, io.rdAddr2, io.wrAddr, io.wrData, io.wrEna, true)
+      val (rs1Val, rs2Val, debugRegs) = registerFile(io.rdAddr1, io.rdAddr2, io.wrAddr, io.wrData, io.wrEna, true)
       io.rdData1 := rs1Val
       io.rdData2 := rs2Val
     }
@@ -106,9 +106,6 @@ class RegisterFileTest extends AnyFlatSpec with ChiselScalatestTester {
     d.io.rdData1.expect(321.U)
     d.clock.step(1)
     d.io.rdData1.expect(1234.U)
-
-
-
   }
   // val rfs = List(Module(new RegisterFile()), Module(new RegisterFile2()))
 

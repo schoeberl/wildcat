@@ -50,7 +50,7 @@ class Three() extends Wildcat() {
   val rs1 = instr(19, 15)
   val rs2 = instr(24, 20)
   val rd = instr(11, 7)
-  val (rs1Val, rs2Val) = registerFile(rs1, rs2, dest, res, wrEna, false)
+  val (rs1Val, rs2Val, debugRegs) = registerFile(rs1, rs2, dest, res, wrEna, false)
 
   // TODO: is it time for a structure (class or bundle?)
   val (instrType, isImm, isStore, rfWrite) = getInstrType(instrReg)

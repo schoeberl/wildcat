@@ -24,7 +24,7 @@ class Decode extends Module {
   val rs1 = instr(19, 15)
   val rs2 = instr(24, 20)
   val rd = instr(11, 7)
-  val (rs1Val, rs2Val) = registerFile(rs1, rs2, rd, io.wbdec.data, io.wbdec.valid)
+  val (rs1Val, rs2Val, debugReg) = registerFile(rs1, rs2, rd, io.wbdec.data, io.wbdec.valid)
 
   val (instrType, isImm, isStore, rfWrite) = getInstrType(instrReg)
   val imm = getImm(instrReg, instrType)

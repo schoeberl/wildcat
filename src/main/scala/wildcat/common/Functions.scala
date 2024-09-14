@@ -177,7 +177,8 @@ object Functions {
       when(wrEna && rd =/= 0.U) {
         regs.write(rd, wrData)
       }
-      (rs1Val, rs2Val)
+      val dummy = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
+      (rs1Val, rs2Val, dummy)
     } else {
       // non need for forwarding as read address is delayed
       val regs = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
@@ -186,7 +187,7 @@ object Functions {
       when(wrEna && rd =/= 0.U) {
         regs(rd) := wrData
       }
-      (rs1Val, rs2Val)
+      (rs1Val, rs2Val, regs)
     }
   }
 
