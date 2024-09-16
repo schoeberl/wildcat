@@ -10,6 +10,11 @@ import wildcat.Opcode._
  *
  * This is a three stage pipeline.
  *
+ * 0. PC generation
+ * 1. Fetch
+ * 2. Decode, register read
+ * 3. Execute, memory access
+ *
  * Author: Martin Schoeberl (martin@jopdesign.com)
  *
  */
@@ -24,11 +29,7 @@ class Three() extends Wildcat() {
   val doBranch = WireDefault(false.B)
   val branchTarget = WireDefault(0.U)
 
-  // Let's do following pipeline stages:
-  // 0. PC generation
-  // 1. Fetch
-  // 2. Decode, register read
-  // 3. Execute
+
 
   // The ROM has a register that is reset to 0, therefore clock cycle 1 is the first instruction.
   // Needed if we want to start from a different address.
@@ -114,10 +115,11 @@ class Three() extends Wildcat() {
   wrEna := decExReg.valid && decExReg.rfWrite && !doBranch
 
   // Forwarding register values
-  exFwdReg.valid := wrEna
+  exFwdReg.valid := wrEna && (dest =/= 0.U)
   exFwdReg.dest := dest
   exFwdReg.res := res
 
+  // Just for testing
   val stop = decExReg.isECall
 
   // almost dummy connections for now

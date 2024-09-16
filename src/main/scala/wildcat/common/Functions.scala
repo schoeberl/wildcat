@@ -157,13 +157,13 @@ object Functions {
         imm := (Fill(20, instruction(31)) ## instruction(31, 25) ## instruction(11, 7)).asSInt
       }
       is(SB.id.U) {
-        imm := (Fill(19, instruction(31)) ## instruction(7) ## instruction(30, 25) ## instruction(11, 8) ## 0.U).asSInt
+        imm := (Fill(19, instruction(31)) ## instruction(7) ## instruction(30, 25) ## instruction(11, 8) ## 0.U(1.W)).asSInt
       }
       is(U.id.U) {
         imm := (instruction(31, 12) ## Fill(12, 0.U)).asSInt
       }
       is(UJ.id.U) {
-        imm := (Fill(11, instruction(31)) ## instruction(19, 12) ## instruction(20) ## instruction(30, 21) ## 0.U).asSInt
+        imm := (Fill(11, instruction(31)) ## instruction(19, 12) ## instruction(20) ## instruction(30, 21) ## 0.U(1.W)).asSInt
       }
     }
     imm

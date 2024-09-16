@@ -30,13 +30,16 @@ class SingleTest() extends AnyFlatSpec with ChiselScalatestTester {
           if (d.io.stop.peekBoolean()) {
             println("Stop")
             stop = true
+            assert(d.io.regFile(28).peekInt() == 1)
           }
           cnt += 1
         }
+        /*
         for(i <- 0 until 32) {
           val r = d.io.regFile(i).peekInt()
           println(f"reg($i) = ${r}")
         }
+         */
       }
     }
   }
