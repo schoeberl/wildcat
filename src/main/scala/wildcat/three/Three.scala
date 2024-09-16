@@ -34,7 +34,7 @@ class Three() extends Wildcat() {
   // Needed if we want to start from a different address.
   // PC generation
 //  val pcReg = RegInit(-4.S(32.W).asUInt)
-  val pcReg = RegInit(0.S(32.W).asUInt) // keep it simpler for now with the pipe viewing
+  val pcReg = RegInit(0.S(32.W).asUInt) // keep it simpler for now for the waveform viewing
 
   val pcNext = Mux(doBranch, branchTarget, pcReg + 4.U)
   pcReg := pcNext
@@ -53,7 +53,7 @@ class Three() extends Wildcat() {
   val (rs1Val, rs2Val, debugRegs) = registerFile(rs1, rs2, dest, res, wrEna, false)
 
   // TODO: is it time for a structure (class or bundle?)
-  val (instrType, isImm, isStore, rfWrite) = getInstrType(instrReg)
+  val (instrType, isImm, isStore, rfWrite, isECall) = getInstrType(instrReg)
   val imm = getImm(instrReg, instrType)
   val aluOp = getAluOp(instrReg)
 
@@ -72,7 +72,7 @@ class Three() extends Wildcat() {
     val branchInstr = Bool()
     val isStore = Bool()
     val rfWrite = Bool()
-    val instr = UInt(32.W) // for debugging
+    val isECall = Bool()
   })
   decEx.valid := !doBranch
   decEx.pc := pcRegReg
@@ -88,12 +88,11 @@ class Three() extends Wildcat() {
   decEx.branchInstr := instrReg(6, 0) === Branch.U
   decEx.isStore := isStore
   decEx.rfWrite := rfWrite
-  decEx.instr := instrReg
+  decEx.isECall := isECall
 
   // Execute
   val decExReg = RegInit(0.U.asTypeOf(decEx))
   decExReg := decEx
-  printf("ins %x \n", decExReg.instr)
   // Forwarding register
   val exFwd = new Bundle() {
     val valid = Bool()
@@ -118,6 +117,8 @@ class Three() extends Wildcat() {
   exFwdReg.valid := wrEna
   exFwdReg.dest := dest
   exFwdReg.res := res
+
+  val stop = decExReg.isECall
 
   // almost dummy connections for now
   io.dmem.rdAddress := 0.U

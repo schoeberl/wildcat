@@ -1,6 +1,8 @@
 package wildcat
 
 import scala.util.Properties
+import scala.util.control.Breaks
+
 
 import chiseltest._
 import org.scalatest.flatspec.AnyFlatSpec
@@ -21,7 +23,16 @@ class SingleTest() extends AnyFlatSpec with ChiselScalatestTester {
 //    test(new FiveCats(Array("a.bin"))).withAnnotations(Seq(WriteVcdAnnotation)) {
     test(new ThreeTestTop(Array("a.bin"))).withAnnotations(Seq(WriteVcdAnnotation)) {
       d => {
-        d.clock.step(100)
+        var stop = false
+        var cnt = 0
+        while(!stop && cnt < 100) {
+          d.clock.step(1)
+          if (d.io.stop.peekBoolean()) {
+            println("Stop")
+            stop = true
+          }
+          cnt += 1
+        }
         for(i <- 0 until 32) {
           val r = d.io.regFile(i).peekInt()
           println(f"reg($i) = ${r}")

@@ -1,7 +1,16 @@
 # TODO
 
- * What are the types of immediate values? mostly signed or mostly unsigned?
+ * Finish for D
+   - jal, jalr
+   - lw, sw
+   - lui, auipc
+ * Later
+   - ecall, ebreak
+   - csrrw, csrrs, csrrc, csrrwi, csrrsi, csrrci
+   - lb, lh, lbu, lhu
+   - sb, sh
  * ecall
+ * What are the types of immediate values? mostly signed or mostly unsigned?
  * Throw an exception when simulator test fails (maybe done)
  * Get testing going
  * Check ALU with the decoding (what did I mean?)
