@@ -17,6 +17,8 @@ object Functions {
     val decOut = Wire(new DecodedInstr())
     decOut.instrType := R.id.U
     decOut.isImm := false.B
+    decOut.isLui := false.B
+    decOut.isAuiPc := false.B
     decOut.isStore := false.B
     decOut.rfWrite := false.B
     decOut.isECall := false.B
@@ -45,10 +47,12 @@ object Functions {
       is(Lui.U) {
         decOut.instrType := U.id.U
         decOut.rfWrite := true.B
+        decOut.isLui := true.B
       }
       is(AuiPc.U) {
         decOut.instrType := U.id.U
         decOut.rfWrite := true.B
+        decOut.isAuiPc := true.B
       }
       is(Jal.U) {
         decOut.instrType := UJ.id.U

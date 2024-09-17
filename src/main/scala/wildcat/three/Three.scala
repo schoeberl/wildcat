@@ -94,9 +94,16 @@ class Three() extends Wildcat() {
   val v2 = Mux(exFwdReg.valid && exFwdReg.dest === decExReg.rs2, exFwdReg.res, decExReg.rs2Val)
 
   val val2 = Mux(decExReg.decOut.isImm, decExReg.decOut.imm.asUInt, v2)
-
   res := alu(decExReg.decOut.aluOp, v1, val2)
+  when (decExReg.decOut.isLui) {
+    res := decExReg.decOut.imm.asUInt
+  }
+  when (decExReg.decOut.isAuiPc) {
+    res := (decExReg.pc.asSInt + decExReg.decOut.imm).asUInt
+  }
+
   dest := decExReg.rd
+
   branchTarget := (decExReg.pc.asSInt + decExReg.decOut.imm).asUInt
   doBranch := compare(decExReg.func3, v1, v2) && decExReg.branchInstr && decExReg.valid
   wrEna := decExReg.valid && decExReg.decOut.rfWrite && !doBranch

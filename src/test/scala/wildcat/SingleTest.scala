@@ -30,7 +30,8 @@ class SingleTest() extends AnyFlatSpec with ChiselScalatestTester {
           if (d.io.stop.peekBoolean()) {
             println("Stop")
             stop = true
-            assert(d.io.regFile(28).peekInt() == 1)
+            // tests from Ripes are OK when 0 (risc-v tests OK when 1)
+            assert(d.io.regFile(28).peekInt() == 0, s"Failed case ${d.io.regFile(3).peekInt()}")
           }
           cnt += 1
         }
