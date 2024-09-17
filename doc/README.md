@@ -13,6 +13,11 @@ Some notes collected along exploring RISC-V.
  * 4 stages: standard without the WB
  * 5 stages: mostly useless WB (just a Mux)
 
+## Notes, Ideas
+
+ * LUI could be recoded as ADDI with R0
+ * Branch predictor idea from Tommy: ```pc == bp_addr ? bp_target : pc + 4``` and setting those on any taken branch
+
 ## Module Organization
 
  * An instruction memory/cache can contain a counter for the PC with autoincrement
@@ -69,9 +74,6 @@ Here some observations:
  * Unaligned memory access can be trapped and handled in SW (Berkeley cores do/did this)
    * Same can be done for floating point emulation
 
-## Further to Explore
-
- * Branch predictor idea from Tommy: ```pc == bp_addr ? bp_target : pc + 4``` and setting those on any taken branch
 
 ## Some Links
 

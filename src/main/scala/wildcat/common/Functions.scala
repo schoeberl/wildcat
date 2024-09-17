@@ -11,56 +11,60 @@ import wildcat.BranchFunct._
 
 object Functions {
 
-  def getInstrType(instruction: UInt) = {
+  def decode(instruction: UInt) = {
 
     val opcode = instruction(6, 0)
-    val instrType = WireDefault(R.id.U)
-    val isImm = WireDefault(false.B)
-    val isStore = WireDefault(false.B)
-    val rfWrite = WireDefault(false.B)
-    val isECall = WireDefault(false.B)
+    val decOut = Wire(new DecodedInstr())
+    decOut.instrType := R.id.U
+    decOut.isImm := false.B
+    decOut.isStore := false.B
+    decOut.rfWrite := false.B
+    decOut.isECall := false.B
     switch(opcode) {
       is(AluImm.U) {
-        instrType := I.id.U
-        isImm := true.B
-        rfWrite := true.B
+        decOut.instrType := I.id.U
+        decOut.isImm := true.B
+        decOut.rfWrite := true.B
       }
       is(Alu.U) {
-        instrType := R.id.U
-        rfWrite := true.B
+        decOut.instrType := R.id.U
+        decOut.rfWrite := true.B
       }
       is(Branch.U) {
-        instrType := SB.id.U
-        isImm := true.B
+        decOut.instrType := SB.id.U
+        decOut.isImm := true.B
       }
       is(Load.U) {
-        instrType := I.id.U
-        rfWrite := true.B
+        decOut.instrType := I.id.U
+        decOut.rfWrite := true.B
       }
       is(Store.U) {
-        instrType := S.id.U
-        isStore := true.B
+        decOut.instrType := S.id.U
+        decOut.isStore := true.B
       }
       is(Lui.U) {
-        instrType := U.id.U
-        rfWrite := true.B
+        decOut.instrType := U.id.U
+        decOut.rfWrite := true.B
       }
       is(AuiPc.U) {
-        instrType := U.id.U
+        decOut.instrType := U.id.U
+        decOut.rfWrite := true.B
       }
       is(Jal.U) {
-        instrType := UJ.id.U
+        decOut.instrType := UJ.id.U
       }
       is(JalR.U) {
-        instrType := I.id.U
-        rfWrite := true.B
+        decOut.instrType := I.id.U
+        decOut.rfWrite := true.B
       }
       is(ECall.U) {
-        instrType := I.id.U
-        isECall := true.B
+        decOut.instrType := I.id.U
+        decOut.isECall := true.B
       }
     }
-    (instrType, isImm, isStore, rfWrite, isECall)
+    decOut.aluOp := getAluOp(instruction)
+    decOut.imm := getImm(instruction, decOut.instrType)
+    decOut
   }
 
   def getAluOp(instruction: UInt): UInt = {
@@ -105,6 +109,7 @@ object Functions {
     }
     aluOp
   }
+
   /*
       def compare(funct3: Int, op1: Int, op2: Int): Boolean = {
       funct3 match {
@@ -193,8 +198,6 @@ object Functions {
       (rs1Val, rs2Val, regs)
     }
   }
-
-
 
   // TODO: something missing? Looks OK now. Wait for the tests.
   def alu(op: UInt, a: UInt, b: UInt): UInt = {

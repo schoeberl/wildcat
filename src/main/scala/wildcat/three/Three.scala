@@ -53,43 +53,30 @@ class Three() extends Wildcat() {
   val rd = instr(11, 7)
   val (rs1Val, rs2Val, debugRegs) = registerFile(rs1, rs2, dest, res, wrEna, false)
 
-  // TODO: is it time for a structure (class or bundle?)
-  val (instrType, isImm, isStore, rfWrite, isECall) = getInstrType(instrReg)
-  val imm = getImm(instrReg, instrType)
-  val aluOp = getAluOp(instrReg)
+  val decOut = decode(instrReg)
 
   val decEx = Wire(new Bundle() {
+    val decOut = new DecodedInstr()
     val valid = Bool()
     val pc = UInt(32.W)
-    val aluOp = UInt(4.W)
     val rs1 = UInt(5.W)
     val rs2 = UInt(5.W)
     val rd = UInt(5.W)
     val rs1Val = UInt(32.W)
     val rs2Val = UInt(32.W)
-    val immVal = UInt(32.W)
-    val isImm = Bool()
     val func3 = UInt(3.W)
     val branchInstr = Bool()
-    val isStore = Bool()
-    val rfWrite = Bool()
-    val isECall = Bool()
   })
+  decEx.decOut := decOut
   decEx.valid := !doBranch
   decEx.pc := pcRegReg
-  decEx.aluOp := aluOp
   decEx.rs1 := instrReg(19, 15)
   decEx.rs2 := instrReg(24, 20)
   decEx.rd := instrReg(11, 7)
   decEx.rs1Val := rs1Val
   decEx.rs2Val := rs2Val
-  decEx.immVal := imm.asUInt
-  decEx.isImm := isImm
   decEx.func3 := instrReg(14, 12)
   decEx.branchInstr := instrReg(6, 0) === Branch.U
-  decEx.isStore := isStore
-  decEx.rfWrite := rfWrite
-  decEx.isECall := isECall
 
   // Execute
   val decExReg = RegInit(0.U.asTypeOf(decEx))
@@ -106,13 +93,13 @@ class Three() extends Wildcat() {
   val v1 = Mux(exFwdReg.valid && exFwdReg.dest === decExReg.rs1, exFwdReg.res, decExReg.rs1Val)
   val v2 = Mux(exFwdReg.valid && exFwdReg.dest === decExReg.rs2, exFwdReg.res, decExReg.rs2Val)
 
-  val val2 = Mux(decExReg.isImm, decExReg.immVal, v2)
+  val val2 = Mux(decExReg.decOut.isImm, decExReg.decOut.imm.asUInt, v2)
 
-  res := alu(decExReg.aluOp, v1, val2)
+  res := alu(decExReg.decOut.aluOp, v1, val2)
   dest := decExReg.rd
-  branchTarget := (decExReg.pc.asSInt + decExReg.immVal.asSInt).asUInt
+  branchTarget := (decExReg.pc.asSInt + decExReg.decOut.imm).asUInt
   doBranch := compare(decExReg.func3, v1, v2) && decExReg.branchInstr && decExReg.valid
-  wrEna := decExReg.valid && decExReg.rfWrite && !doBranch
+  wrEna := decExReg.valid && decExReg.decOut.rfWrite && !doBranch
 
   // Forwarding register values
   exFwdReg.valid := wrEna && (dest =/= 0.U)
@@ -120,11 +107,11 @@ class Three() extends Wildcat() {
   exFwdReg.res := res
 
   // Just for testing
-  val stop = decExReg.isECall
+  val stop = decExReg.decOut.isECall
 
   // almost dummy connections for now
   io.dmem.rdAddress := 0.U
   io.dmem.wrAddress := 0.U
   io.dmem.wrData := decExReg.rs2Val
-  io.dmem.wrEnable := Mux(decExReg.isStore, 15.U, 0.U)
+  io.dmem.wrEnable := Mux(decExReg.decOut.isStore, 15.U, 0.U)
 }

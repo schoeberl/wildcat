@@ -34,6 +34,8 @@ risc-v-lab:
 	git clone https://github.com/schoeberl/risc-v-lab.git
 
 test: risc-v-lab
+	test=asm/riscv-v1_addi.s sbt "testOnly wildcat.SingleTest"
+	test=asm/riscv-v1_bne.s sbt "testOnly wildcat.SingleTest"
 	sbt test
 
 sim-test:
