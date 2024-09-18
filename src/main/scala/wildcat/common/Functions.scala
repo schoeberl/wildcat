@@ -21,6 +21,8 @@ object Functions {
     decOut.isAuiPc := false.B
     decOut.isLoad := false.B
     decOut.isStore := false.B
+    decOut.isJal := false.B
+    decOut.isJalr := false.B
     decOut.rfWrite := false.B
     decOut.isECall := false.B
     decOut.rs1Valid := false.B
@@ -63,10 +65,13 @@ object Functions {
       }
       is(Jal.U) {
         decOut.instrType := UJ.id.U
+        decOut.rfWrite := true.B
+        decOut.isJal := true.B
       }
       is(JalR.U) {
         decOut.instrType := I.id.U
         decOut.rfWrite := true.B
+        decOut.isJalr := true.B
       }
       is(ECall.U) {
         decOut.instrType := I.id.U

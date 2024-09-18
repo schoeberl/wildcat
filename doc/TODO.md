@@ -1,9 +1,7 @@
 # TODO
 
  * Finish for D
-   - jal, jalr
-   - update time constraint to 5 ns - done
-   - Do a PLL for famx in Altera (or simply contraint it better)
+   - Do a PLL for famx in Altera (or simply constraine it better)
    - Also numbers on Xilinx and Skywater130
  * Later
    - ecall, ebreak
@@ -11,11 +9,23 @@
    - lb, lh, lbu, lhu
    - sb, sh
  * ecall
+ * Remove data memory from synthesis experiments 
+ * Get better testing going (automated)
+ * JALR: The target address is obtained by adding the 12-bit signed I-immediate to the register rs1, then setting the least-significant bit of the result to zero.
+   - Maybe this is not needed as the compiler does this already
  * JALR should check for func3 being 0
  * Improve the README
  * What are the types of immediate values? mostly signed or mostly unsigned?
- * Get beter testing going
  * Check ALU with the decoding (what did I mean?)
+ * Write documentation
+
+# Docu Start
+
+Branch is currently executed in the EX stage.On a taken branch the
+FE and DEC stages are flushed by changing ```instrReg``` to ```NOP```
+and setting ```decExReg.vald``` to ```false.B ```.
+
+JALR uses the ALU with the immediate similar to ADDI.
 
 # Further Reading
  * Rescue RISC-V test from my local copy of sodor in data/repositories

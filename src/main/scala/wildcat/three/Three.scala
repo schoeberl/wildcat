@@ -22,8 +22,8 @@ class Three() extends Wildcat() {
 
   // some forward declarations
   val stall = WireDefault(false.B)
-  val res = Wire(UInt(32.W))
-  val dest = Wire(UInt(5.W))
+  val wbData = Wire(UInt(32.W))
+  val wbDest = Wire(UInt(5.W))
   val wrEna = WireDefault(true.B)
 
   val doBranch = WireDefault(false.B)
@@ -51,7 +51,7 @@ class Three() extends Wildcat() {
   val rs1 = instr(19, 15)
   val rs2 = instr(24, 20)
   val rd = instr(11, 7)
-  val (rs1Val, rs2Val, debugRegs) = registerFile(rs1, rs2, dest, res, wrEna, false)
+  val (rs1Val, rs2Val, debugRegs) = registerFile(rs1, rs2, wbDest, wbData, wrEna, false)
 
   val decOut = decode(instrReg)
 
@@ -85,15 +85,16 @@ class Three() extends Wildcat() {
   // Forwarding register
   val exFwd = new Bundle() {
     val valid = Bool()
-    val dest = UInt(5.W)
-    val res = UInt(32.W)
+    val wbDest = UInt(5.W)
+    val wbData = UInt(32.W)
   }
   val exFwdReg = RegInit(0.U.asTypeOf(exFwd))
 
   // Forwarding
-  val v1 = Mux(exFwdReg.valid && exFwdReg.dest === decExReg.rs1, exFwdReg.res, decExReg.rs1Val)
-  val v2 = Mux(exFwdReg.valid && exFwdReg.dest === decExReg.rs2, exFwdReg.res, decExReg.rs2Val)
+  val v1 = Mux(exFwdReg.valid && exFwdReg.wbDest === decExReg.rs1, exFwdReg.wbData, decExReg.rs1Val)
+  val v2 = Mux(exFwdReg.valid && exFwdReg.wbDest === decExReg.rs2, exFwdReg.wbData, decExReg.rs2Val)
 
+  val res = Wire(UInt(32.W))
   val val2 = Mux(decExReg.decOut.isImm, decExReg.decOut.imm.asUInt, v2)
   res := alu(decExReg.decOut.aluOp, v1, val2)
   when (decExReg.decOut.isLui) {
@@ -106,17 +107,23 @@ class Three() extends Wildcat() {
     res := io.dmem.rdData
   }
 
-  dest := decExReg.rd
-
+  wbDest := decExReg.rd
+  wbData := res
+  when (decExReg.decOut.isJal || decExReg.decOut.isJalr) {
+    wbData := decExReg.pc + 4.U
+  }
   // Branching
   branchTarget := (decExReg.pc.asSInt + decExReg.decOut.imm).asUInt
-  doBranch := compare(decExReg.func3, v1, v2) && decExReg.branchInstr && decExReg.valid
-  wrEna := decExReg.valid && decExReg.decOut.rfWrite && !doBranch
+  when (decExReg.decOut.isJalr) {
+    branchTarget := res
+  }
+  doBranch := ((compare(decExReg.func3, v1, v2) && decExReg.branchInstr) || decExReg.decOut.isJal || decExReg.decOut.isJalr) && decExReg.valid
+  wrEna := decExReg.valid && decExReg.decOut.rfWrite
 
   // Memory access
   // Forwarding to memory
-  val address = Mux(wrEna && (dest =/= 0.U) && dest === decEx.rs1, res, rs1Val)
-  val data = Mux(wrEna && (dest =/= 0.U) && dest === decEx.rs2, res, rs2Val)
+  val address = Mux(wrEna && (wbDest =/= 0.U) && wbDest === decEx.rs1, wbData, rs1Val)
+  val data = Mux(wrEna && (wbDest =/= 0.U) && wbDest === decEx.rs2, wbData, rs2Val)
 
   val memAddress = (address.asSInt + decOut.imm).asUInt
   io.dmem.rdAddress := memAddress
@@ -125,10 +132,10 @@ class Three() extends Wildcat() {
   io.dmem.wrEnable := Mux(decOut.isStore, 15.U, 0.U)
 
   // Forwarding register values to ALU
-  exFwdReg.valid := wrEna && (dest =/= 0.U)
-  exFwdReg.dest := dest
-  exFwdReg.res := res
+  exFwdReg.valid := wrEna && (wbDest =/= 0.U)
+  exFwdReg.wbDest := wbDest
+  exFwdReg.wbData := wbData
 
-  // Just for testing
+  // Just to exit tests
   val stop = decExReg.decOut.isECall
 }
