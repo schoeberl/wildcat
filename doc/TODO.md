@@ -15,6 +15,7 @@
    - Maybe this is not needed as the compiler does this already
  * JALR should check for func3 being 0
  * Improve the README
+ * Refactor
  * What are the types of immediate values? mostly signed or mostly unsigned?
  * Check ALU with the decoding (what did I mean?)
  * Write documentation
