@@ -2,6 +2,9 @@
 
  * Finish for D
    - jal, jalr
+   - update time constraint to 5 ns - done
+   - Do a PLL for famx in Altera (or simply contraint it better)
+   - Also numbers on Xilinx and Skywater130
  * Later
    - ecall, ebreak
    - csrrw, csrrs, csrrc, csrrwi, csrrsi, csrrci
