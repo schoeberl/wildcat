@@ -2,16 +2,16 @@
 
  * Finish for D
    - jal, jalr
-   - lw, sw
-   - lui, auipc
  * Later
    - ecall, ebreak
    - csrrw, csrrs, csrrc, csrrwi, csrrsi, csrrci
    - lb, lh, lbu, lhu
    - sb, sh
  * ecall
+ * JALR should check for func3 being 0
+ * Improve the README
  * What are the types of immediate values? mostly signed or mostly unsigned?
- * Get testing going
+ * Get beter testing going
  * Check ALU with the decoding (what did I mean?)
 
 # Further Reading

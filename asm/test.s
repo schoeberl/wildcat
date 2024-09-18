@@ -13,7 +13,7 @@
 	addi	x2, x0, 0xfc
 	or	x3, x1, x2
 	and	x3, x1, x2
-	addi x28, x3, -11
+	addi x28, x3, -12
 
 # notify success to the simulator
     ecall

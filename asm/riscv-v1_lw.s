@@ -9,6 +9,7 @@
 # bits of the indicated label.
 #
 
+# Wildcat does not support the .data directive so we should probablu fail
         # Test 1: Load some data
 
 	.set data_addr, 0x84   # hardcoded as I don't find how to do it with as
@@ -52,8 +53,8 @@
 
         # If we get here then we passed
 
-        addi x28, x0, 1
-        bne   x0, x28, pass
+        addi x28, x0, 0
+        beq   x0, x28, pass
 
 fail:
         addi x28, x0, 2

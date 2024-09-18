@@ -1,19 +1,21 @@
 [*]
 [*] GTKWave Analyzer v3.4.0 (w)1999-2022 BSI
-[*] Mon Sep 16 05:51:47 2024
+[*] Tue Sep 17 21:59:36 2024
 [*]
-[dumpfile] "/Users/martin/source/wildcat/test_run_dir/Single_asmriscvv1_bnes_should_pass/ThreeTestTop.vcd"
-[dumpfile_mtime] "Mon Sep 16 04:54:55 2024"
-[dumpfile_size] 30607
+[dumpfile] "/Users/martin/source/wildcat/test_run_dir/Single_asmmems_should_pass/ThreeTestTop.vcd"
+[dumpfile_mtime] "Tue Sep 17 21:58:52 2024"
+[dumpfile_size] 42099
 [savefile] "/Users/martin/source/wildcat/wildcat.gtkw"
-[timestart] 33
-[size] 1392 600
+[timestart] 0
+[size] 1576 948
 [pos] -1 -1
-*-4.061142 75 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-4.504392 56 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] ThreeTestTop.
 [treeopen] ThreeTestTop.three.
+[treeopen] ThreeTestTop.three.dmem.
+[treeopen] ThreeTestTop.three.dmem.mem.
 [sst_width] 253
-[signals_width] 263
+[signals_width] 394
 [sst_expanded] 1
 [sst_vpaned_height] 158
 @28
@@ -27,102 +29,27 @@ ThreeTestTop.three.cpu.instrReg[31:0]
 -
 @22
 ThreeTestTop.three.cpu.decExReg__rs1[4:0]
-@23
 ThreeTestTop.three.cpu.decExReg__rs2[4:0]
-@22
 ThreeTestTop.three.cpu.decExReg__rs1Val[31:0]
 ThreeTestTop.three.cpu.decExReg__rs2Val[31:0]
-@c00022
-ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-@28
-(0)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(1)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(2)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(3)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(4)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(5)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(6)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(7)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(8)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(9)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(10)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(11)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(12)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(13)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(14)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(15)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(16)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(17)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(18)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(19)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(20)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(21)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(22)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(23)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(24)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(25)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(26)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(27)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(28)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(29)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(30)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-(31)ThreeTestTop.three.cpu.decExReg__immVal[31:0]
-@1401200
--group_end
-@28
-ThreeTestTop.three.cpu.decEx_isImm
-@22
-ThreeTestTop.three.cpu.res[31:0]
-@200
--
-@c00022
+ThreeTestTop.three.cpu.debugRegs_0_0[31:0]
+ThreeTestTop.three.cpu.debugRegs_0_1[31:0]
+ThreeTestTop.three.cpu.debugRegs_0_2[31:0]
+ThreeTestTop.three.cpu.debugRegs_0_3[31:0]
+ThreeTestTop.three.cpu.debugRegs_0_4[31:0]
+ThreeTestTop.three.cpu.debugRegs_0_5[31:0]
+ThreeTestTop.three.cpu.debugRegs_0_6[31:0]
+ThreeTestTop.three.cpu.debugRegs_0_28[31:0]
 ThreeTestTop.three.cpu.exFwdReg_dest[4:0]
-@28
-(0)ThreeTestTop.three.cpu.exFwdReg_dest[4:0]
-(1)ThreeTestTop.three.cpu.exFwdReg_dest[4:0]
-(2)ThreeTestTop.three.cpu.exFwdReg_dest[4:0]
-(3)ThreeTestTop.three.cpu.exFwdReg_dest[4:0]
-(4)ThreeTestTop.three.cpu.exFwdReg_dest[4:0]
-@1401200
--group_end
-@22
 ThreeTestTop.three.cpu.exFwdReg_res[31:0]
 @28
 ThreeTestTop.three.cpu.exFwdReg_valid
-@200
--
+ThreeTestTop.three.dmem.clock
 @22
-ThreeTestTop.three.cpu.debugRegs_0[31:0]
-ThreeTestTop.three.cpu.debugRegs_1[31:0]
-ThreeTestTop.three.cpu.debugRegs_2[31:0]
-ThreeTestTop.three.cpu.debugRegs_3[31:0]
-ThreeTestTop.three.cpu.debugRegs_4[31:0]
-ThreeTestTop.three.cpu.debugRegs_5[31:0]
-ThreeTestTop.three.cpu.debugRegs_6[31:0]
-ThreeTestTop.three.cpu.debugRegs_7[31:0]
-ThreeTestTop.three.cpu.debugRegs_8[31:0]
-ThreeTestTop.three.cpu.debugRegs_9[31:0]
-ThreeTestTop.three.cpu.debugRegs_10[31:0]
-ThreeTestTop.three.cpu.debugRegs_11[31:0]
-ThreeTestTop.three.cpu.debugRegs_12[31:0]
-ThreeTestTop.three.cpu.debugRegs_13[31:0]
-ThreeTestTop.three.cpu.debugRegs_14[31:0]
-ThreeTestTop.three.cpu.debugRegs_15[31:0]
-ThreeTestTop.three.cpu.debugRegs_16[31:0]
-ThreeTestTop.three.cpu.debugRegs_17[31:0]
-ThreeTestTop.three.cpu.debugRegs_18[31:0]
-ThreeTestTop.three.cpu.debugRegs_19[31:0]
-ThreeTestTop.three.cpu.debugRegs_20[31:0]
-ThreeTestTop.three.cpu.debugRegs_21[31:0]
-ThreeTestTop.three.cpu.debugRegs_22[31:0]
-ThreeTestTop.three.cpu.debugRegs_23[31:0]
-ThreeTestTop.three.cpu.debugRegs_24[31:0]
-ThreeTestTop.three.cpu.debugRegs_25[31:0]
-ThreeTestTop.three.cpu.debugRegs_26[31:0]
-ThreeTestTop.three.cpu.debugRegs_27[31:0]
-ThreeTestTop.three.cpu.debugRegs_28[31:0]
-ThreeTestTop.three.cpu.debugRegs_29[31:0]
-ThreeTestTop.three.cpu.debugRegs_30[31:0]
-ThreeTestTop.three.cpu.debugRegs_31[31:0]
+ThreeTestTop.three.cpu.io_dmem_rdAddress[31:0]
+ThreeTestTop.three.cpu.io_dmem_rdData[31:0]
+ThreeTestTop.three.cpu.io_dmem_wrAddress[31:0]
+ThreeTestTop.three.cpu.io_dmem_wrData[31:0]
+ThreeTestTop.three.cpu.io_dmem_wrEnable[3:0]
 [pattern_trace] 1
 [pattern_trace] 0

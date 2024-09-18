@@ -19,18 +19,24 @@ object Functions {
     decOut.isImm := false.B
     decOut.isLui := false.B
     decOut.isAuiPc := false.B
+    decOut.isLoad := false.B
     decOut.isStore := false.B
     decOut.rfWrite := false.B
     decOut.isECall := false.B
+    decOut.rs1Valid := false.B
+    decOut.rs2Valid := false.B
     switch(opcode) {
       is(AluImm.U) {
         decOut.instrType := I.id.U
         decOut.isImm := true.B
         decOut.rfWrite := true.B
+        decOut.rs1Valid := true.B
       }
       is(Alu.U) {
         decOut.instrType := R.id.U
         decOut.rfWrite := true.B
+        decOut.rs1Valid := true.B // TODO: do I need this?
+        decOut.rs2Valid := true.B
       }
       is(Branch.U) {
         decOut.instrType := SB.id.U
@@ -39,6 +45,7 @@ object Functions {
       is(Load.U) {
         decOut.instrType := I.id.U
         decOut.rfWrite := true.B
+        decOut.isLoad := true.B
       }
       is(Store.U) {
         decOut.instrType := S.id.U

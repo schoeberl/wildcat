@@ -81,6 +81,7 @@ class Three() extends Wildcat() {
   // Execute
   val decExReg = RegInit(0.U.asTypeOf(decEx))
   decExReg := decEx
+
   // Forwarding register
   val exFwd = new Bundle() {
     val valid = Bool()
@@ -101,24 +102,33 @@ class Three() extends Wildcat() {
   when (decExReg.decOut.isAuiPc) {
     res := (decExReg.pc.asSInt + decExReg.decOut.imm).asUInt
   }
+  when (decExReg.decOut.isLoad) {
+    res := io.dmem.rdData
+  }
 
   dest := decExReg.rd
 
+  // Branching
   branchTarget := (decExReg.pc.asSInt + decExReg.decOut.imm).asUInt
   doBranch := compare(decExReg.func3, v1, v2) && decExReg.branchInstr && decExReg.valid
   wrEna := decExReg.valid && decExReg.decOut.rfWrite && !doBranch
 
-  // Forwarding register values
+  // Memory access
+  // Forwarding to memory
+  val address = Mux(wrEna && (dest =/= 0.U) && dest === decEx.rs1, res, rs1Val)
+  val data = Mux(wrEna && (dest =/= 0.U) && dest === decEx.rs2, res, rs2Val)
+
+  val memAddress = (address.asSInt + decOut.imm).asUInt
+  io.dmem.rdAddress := memAddress
+  io.dmem.wrAddress := memAddress
+  io.dmem.wrData := data
+  io.dmem.wrEnable := Mux(decOut.isStore, 15.U, 0.U)
+
+  // Forwarding register values to ALU
   exFwdReg.valid := wrEna && (dest =/= 0.U)
   exFwdReg.dest := dest
   exFwdReg.res := res
 
   // Just for testing
   val stop = decExReg.decOut.isECall
-
-  // almost dummy connections for now
-  io.dmem.rdAddress := 0.U
-  io.dmem.wrAddress := 0.U
-  io.dmem.wrData := decExReg.rs2Val
-  io.dmem.wrEnable := Mux(decExReg.decOut.isStore, 15.U, 0.U)
 }

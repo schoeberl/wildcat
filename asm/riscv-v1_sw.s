@@ -44,8 +44,8 @@
 
         # If we get here then we passed
 
-        addi x28, x0, 1
-        bne   x0, x28, pass
+        addi x28, x0, 0
+        beq   x0, x28, pass
 
 fail:
         addi x28, x0, 2

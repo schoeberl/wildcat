@@ -181,11 +181,8 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       imm & 0xfff match {
         case 0xf10 => 0 // hartid
         case 0x000 =>
-          // test x28 for test condition: 1 = ok
-          if (reg(28) != 1) {
-            println("Test failed with return code " + reg(1))
-          }
-          assert(reg(28) == 1)
+          // test x28 for test condition: 0 = ok in new tests, not in the original
+          assert(reg(28) == 0, "Test failed with return code " + reg(1))
           run = false
           0
         case _ => 0 // this gets us around _start in the test cases

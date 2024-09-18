@@ -25,7 +25,10 @@ class DecodedInstr extends Bundle {
   val isImm = Bool()
   val isLui = Bool()
   val isAuiPc = Bool()
+  val isLoad = Bool()
   val isStore = Bool()
   val rfWrite = Bool()
   val isECall = Bool()
+  val rs1Valid = Bool()
+  val rs2Valid = Bool()
 }
