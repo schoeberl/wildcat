@@ -1,8 +1,7 @@
-package wildcat.three
+package wildcat.pipeline
 
 import chisel3._
 import wildcat.Util
-import wildcat.common._
 
 
 /*

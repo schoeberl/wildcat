@@ -7,8 +7,6 @@ import scala.util.control.Breaks
 import chiseltest._
 import org.scalatest.flatspec.AnyFlatSpec
 
-import wildcat.three.ThreeTop
-
 import scala.sys.process._
 
 class SingleTest() extends AnyFlatSpec with ChiselScalatestTester {

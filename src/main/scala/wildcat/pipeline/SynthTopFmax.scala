@@ -1,8 +1,6 @@
-package wildcat.three
+package wildcat.pipeline
 
 import chisel3._
-import wildcat.Util
-import wildcat.common._
 
 // Only for synthesis tests leave all connections open
 // Maybe add registers for fmax

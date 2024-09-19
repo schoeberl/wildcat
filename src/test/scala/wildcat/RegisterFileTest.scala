@@ -3,7 +3,7 @@ package wildcat
 import chisel3._
 import chiseltest._
 import org.scalatest.flatspec.AnyFlatSpec
-import wildcat.common.Functions.registerFile
+import wildcat.pipeline.Functions.registerFile
 
 
 class RegisterFileTest extends AnyFlatSpec with ChiselScalatestTester {

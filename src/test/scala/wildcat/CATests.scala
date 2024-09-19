@@ -4,7 +4,7 @@ import chisel3._
 import chiseltest._
 import chisel3.util.experimental.BoringUtils
 import org.scalatest.flatspec.AnyFlatSpec
-import wildcat.three.Three
+import wildcat.pipeline.Three
 
 import scala.sys.process._
 

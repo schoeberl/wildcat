@@ -1,12 +1,12 @@
-package wildcat.common
+package wildcat.pipeline
 
 import chisel3._
 import chisel3.util._
 import wildcat.AluFunct3._
 import wildcat.AluType._
+import wildcat.BranchFunct._
 import wildcat.InstrType._
 import wildcat.Opcode._
-import wildcat.BranchFunct._
 
 
 object Functions {

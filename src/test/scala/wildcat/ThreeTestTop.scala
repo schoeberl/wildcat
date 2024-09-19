@@ -2,7 +2,7 @@ package wildcat
 
 import chisel3._
 import chisel3.util.experimental.BoringUtils
-import wildcat.three._
+import wildcat.pipeline._
 
 
 /*

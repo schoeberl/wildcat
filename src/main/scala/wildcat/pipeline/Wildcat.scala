@@ -1,4 +1,4 @@
-package wildcat.common
+package wildcat.pipeline
 
 import chisel3._
 

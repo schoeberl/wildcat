@@ -1,7 +1,6 @@
-package wildcat.common
+package wildcat.pipeline
 
 import chisel3._
-import wildcat.InstrType.R
 
 class InstrIO extends Bundle {
   val address = Output(UInt(32.W))

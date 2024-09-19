@@ -1,9 +1,8 @@
-package wildcat.three
+package wildcat.pipeline
 
 import chisel3._
-import wildcat.common._
-import wildcat.common.Functions._
 import wildcat.Opcode._
+import wildcat.pipeline.Functions._
 
 /*
  * This file is part of the RISC-V processor Wildcat.
