@@ -19,7 +19,7 @@ class SingleTest() extends AnyFlatSpec with ChiselScalatestTester {
   s"Single $f" should "pass" in {
     s"make app APP=$f".!
 //    test(new FiveCats(Array("a.bin"))).withAnnotations(Seq(WriteVcdAnnotation)) {
-    test(new ThreeTestTop(Array("a.bin"))).withAnnotations(Seq(WriteVcdAnnotation)) {
+    test(new WildcatTestTop(Array("a.bin"))).withAnnotations(Seq(WriteVcdAnnotation)) {
       d => {
         var stop = false
         var cnt = 0

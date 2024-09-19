@@ -9,13 +9,12 @@
    - lb, lh, lbu, lhu
    - sb, sh
  * ecall
- * Remove data memory from synthesis experiments 
  * Get better testing going (automated)
+ * Use Java to read .elf files
+   - maybe check them in for faster tests
  * JALR: The target address is obtained by adding the 12-bit signed I-immediate to the register rs1, then setting the least-significant bit of the result to zero.
    - Maybe this is not needed as the compiler does this already
- * JALR should check for func3 being 0
- * Improve the README
- * Refactor
+ * JALR should check for func3 being 0 - it uses this 0 for ALU op
  * What are the types of immediate values? mostly signed or mostly unsigned?
  * Check ALU with the decoding (what did I mean?)
  * Write documentation
