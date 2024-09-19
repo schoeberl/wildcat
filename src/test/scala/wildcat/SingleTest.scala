@@ -6,7 +6,7 @@ import scala.util.control.Breaks
 
 import chiseltest._
 import org.scalatest.flatspec.AnyFlatSpec
-import wildcat.pipeline.FiveCats
+
 import wildcat.three.ThreeTop
 
 import scala.sys.process._

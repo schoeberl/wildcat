@@ -3,9 +3,8 @@ package wildcat
 import chisel3._
 import chiseltest._
 import chisel3.util.experimental.BoringUtils
-
 import org.scalatest.flatspec.AnyFlatSpec
-import wildcat.pipeline.FiveCats
+import wildcat.three.Three
 
 import scala.sys.process._
 
@@ -21,7 +20,7 @@ class CATests extends AnyFlatSpec with ChiselScalatestTester {
     val io = IO(new Bundle {
       val regFile = Output(Vec(32,UInt(32.W)))
     })
-    val wc = Module(new FiveCats(args))
+    // val wc = Module(new Three(args))
     io.regFile := DontCare
     // does boring work with functions?
     // BoringUtils.bore(wc.decode.regs, Seq(io.regFile))
