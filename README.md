@@ -78,15 +78,15 @@ Artix 7 has 6-bit LUTs and the timing info
 
 Skywater130 timing info is for max_tt_025C_1v80.
 
-| Design  (Cyclon IV)        | Fmax     | LEs   | Regs | RAM bits |
-|:---------------------------|:---------|:------|:-----|:---------|
-| Three stages (regfile FF)  | 80.2 MHz | 3,130 | 1295 | 0        |
-| Three stages (regfile mem) | 86.2 MHz | 1,756 | 379  | 2,048    |
+| Design  (Cyclon IV)        | Fmax     | LEs   | Regs  | RAM bits |
+|:---------------------------|:---------|:------|:------|:---------|
+| Three stages (regfile FF)  | 80.2 MHz | 3,130 | 1,295 | 0        |
+| Three stages (regfile mem) | 86.2 MHz | 1,756 | 379   | 2,048    |
 
-| Design  (Artix 7)          | Fmax        | LCs   | Regs | RAM bits |
-|:---------------------------|:------------|:------|:-----|:---------|
-| Three stages (regfile FF)  | 99.6 MHz    | 1,744 | 1329 | 0        |
-| Three stages (regfile mem) | 8xxx6.2 MHz | 1,756 | 379  | 2,048    |
+| Design  (Artix 7)          | Fmax      | LCs   | Regs  | RAM bits |
+|:---------------------------|:----------|:------|:------|:---------|
+| Three stages (regfile FF)  | 99.6 MHz  | 1,744 | 1,329 | 0        |
+| Three stages (regfile mem) | 112.3 MHz | 1,270 | 303   | 0        |
 
 | Design  (Skywater130)     | Fmax     | Size           |
 |:--------------------------|:---------|:---------------|
@@ -95,6 +95,10 @@ Skywater130 timing info is for max_tt_025C_1v80.
 For the FPGA designs we use on-chip memory for the register file.
 For the ASIC design we use flip-flops. It is estimated that the
 RF dominates the area in the ASIC design.
+
+The memory based register file is implemented with distributed
+LUT RAMs in the Artix. Therefore, the number of bits in block
+RAMs is zero.
 
 ### Tools on MacOS
 
