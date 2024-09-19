@@ -71,17 +71,26 @@ make test
 Here are resource and fmax results for the 3-stage pipeline.
 We exclude instruction and data memory/cache in the numbers.
 
-| Design  (Cyclon IV) | Fmax   | LEs  | Regs   | RAM bits |
-|:--------------------|:-------|:-----|:-------|:---------|
-| Three stages        | 70 MHz | 1xxx | 2xx    | 1024     |
+Cyclon IV has 4-bit LUTs and the timing info
+is for the Slow 1200mV 85C Model.
 
-| Design  (Artix 7) | Fmax   | LCs  | Regs   | RAM bits |
-|:------------------|:-------|:-----|:-------|:---------|
-| Three stages      | 70 MHz | 1xxx | 2xx    | 1024     |
+Artix 7 has 6-bit LUTs and the timing info
 
-| Design  (Skywater130) | Fmax    | Size           |
-|:----------------------|:--------|:---------------|
-| Three stages          | 70? MHz | 150 x 150 umm2 |
+Skywater130 timing info is for max_tt_025C_1v80.
+
+| Design  (Cyclon IV)        | Fmax     | LEs   | Regs | RAM bits |
+|:---------------------------|:---------|:------|:-----|:---------|
+| Three stages (regfile FF)  | 80.2 MHz | 3,130 | 1295 | 0        |
+| Three stages (regfile mem) | 86.2 MHz | 1,756 | 379  | 2,048    |
+
+| Design  (Artix 7)          | Fmax        | LCs   | Regs | RAM bits |
+|:---------------------------|:------------|:------|:-----|:---------|
+| Three stages (regfile FF)  | 99.6 MHz    | 1,744 | 1329 | 0        |
+| Three stages (regfile mem) | 8xxx6.2 MHz | 1,756 | 379  | 2,048    |
+
+| Design  (Skywater130)     | Fmax     | Size           |
+|:--------------------------|:---------|:---------------|
+| Three stages (regfile FF) | 81.2 MHz | 429 x 432 umm2 |
 
 For the FPGA designs we use on-chip memory for the register file.
 For the ASIC design we use flip-flops. It is estimated that the
