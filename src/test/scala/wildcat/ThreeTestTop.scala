@@ -15,7 +15,7 @@ class ThreeTestTop(args: Array[String]) extends Module {
     val regFile = Output(Vec(32,UInt(32.W)))
     val stop = Output(Bool())
   })
-  val three = Module(new ThreeTop(args))
+  val three = Module(new ThreeCatsTop(args))
 
   io.regFile := DontCare
   BoringUtils.bore(three.cpu.debugRegs, Seq(io.regFile))

@@ -12,7 +12,7 @@ import wildcat.Util
  * Author: Martin Schoeberl (martin@jopdesign.com)
  *
  */
-class ThreeTop(args: Array[String]) extends Module {
+class ThreeCatsTop(args: Array[String]) extends Module {
 
   val io = IO(new Bundle {
     val led = Output(UInt(8.W))
@@ -20,7 +20,7 @@ class ThreeTop(args: Array[String]) extends Module {
 
   val (code, start) = Util.getCode(args)
 
-  val cpu = Module(new Three())
+  val cpu = Module(new ThreeCats())
   val dmem = Module(new ScratchPadMem())
   cpu.io.dmem <> dmem.io
   val imem = Module(new InstructionROM(code))
@@ -36,6 +36,6 @@ class ThreeTop(args: Array[String]) extends Module {
   io.led := RegNext(ledReg)
 }
 
-object ThreeTop extends App {
-  emitVerilog(new ThreeTop(args), Array("--target-dir", "generated"))
+object ThreeCatsTop extends App {
+  emitVerilog(new ThreeCatsTop(args), Array("--target-dir", "generated"))
 }

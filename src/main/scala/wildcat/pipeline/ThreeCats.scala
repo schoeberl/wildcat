@@ -17,7 +17,7 @@ import wildcat.pipeline.Functions._
  * Author: Martin Schoeberl (martin@jopdesign.com)
  *
  */
-class Three() extends Wildcat() {
+class ThreeCats() extends Wildcat() {
 
   // some forward declarations
   val stall = WireDefault(false.B)
