@@ -48,7 +48,7 @@ sim-test:
 	sbt "testOnly wildcat.SimulatorTest"
 
 hw:
-	$(SBT) "runMain wildcat.pipeline.ThreeCatsTop a.bin"
+	$(SBT) "runMain wildcat.pipeline.WildcatTop a.bin"
 
 hw-fmax:
 	$(SBT) "runMain wildcat.pipeline.SynthTopFmax a.bin"
@@ -63,9 +63,12 @@ synpath:
 synth:
 	./vivado_synth.sh -t SynthTopFmax -p xc7a100tcsg324-1 -x nexysA7.xdc -o build generated/SynthTopFmax.v
 
+synth-for-real:
+	./vivado_synth.sh -t WildcatTop -p xc7a100tcsg324-1 -x nexysA7.xdc -o build generated/WildcatTop.v
+
 cp-bit:
 	-mkdir build
-	scp masca@chipdesign1.compute.dtu.dk:~/source/wildcat/build/ThreeCatsTop.bit build
+	scp masca@chipdesign1.compute.dtu.dk:~/source/wildcat/build/WildcatTop.bit build
 
 # Configure the Basys3 or NexysA7 board with open source tools
 config:

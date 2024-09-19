@@ -21,7 +21,8 @@ class WildcatTop(args: Array[String]) extends Module {
   val (code, start) = Util.getCode(args)
 
   // Here switch between different designs
-  val cpu = Module(new ThreeCats())
+  // val cpu = Module(new ThreeCats())
+  val cpu = Module(new WildFour())
   val dmem = Module(new ScratchPadMem())
   cpu.io.dmem <> dmem.io
   val imem = Module(new InstructionROM(code))
