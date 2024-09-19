@@ -44,10 +44,10 @@ sim-test:
 	sbt "testOnly wildcat.SimulatorTest"
 
 hw:
-	$(SBT) "runMain wildcat.three.ThreeTop a.bin"
+	$(SBT) "runMain wildcat.pipeline.ThreeCatsTop a.bin"
 
 hw-fmax:
-	$(SBT) "runMain wildcat.three.SynthTopFmax a.bin"
+	$(SBT) "runMain wildcat.pipeline.SynthTopFmax a.bin"
 
 # Synthesize and copy targets
 
@@ -61,7 +61,7 @@ synth:
 
 cp-bit:
 	-mkdir build
-	scp masca@chipdesign1.compute.dtu.dk:~/source/wildcat/build/ThreeTop.bit build
+	scp masca@chipdesign1.compute.dtu.dk:~/source/wildcat/build/ThreeCatsTop.bit build
 
 # Configure the Basys3 or NexysA7 board with open source tools
 config:
