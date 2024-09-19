@@ -4,31 +4,18 @@ import chisel3._
 import wildcat.Util
 import wildcat.common._
 
-// Only for synthesis tests, dummy write to instruction memory
+// Only for synthesis tests leave all connections open
+// Maybe add registers for fmax
 class SynthTopFmax(args: Array[String]) extends Module {
+
   val io = IO(new Bundle {
-    val dummy = Output(UInt(32.W))
-    val wrData = Input(UInt(32.W))
-    val wrAddr = Input(UInt(32.W))
+    val imem = new InstrIO()
+    val dmem = new MemIO()
   })
 
-  val (code, start) = Util.getCode(args)
-
   val cpu = Module(new Three())
-  val dmem = Module(new ScratchPadMem())
-  cpu.io.dmem <> dmem.io
-
-  val imem = Module(new ScratchPadMem())
-  imem.io.rdAddress := cpu.io.imem.address
-  cpu.io.imem.data := imem.io.rdData
-  cpu.io.imem.stall := imem.io.stall
-
-  // dummy write for synthesis tests
-  imem.io.wrAddress := io.wrAddr
-  imem.io.wrData := io.wrData
-  imem.io.wrEnable := 15.U
-
-  io.dummy := RegNext(RegNext(cpu.io.dmem.wrData))
+  cpu.io.imem <> io.imem
+  cpu.io.dmem <> io.dmem
 }
 
 object SynthTopFmax extends App {
