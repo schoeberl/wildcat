@@ -74,7 +74,7 @@ We exclude instruction and data memory/cache in the numbers.
 Cyclon IV has 4-bit LUTs and the timing info
 is for the Slow 1200mV 85C Model.
 
-Artix 7 has 6-bit LUTs and the timing info
+Artix 7 has 6-bit LUTs.
 
 Skywater130 timing info is for max_tt_025C_1v80.
 
@@ -102,17 +102,17 @@ Skywater130 timing info is for max_tt_025C_1v80.
 | Four stages (regfile FF)  | 73.2 MHz | 433 x 438 umm2 |
 | Five stages (regfile FF)  | 69.5 MHz | 439 x 443 umm2 |
 
-51: nom_tt_025C_1v80/max.rpt
-4: 6.330872   slack (MET)
-5: 5.619136   slack (MET)
 
-For the FPGA designs we use on-chip memory for the register file.
+For the FPGA designs we explore flip-flops (FF) and on-chip memory
+(mem) for the register file.
 For the ASIC design we use flip-flops. It is estimated that the
 RF dominates the area in the ASIC design.
 
 The memory based register file is implemented with distributed
 LUT RAMs in the Artix. Therefore, the number of bits in block
 RAMs is zero.
+
+## RISC-V Tools
 
 ### Tools on MacOS
 
