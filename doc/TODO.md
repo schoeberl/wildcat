@@ -1,8 +1,8 @@
 # TODO
 
- * Finish for D
-   - Do a PLL for famx in Altera (or simply constraine it better)
-   - Also numbers on Xilinx and Skywater130
+ * Finish for D 
+   - WildFour
+     - stall on load use hazard is missing (not covered by the tests)
  * Later
    - ecall, ebreak
    - csrrw, csrrs, csrrc, csrrwi, csrrsi, csrrci
@@ -18,6 +18,10 @@
  * What are the types of immediate values? mostly signed or mostly unsigned?
  * Check ALU with the decoding (what did I mean?)
  * Write documentation
+
+## Better Naming
+
+ * wrEna is later called valid
 
 # Docu Start
 

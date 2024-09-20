@@ -25,10 +25,27 @@ class WildFour() extends Wildcat() {
   val wbDest = Wire(UInt(5.W))
   val wrEna = WireDefault(true.B)
 
+  val writeBackData = Wire(UInt(32.W))
+
   val doBranch = WireDefault(false.B)
   val branchTarget = WireDefault(0.U)
 
-
+  // Pipe and forwarding register from MEM
+  val exMem = new Bundle() {
+    val valid = Bool()
+    val wbDest = UInt(5.W)
+    val wbData = UInt(32.W)
+    val address = UInt(32.W)
+    val isLoad = Bool()
+  }
+  val exMemReg = RegInit(0.U.asTypeOf(exMem))
+  // Forwarding register from WB
+  val memFwd = new Bundle() {
+    val valid = Bool()
+    val wbDest = UInt(5.W)
+    val wbData = UInt(32.W)
+  }
+  val memFwdReg = RegInit(0.U.asTypeOf(memFwd))
 
   // The ROM has a register that is reset to 0, therefore clock cycle 1 is the first instruction.
   // Needed if we want to start from a different address.
@@ -50,7 +67,7 @@ class WildFour() extends Wildcat() {
   val rs1 = instr(19, 15)
   val rs2 = instr(24, 20)
   val rd = instr(11, 7)
-  val (rs1Val, rs2Val, debugRegs) = registerFile(rs1, rs2, wbDest, wbData, wrEna, false)
+  val (rs1Val, rs2Val, debugRegs) = registerFile(rs1, rs2, exMemReg.wbDest, writeBackData, exMemReg.valid, false)
 
   val decOut = decode(instrReg)
 
@@ -65,6 +82,8 @@ class WildFour() extends Wildcat() {
     val rs2Val = UInt(32.W)
     val func3 = UInt(3.W)
     val branchInstr = Bool()
+    val isStore = Bool()
+    val isLoad = Bool()
   })
   decEx.decOut := decOut
   decEx.valid := !doBranch
@@ -76,22 +95,18 @@ class WildFour() extends Wildcat() {
   decEx.rs2Val := rs2Val
   decEx.func3 := instrReg(14, 12)
   decEx.branchInstr := instrReg(6, 0) === Branch.U
+  decEx.isStore := decOut.isStore
+  decEx.isLoad := decOut.isLoad
 
   // Execute
   val decExReg = RegInit(0.U.asTypeOf(decEx))
   decExReg := decEx
 
-  // Forwarding register
-  val exFwd = new Bundle() {
-    val valid = Bool()
-    val wbDest = UInt(5.W)
-    val wbData = UInt(32.W)
-  }
-  val exFwdReg = RegInit(0.U.asTypeOf(exFwd))
-
   // Forwarding
-  val v1 = Mux(exFwdReg.valid && exFwdReg.wbDest === decExReg.rs1, exFwdReg.wbData, decExReg.rs1Val)
-  val v2 = Mux(exFwdReg.valid && exFwdReg.wbDest === decExReg.rs2, exFwdReg.wbData, decExReg.rs2Val)
+  val v1 = Mux(exMemReg.valid && exMemReg.wbDest === decExReg.rs1, exMemReg.wbData,
+    Mux(memFwdReg.valid && memFwdReg.wbDest === decExReg.rs1, memFwdReg.wbData, decExReg.rs1Val))
+  val v2 = Mux(exMemReg.valid && exMemReg.wbDest === decExReg.rs2, exMemReg.wbData,
+    Mux(memFwdReg.valid && memFwdReg.wbDest === decExReg.rs2, memFwdReg.wbData, decExReg.rs2Val))
 
   val res = Wire(UInt(32.W))
   val val2 = Mux(decExReg.decOut.isImm, decExReg.decOut.imm.asUInt, v2)
@@ -119,21 +134,39 @@ class WildFour() extends Wildcat() {
   doBranch := ((compare(decExReg.func3, v1, v2) && decExReg.branchInstr) || decExReg.decOut.isJal || decExReg.decOut.isJalr) && decExReg.valid
   wrEna := decExReg.valid && decExReg.decOut.rfWrite
 
-  // Memory access
-  // Forwarding to memory
-  val address = Mux(wrEna && (wbDest =/= 0.U) && wbDest === decEx.rs1, wbData, rs1Val)
-  val data = Mux(wrEna && (wbDest =/= 0.U) && wbDest === decEx.rs2, wbData, rs2Val)
+  // pipe register stage
 
-  val memAddress = (address.asSInt + decOut.imm).asUInt
+  // *** register write back either from pipe register or from memory read ***
+  // Mux is part of Mem, output reg is for forwarding to ALU and memory itself
+  // note that we need a stall for load use bubble
+
+  exMemReg.valid := wrEna && (wbDest =/= 0.U) // is this needed here or is this already set in wrEna?
+  exMemReg.wbDest := wbDest
+  exMemReg.wbData := wbData
+  exMemReg.address := (decExReg.rs1Val.asSInt + decExReg.decOut.imm).asUInt
+  exMemReg.isLoad := decExReg.isLoad
+
+  // Memory access
+  // Forwarding to memory -- needs to change from reg after mem
+
+  // val address = Mux(wrEna && (wbDest =/= 0.U) && wbDest === decEx.rs1, wbData, rs1Val)
+  // val data = Mux(wrEna && (wbDest =/= 0.U) && wbDest === decEx.rs2, wbData, rs2Val)
+  val data = exMemReg.wbData // TODO local forwarding, maybe?
+  // TODO: this is one clock cycle to late. It needs to be the combinational value from EX stage
+
+  val memAddress = exMemReg.address
   io.dmem.rdAddress := memAddress
   io.dmem.wrAddress := memAddress
   io.dmem.wrData := data
-  io.dmem.wrEnable := Mux(decOut.isStore, 15.U, 0.U)
+  io.dmem.wrEnable := Mux(decExReg.isStore, 15.U, 0.U)
 
-  // Forwarding register values to ALU
-  exFwdReg.valid := wrEna && (wbDest =/= 0.U)
-  exFwdReg.wbDest := wbDest
-  exFwdReg.wbData := wbData
+  // write back mux in memory stage
+  writeBackData := Mux(exMemReg.isLoad, io.dmem.rdData, exMemReg.wbData)
+
+  // Forwarding register values to ALU and memory?
+  memFwdReg.valid := exMemReg.valid
+  memFwdReg.wbDest := exMemReg.wbDest
+  memFwdReg.wbData := exMemReg.wbData
 
   // Just to exit tests
   val stop = decExReg.decOut.isECall
