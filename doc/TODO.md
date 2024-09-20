@@ -1,13 +1,14 @@
 # TODO
 
  * Finish for D 
-   - WildFour
+   - WildFour and StandardFive
      - stall on load use hazard is missing (not covered by the tests)
  * Later
-   - ecall, ebreak
-   - csrrw, csrrs, csrrc, csrrwi, csrrsi, csrrci
    - lb, lh, lbu, lhu
    - sb, sh
+   - ecall, ebreak
+   - csrrw, csrrs, csrrc, csrrwi, csrrsi, csrrci
+ * Better names for signals (e.g., for those with a feedback, e.g., RF write)
  * ecall
  * Get better testing going (automated)
  * Use Java to read .elf files
@@ -17,6 +18,7 @@
  * JALR should check for func3 being 0 - it uses this 0 for ALU op
  * What are the types of immediate values? mostly signed or mostly unsigned?
  * Check ALU with the decoding (what did I mean?)
+ * And much more not listed here, e.g. caches, interconnect, newlib, ...
  * Write documentation
 
 ## Better Naming
