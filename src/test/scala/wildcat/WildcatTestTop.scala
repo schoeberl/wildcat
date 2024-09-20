@@ -15,10 +15,10 @@ class WildcatTestTop(args: Array[String]) extends Module {
     val regFile = Output(Vec(32,UInt(32.W)))
     val stop = Output(Bool())
   })
-  val three = Module(new WildcatTop(args))
+  val cpuTop = Module(new WildcatTop(args))
 
   io.regFile := DontCare
-  BoringUtils.bore(three.cpu.debugRegs, Seq(io.regFile))
+  BoringUtils.bore(cpuTop.cpu.debugRegs, Seq(io.regFile))
   io.stop := DontCare
-  BoringUtils.bore(three.cpu.stop, Seq(io.stop))
+  BoringUtils.bore(cpuTop.cpu.stop, Seq(io.stop))
 }
