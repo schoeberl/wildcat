@@ -84,18 +84,27 @@ Skywater130 timing info is for max_tt_025C_1v80.
 | Three stages (regfile mem) | 86.2 MHz | 1,756 | 379   | 2,048    |
 | Four stages (regfile FF)   | 83.9 MHz | 3,040 | 1,367 | 0        |
 | Four stages (regfile mem)  | 84.5 MHz | 1,727 | 451   | 2,048    |
+| Five stages (regfile FF)   | 78.4 MHz | 3,107 | 1,438 | 0        |
+| Five stages (regfile mem)  | 75.7 MHz | 1,813 | 522   | 2,048    |
 
-| Design  (Artix 7)           | Fmax      | LCs   | Regs  | RAM bits |
-|:----------------------------|:----------|:------|:------|:---------|
-| Three stages (regfile FF)   | 99.6 MHz  | 1,744 | 1,329 | 0        |
-| Three stages (regfile mem)  | 112.3 MHz | 1,270 | 303   | 0        |
-| Four stages (regfile FF)    | 107.5 MHz | 1,551 | 1,438 | 0        |
-| Four stages (regfile mem)   | 111.2 MHz | 993   | 442   | 0        |
+| Design  (Artix 7)          | Fmax      | LCs   | Regs  | RAM bits |
+|:---------------------------|:----------|:------|:------|:---------|
+| Three stages (regfile FF)  | 99.6 MHz  | 1,744 | 1,329 | 0        |
+| Three stages (regfile mem) | 112.3 MHz | 1,270 | 303   | 0        |
+| Four stages (regfile FF)   | 107.5 MHz | 1,551 | 1,438 | 0        |
+| Four stages (regfile mem)  | 111.2 MHz | 993   | 442   | 0        |
+| Five stages (regfile FF)   | 106.1 MHz | 1,724 | 1,511 | 0        |
+| Five stages (regfile mem)  | 102.0 MHz | 1,158 | 515   | 0        |
 
 | Design  (Skywater130)     | Fmax     | Size           |
 |:--------------------------|:---------|:---------------|
 | Three stages (regfile FF) | 81.2 MHz | 429 x 432 umm2 |
 | Four stages (regfile FF)  | 73.2 MHz | 433 x 438 umm2 |
+| Five stages (regfile FF)  | 69.5 MHz | 439 x 443 umm2 |
+
+51: nom_tt_025C_1v80/max.rpt
+4: 6.330872   slack (MET)
+5: 5.619136   slack (MET)
 
 For the FPGA designs we use on-chip memory for the register file.
 For the ASIC design we use flip-flops. It is estimated that the
