@@ -26,6 +26,8 @@ class WildFour() extends Wildcat() {
   val wrEna = WireDefault(true.B)
 
   val writeBackData = Wire(UInt(32.W))
+  val writeBackDest = Wire(UInt(5.W))
+  val writeBackEna = Wire(Bool())
 
   val doBranch = WireDefault(false.B)
   val branchTarget = WireDefault(0.U)
@@ -67,7 +69,7 @@ class WildFour() extends Wildcat() {
   val rs1 = instr(19, 15)
   val rs2 = instr(24, 20)
   val rd = instr(11, 7)
-  val (rs1Val, rs2Val, debugRegs) = registerFile(rs1, rs2, exMemReg.wbDest, writeBackData, exMemReg.valid, false)
+  val (rs1Val, rs2Val, debugRegs) = registerFile(rs1, rs2, writeBackDest, writeBackData, writeBackEna, false)
 
   val decOut = decode(instrReg)
 
@@ -162,6 +164,8 @@ class WildFour() extends Wildcat() {
 
   // write back mux in memory stage
   writeBackData := Mux(exMemReg.isLoad, io.dmem.rdData, exMemReg.wbData)
+  writeBackDest := exMemReg.wbDest
+  writeBackEna := exMemReg.valid
 
   // Forwarding register values to ALU and memory?
   memFwdReg.valid := exMemReg.valid
