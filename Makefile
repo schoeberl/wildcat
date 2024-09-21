@@ -84,14 +84,14 @@ qsynth:
 
 # some tests
 mem-speed:
-	sbt "runMain wildcat.pipeline.MemSpeed"
+	sbt "runMain wildcat.explore.MemSpeed"
 	quartus_map quartus/$(BOARD)/MemSpeed
 	quartus_fit quartus/$(BOARD)/MemSpeed
 	quartus_asm quartus/$(BOARD)/MemSpeed
 	quartus_sta quartus/$(BOARD)/MemSpeed
 
 alu-speed:
-	sbt "runMain wildcat.pipeline.AluSpeed"
+	sbt "runMain wildcat.explore.AluSpeed"
 	quartus_map quartus/$(BOARD)/AluSpeed
 	quartus_fit quartus/$(BOARD)/AluSpeed
 	quartus_asm quartus/$(BOARD)/AluSpeed
