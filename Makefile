@@ -82,6 +82,21 @@ qsynth:
 	quartus_asm quartus/$(BOARD)/Wildcat
 	quartus_sta quartus/$(BOARD)/Wildcat
 
+# some tests
+mem-speed:
+	sbt "runMain wildcat.pipeline.MemSpeed"
+	quartus_map quartus/$(BOARD)/MemSpeed
+	quartus_fit quartus/$(BOARD)/MemSpeed
+	quartus_asm quartus/$(BOARD)/MemSpeed
+	quartus_sta quartus/$(BOARD)/MemSpeed
+
+alu-speed:
+	sbt "runMain wildcat.pipeline.AluSpeed"
+	quartus_map quartus/$(BOARD)/AluSpeed
+	quartus_fit quartus/$(BOARD)/AluSpeed
+	quartus_asm quartus/$(BOARD)/AluSpeed
+	quartus_sta quartus/$(BOARD)/AluSpeed
+
 # need to change sign in into nix with
 # nix-shell shell.nix
 openlane:
