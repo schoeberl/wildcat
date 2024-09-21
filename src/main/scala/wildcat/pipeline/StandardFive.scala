@@ -115,10 +115,10 @@ class StandardFive() extends Wildcat() {
 
   // Forwarding
   val v1 = Mux(exMemReg.valid && exMemReg.wbDest === decExReg.rs1, exMemReg.wbData,
-    Mux(memWbReg.valid && memWbReg.wbDest === decExReg.rs1, Mux(memWbReg.isLoad, memWbReg.memData, memWbReg.regData),
+    Mux(memWbReg.valid && memWbReg.wbDest === decExReg.rs1, writeBackData,
       Mux(forwardReg.valid && forwardReg.wbDest === decExReg.rs1, forwardReg.wbData, decExReg.rs1Val)))
   val v2 = Mux(exMemReg.valid && exMemReg.wbDest === decExReg.rs2, exMemReg.wbData,
-    Mux(memWbReg.valid && memWbReg.wbDest === decExReg.rs2, Mux(memWbReg.isLoad, memWbReg.memData, memWbReg.regData),
+    Mux(memWbReg.valid && memWbReg.wbDest === decExReg.rs2, writeBackData,
       Mux(forwardReg.valid && forwardReg.wbDest === decExReg.rs2, forwardReg.wbData, decExReg.rs2Val)))
 
   val res = Wire(UInt(32.W))

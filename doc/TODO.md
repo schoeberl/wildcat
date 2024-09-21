@@ -1,6 +1,5 @@
 # TODO
 
- * use the WB mux in 5 stages for forwarding
  * 4/5 stages stall on load use hazard is missing (not covered by the tests)
  * 3/4/5 load and use as address is wrong (need a forward to the adder)
    - test missing
