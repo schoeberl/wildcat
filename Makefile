@@ -97,6 +97,10 @@ openlane:
 	openlane wildcat.json
 	openlane --last-run --flow openinklayout wildcat.json
 
+experiments:
+	openlane verilog/experiments.json
+	openlane --last-run --flow openinklayout experiments.json
+
 clean:
 	git clean -fd
 	rm -rf ./idea
