@@ -93,7 +93,7 @@ object Util {
   }
 
   def getAsmFiles(path: String = "asm") = {
-    new File(path).listFiles.filter(_.isFile).toList.filter(_.getName.endsWith(".s")).map(_.toString)
+    new File(path).listFiles.filter(_.isFile).toList.filter(_.getName.endsWith(".S")).map(_.toString)
   }
 
   def getSimpleTests(path: String) = {

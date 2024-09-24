@@ -12,7 +12,7 @@ class WildcatTest() extends AnyFlatSpec with ChiselScalatestTester {
 
   val allProgs = Properties.envOrNone("test") match {
     case Some(t) => List(t)
-    case None => getAsmFiles() ++ getAsmFiles("risc-v-lab/tests/ripes")  ++ getAsmFiles("risc-v-lab/tests/riscv-tests")
+    case None => getAsmFiles("rv32ui") // getAsmFiles() ++ getAsmFiles("risc-v-lab/tests/ripes")  ++ getAsmFiles("risc-v-lab/tests/riscv-tests")
   }
   val failed = List("risc-v-lab/tests/ripes/memory.s", "risc-v-lab/tests/riscv-tests/jalr.s", "asm/riscv-v1_lw.s")
   val progs = allProgs.filterNot(failed.contains(_))
@@ -31,7 +31,7 @@ class WildcatTest() extends AnyFlatSpec with ChiselScalatestTester {
             if (d.io.stop.peekBoolean()) {
               stop = true
               // tests from Ripes are OK when 0 (risc-v tests OK when 1)
-              assert(d.io.regFile(28).peekInt() == 0, s"Failed case ${d.io.regFile(3).peekInt()}")
+              assert(d.io.regFile(28).peekInt() != 0, s"Failed case ${d.io.regFile(3).peekInt()}")
             }
             cnt += 1
           }

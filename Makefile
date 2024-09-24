@@ -20,7 +20,8 @@ work:
 	test=$(APP) sbt "testOnly wildcat.WildcatTest"
 
 app:
-	riscv64-unknown-elf-as -march rv32i $(APP)
+	gcc -E $(APP) -o $(APP).i
+	riscv64-unknown-elf-as -march rv32i $(APP).i
 #	riscv64-unknown-elf-objdump -d a.out
 	riscv64-unknown-elf-objcopy -O binary -j .text a.out a.bin
 #	riscv64-unknown-elf-objcopy -O binary -j .text a.out text.bin
