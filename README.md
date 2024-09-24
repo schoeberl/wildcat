@@ -68,7 +68,7 @@ make test
 
 ## Results
 
-Here are resource and fmax results for the 3-stage pipeline.
+Here are resource and fmax results for the 3-, 4-, and 5-stages pipeline.
 We exclude instruction and data memory/cache in the numbers.
 
 Cyclon IV has 4-bit LUTs and the timing info
@@ -105,8 +105,8 @@ Skywater130 timing info is for max_tt_025C_1v80.
 
 For the FPGA designs we explore flip-flops (FF) and on-chip memory
 (mem) for the register file.
-For the ASIC design we use flip-flops. It is estimated that the
-RF dominates the area in the ASIC design.
+For the ASIC design we use flip-flops only.
+It is estimated that the register file dominates the area in the ASIC design.
 
 The memory based register file is implemented with distributed
 LUT RAMs in the Artix. Therefore, the number of bits in block

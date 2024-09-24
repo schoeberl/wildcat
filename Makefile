@@ -17,14 +17,15 @@ all:
 	echo "Select your make target"
 
 work:
-	test=$(APP) sbt "testOnly wildcat.SingleTest"
+	test=$(APP) sbt "testOnly wildcat.WildcatTest"
 
 app:
 	riscv64-unknown-elf-as -march rv32i $(APP)
 #	riscv64-unknown-elf-objdump -d a.out
-	riscv64-unknown-elf-objcopy -O binary -j .text a.out text.bin
-	riscv64-unknown-elf-objcopy -O binary -j .data a.out data.bin
-	cat text.bin data.bin > a.bin # this does not make much sense
+	riscv64-unknown-elf-objcopy -O binary -j .text a.out a.bin
+#	riscv64-unknown-elf-objcopy -O binary -j .text a.out text.bin
+#	riscv64-unknown-elf-objcopy -O binary -j .data a.out data.bin
+#	cat text.bin data.bin > a.bin # this does not make much sense
 #	hexdump -e '"%08x\n"' a.bin
 
 run:
@@ -34,14 +35,6 @@ risc-v-lab:
 	git clone https://github.com/schoeberl/risc-v-lab.git
 
 test: risc-v-lab
-	test=asm/test.s sbt "testOnly wildcat.SingleTest"
-	test=asm/jal.s sbt "testOnly wildcat.SingleTest"
-	test=asm/mem.s sbt "testOnly wildcat.SingleTest"
-	test=risc-v-lab/tests/ripes/andi.s sbt "testOnly wildcat.SingleTest"
-	test=risc-v-lab/tests/ripes/addi.s sbt "testOnly wildcat.SingleTest"
-	test=risc-v-lab/tests/ripes/add.s sbt "testOnly wildcat.SingleTest"
-	test=risc-v-lab/tests/ripes/lui.s sbt "testOnly wildcat.SingleTest"
-	test=risc-v-lab/tests/ripes/xor.s sbt "testOnly wildcat.SingleTest"
 	sbt test
 
 sim-test:

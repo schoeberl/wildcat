@@ -1,5 +1,7 @@
 # TODO
 
+ * Why do the test NOT fail?
+ * Forwarding from ALU/memory to address computation is missing.
  * 4/5 stages stall on load use hazard is missing (not covered by the tests)
  * 3/4/5 load and use as address is wrong (need a forward to the adder)
    - test missing
@@ -9,8 +11,11 @@
    - ecall, ebreak
    - csrrw, csrrs, csrrc, csrrwi, csrrsi, csrrci
  * Better names for signals (e.g., for those with a feedback, e.g., RF write)
+ * Move selection between register and imm back into decode
+   - maybe more of the muxing could be done there
+   - probably branch target computation
+   - or the whole branching itself
  * ecall
- * Get better testing going (automated)
  * Use Java to read .elf files
    - maybe check them in for faster tests
  * JALR: The target address is obtained by adding the 12-bit signed I-immediate to the register rs1, then setting the least-significant bit of the result to zero.
