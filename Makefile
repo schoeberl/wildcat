@@ -20,9 +20,7 @@ work:
 	test=$(APP) sbt "testOnly wildcat.WildcatTest"
 
 app:
-	gcc -E $(APP) -o $(APP).i
-#	riscv64-unknown-elf-gcc -E $(APP) -o $(APP).i # why does this not work with asm examples, but with rv32ui?
-	riscv64-unknown-elf-as -march rv32i $(APP).i
+	riscv64-unknown-elf-as -march rv32i $(APP)
 #	riscv64-unknown-elf-objdump -d a.out
 	riscv64-unknown-elf-objcopy -O binary -j .text a.out a.bin
 #	riscv64-unknown-elf-objcopy -O binary -j .text a.out text.bin
@@ -105,8 +103,7 @@ experiments:
 
 clean:
 	git clean -fd
-	rm -rf ./idea
-	rm -rf ./idea
+#	rm -rf ./idea
 	rm -rf ./risc-v-lab
 
 #### not (yet) used

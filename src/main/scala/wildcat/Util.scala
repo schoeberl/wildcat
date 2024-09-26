@@ -92,7 +92,7 @@ object Util {
     (code, start)
   }
 
-  def getAsmFiles(path: String = "asm", ext: String = ".S") = {
+  def getAsmFiles(path: String = "asm", ext: String = ".s") = {
     new File(path).listFiles.filter(_.isFile).toList.filter(_.getName.endsWith(ext)).map(_.toString)
   }
 
