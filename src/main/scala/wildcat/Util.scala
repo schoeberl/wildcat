@@ -73,18 +73,18 @@ object Util {
     arr
   }
 
-  def getCode(args: Array[String]): (Array[Int], Int) = {
+  def getCode(name: String): (Array[Int], Int) = {
     val (code, start) =
-      if (args.isEmpty) {
+      if (name == null) {
         // No program given, do something very minimal
         (Array(0x00200093, //	addi x1 x0 2
           0x00300113, //	addi x2 x0 3
           0x002081b3 // add x3 x1 x2
         ), 0)
-      } else if (args(0).endsWith(".bin")) {
-        (Util.readBin(args(0)), 0)
-      } else if (args(0).endsWith(".hex")) {
-        (Util.readHex(args(0)), 0x200)
+      } else if (name.endsWith(".bin")) {
+        (Util.readBin(name), 0)
+      } else if (name.endsWith(".hex")) {
+        (Util.readHex(name), 0x200)
       } else {
         throw new Exception("Unknown file extension")
       }

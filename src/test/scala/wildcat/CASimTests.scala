@@ -21,7 +21,7 @@ class CASimTests extends AnyFlatSpec with ChiselScalatestTester {
         println(s"Skipping $f")
         succeed
       } else {
-        val sim = SimRV.runSimRV(Array(f.toString().dropRight(4) + ".bin"))
+        val sim = SimRV.runSimRV(f.toString().dropRight(4) + ".bin")
         for (i <- 0 until 32) {
           val r = sim.reg(i)
           val e = result(i)

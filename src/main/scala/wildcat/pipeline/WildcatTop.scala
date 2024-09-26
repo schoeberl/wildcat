@@ -12,13 +12,13 @@ import wildcat.Util
  * Author: Martin Schoeberl (martin@jopdesign.com)
  *
  */
-class WildcatTop(args: Array[String]) extends Module {
+class WildcatTop(file: String) extends Module {
 
   val io = IO(new Bundle {
     val led = Output(UInt(8.W))
   })
 
-  val (code, start) = Util.getCode(args)
+  val (code, start) = Util.getCode(file)
 
   // Here switch between different designs
   val cpu = Module(new ThreeCats())
@@ -40,5 +40,5 @@ class WildcatTop(args: Array[String]) extends Module {
 }
 
 object WildcatTop extends App {
-  emitVerilog(new WildcatTop(args), Array("--target-dir", "generated"))
+  emitVerilog(new WildcatTop(null), Array("--target-dir", "generated"))
 }

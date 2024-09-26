@@ -239,10 +239,10 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
 
 object SimRV {
 
-  def runSimRV(args: Array[String]) = {
+  def runSimRV(file: String) = {
     val mem = new Array[Int](1024 * 256) // 1 MB, also check masking in load and store
 
-    val (code, start) = Util.getCode(args)
+    val (code, start) = Util.getCode(file)
 
     for (i <- 0 until code.length) {
       mem(i) = code(i)
@@ -257,6 +257,6 @@ object SimRV {
   }
 
   def main(args: Array[String]): Unit = {
-    runSimRV(args)
+    runSimRV(args(0))
   }
 }

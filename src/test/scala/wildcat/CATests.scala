@@ -25,7 +25,7 @@ class CATests extends AnyFlatSpec with ChiselScalatestTester {
         println(s"Skipping $f")
         succeed
       } else {
-        test(new WildcatTestTop(Array(f.getAbsolutePath))) {
+        test(new WildcatTestTop(f.getAbsolutePath)) {
           d => {
             d.clock.step(100)
             for (i <- 0 until 32) {

@@ -23,7 +23,7 @@ class WildcatTest() extends AnyFlatSpec with ChiselScalatestTester {
       "rm a.bin".!
       s"make app APP=$p".!
       //    test(new FiveCats(Array("a.bin"))).withAnnotations(Seq(WriteVcdAnnotation)) {
-      test(new WildcatTestTop(Array("a.bin"))).withAnnotations(Seq(WriteVcdAnnotation)) {
+      test(new WildcatTestTop("a.bin")).withAnnotations(Seq(WriteVcdAnnotation)) {
         d => {
           var stop = false
           var cnt = 0
