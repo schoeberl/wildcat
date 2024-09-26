@@ -92,11 +92,11 @@ object Util {
     (code, start)
   }
 
-  def getAsmFiles(path: String = "asm") = {
-    new File(path).listFiles.filter(_.isFile).toList.filter(_.getName.endsWith(".S")).map(_.toString)
+  def getAsmFiles(path: String = "asm", ext: String = ".S") = {
+    new File(path).listFiles.filter(_.isFile).toList.filter(_.getName.endsWith(ext)).map(_.toString)
   }
 
   def getSimpleTests(path: String) = {
-    new File(path).listFiles.filter(_.isFile).toList.filter(_.getName.endsWith("addpos.bin"))
+    new File(path).listFiles.filter(_.isFile).toList.filter(_.getName.endsWith(".bin"))
   }
 }

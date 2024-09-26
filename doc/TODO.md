@@ -1,5 +1,9 @@
 # TODO
 
+ * Why using an args array for toplevel? change that
+ * width.s should not fail in the ISA simulator
+   - string should work as well, do we need a linker script? 
+ * Work on failing simple tests
  * Still many tests passing. Probably test against 0 in x28 is not that great, as this is a default value.
    -Switch to the real RISC-V tests
  * Forwarding from ALU/memory to address computation is missing.

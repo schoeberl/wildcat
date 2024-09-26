@@ -239,8 +239,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
 
 object SimRV {
 
-  def main(args: Array[String]): Unit = {
-
+  def runSimRV(args: Array[String]) = {
     val mem = new Array[Int](1024 * 256) // 1 MB, also check masking in load and store
 
     val (code, start) = Util.getCode(args)
@@ -253,6 +252,11 @@ object SimRV {
 
     // TODO: do we really want ot ba able to start at an arbitrary address?
     // Read in RV spec
-    new SimRV(mem, start, stop)
+    val sim = new SimRV(mem, start, stop)
+    sim
+  }
+
+  def main(args: Array[String]): Unit = {
+    runSimRV(args)
   }
 }

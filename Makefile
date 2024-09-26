@@ -34,6 +34,7 @@ run:
 
 risc-v-lab:
 	git clone https://github.com/schoeberl/risc-v-lab.git
+	make -C risc-v-lab/tests/simple
 
 test: risc-v-lab
 	sbt test
