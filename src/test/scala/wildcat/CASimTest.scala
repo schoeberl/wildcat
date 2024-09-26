@@ -9,7 +9,7 @@ import wildcat.isasim.SimRV
  * Test with the CAE tests.
  * Living at a repo relative to the Wildcat one.
  */
-class CASimTests extends AnyFlatSpec with ChiselScalatestTester {
+class CASimTest extends AnyFlatSpec with ChiselScalatestTester {
 
   val files = Util.getSimpleTests("risc-v-lab/tests/simple")
   val failed = List("string.bin", "width.bin")
@@ -21,7 +21,7 @@ class CASimTests extends AnyFlatSpec with ChiselScalatestTester {
         println(s"Skipping $f")
         succeed
       } else {
-        val sim = SimRV.runSimRV(f.toString().dropRight(4) + ".bin")
+        val sim = SimRV.runSimRV(f.toString())
         for (i <- 0 until 32) {
           val r = sim.reg(i)
           val e = result(i)
