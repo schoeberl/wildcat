@@ -46,16 +46,7 @@ and setting ```decExReg.vald``` to ```false.B ```.
 JALR uses the ALU with the immediate similar to ADDI.
 
 # Further Reading
- * Rescue RISC-V test from my local copy of sodor in data/repositories
-   * Can be found in the initial commit of FlexPRET (maybe?)
-   * also test from https://github.com/mortbopet/Ripes (same as the above?)
-   * Look into YARVI for tests, they are committed
-     - uses the rv32ui-p from riscv-tests, slight difference
-   * riscv-tests need more support (csr...)
-   * Look also into the tests on Helena
-   * They are also at: https://github.com/YosysHQ/picorv32/tree/master/tests
-     - has its own pass/fail including writing to memory 
-   * Build see: https://github.com/YosysHQ/picorv32/blob/f00a88c36eaab478b64ee27d8162e421049bcc66/Makefile#L121
+ * A nice single cycle implementation: /Users/martin/data/dtu/teaching/cae/exam2022/Final Assignment ...
  * Checkout: https://github.com/SpinalHDL/VexRiscv (has a lot of info)
  * unaligned access is not too hard with byte-wise access
    * or trap on unaligned access
