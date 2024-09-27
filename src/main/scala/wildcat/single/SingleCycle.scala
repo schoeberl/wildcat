@@ -64,7 +64,3 @@ class SingleCycle(file: String) extends Module {
 
   io.stop := decOut.isECall
 }
-
-object SingleCycle extends App {
-  emitVerilog(new SingleCycle(args(0)), Array("--target-dir", "generated"))
-}

@@ -48,7 +48,7 @@ hw-fmax:
 	$(SBT) "runMain wildcat.pipeline.SynthTopFmax a.bin"
 
 hw-single:
-	$(SBT) "runMain wildcat.single.SingleCycle a.bin"
+	$(SBT) "runMain wildcat.single.SingleCycleTop a.bin"
 
 # Synthesize and copy targets
 
