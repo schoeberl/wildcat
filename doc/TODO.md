@@ -1,8 +1,13 @@
 # TODO
 
+ * have isBranch in decode (not in core)
+ * Should fail when not given a program (no default to silly program)
+ * Something is fishy with testing, as SingleCycle works (even without branch)
  * width.s should not fail in the ISA simulator
    - string should work as well, do we need a linker script? 
  * Work on failing simple tests
+ * Aim to have same interface for pipeline and single cycle
+   - reuse tests 
  * Forwarding from ALU/memory to address computation is missing.
  * 4/5 stages stall on load use hazard is missing (not covered by the tests)
  * 3/4/5 load and use as address is wrong (need a forward to the adder)
@@ -15,6 +20,9 @@
  * Better names for signals (e.g., for those with a feedback, e.g., RF write)
  * Read .elf files in Scala
  * Maybe commit the .elf files for faster tests
+ * Maybe add some tracing facility
+ * Get C compiled apps running
+ * Get Rust bare metal running
  * Move selection between register and imm back into decode
    - maybe more of the muxing could be done there
    - probably branch target computation

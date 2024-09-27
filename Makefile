@@ -47,6 +47,9 @@ hw:
 hw-fmax:
 	$(SBT) "runMain wildcat.pipeline.SynthTopFmax a.bin"
 
+hw-single:
+	$(SBT) "runMain wildcat.single.SingleCycle a.bin"
+
 # Synthesize and copy targets
 
 # does not work from Makefile, C & P into shell

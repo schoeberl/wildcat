@@ -40,5 +40,5 @@ class WildcatTop(file: String) extends Module {
 }
 
 object WildcatTop extends App {
-  emitVerilog(new WildcatTop(null), Array("--target-dir", "generated"))
+  emitVerilog(new WildcatTop(args(0)), Array("--target-dir", "generated"))
 }
