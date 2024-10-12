@@ -181,9 +181,6 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       imm & 0xfff match {
         case 0xf10 => 0 // hartid
         case 0x000 =>
-          // TODO this test should not be part of the simulator, but part of the test
-          // test x28 for test condition: 0 = ok in Ripes tests, not in the original (it is 1)
-          // assert(reg(28) == 1, "Test failed with return code " + reg(3))
           run = false
           0
         case _ => 0 // this gets us around _start in the test cases
