@@ -1,10 +1,12 @@
 # TODO
 
+ * Frist thing: test check of ISA sim into the tester; currently disabled in the simulation
  * have isBranch in decode (not in core)
  * Should fail when not given a program (no default to silly program)
  * Something is fishy with testing, as SingleCycle works (even without branch)
  * width.s should not fail in the ISA simulator
-   - string should work as well, do we need a linker script? 
+   - string should work as well, do we need a linker script?
+ * Simulator should also be tested with the standard tests
  * Work on failing simple tests
  * Aim to have same interface for pipeline and single cycle
    - reuse tests 

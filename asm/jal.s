@@ -11,13 +11,13 @@ foo:
     ret
 
 fail:
-    addi x28, x0, 1
+    addi x28, x0, 2
 	ecall
 1:  beq   x0, x0, 1b
     nop
 
 pass:
-    addi x28, x0, 0
+    addi x28, x0, 1
 	ecall
 1:  beq   x0, x0, 1b
 
