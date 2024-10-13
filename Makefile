@@ -22,14 +22,14 @@ work:
 app:
 	riscv64-unknown-elf-as -march rv32i $(APP)
 #	riscv64-unknown-elf-objdump -d a.out
-	riscv64-unknown-elf-objcopy -O binary -j .text a.out a.bin
+#	riscv64-unknown-elf-objcopy -O binary -j .text a.out a.bin
 #	riscv64-unknown-elf-objcopy -O binary -j .text a.out text.bin
 #	riscv64-unknown-elf-objcopy -O binary -j .data a.out data.bin
 #	cat text.bin data.bin > a.bin # this does not make much sense
 #	hexdump -e '"%08x\n"' a.bin
 
 run:
-	sbt "runMain wildcat.isasim.SimRV a.bin"
+	sbt "runMain wildcat.isasim.SimRV a.out"
 
 risc-v-lab:
 	git clone https://github.com/schoeberl/risc-v-lab.git
@@ -42,13 +42,13 @@ sim-test:
 	sbt "testOnly wildcat.SimulatorTest"
 
 hw:
-	$(SBT) "runMain wildcat.pipeline.WildcatTop a.bin"
+	$(SBT) "runMain wildcat.pipeline.WildcatTop a.out"
 
 hw-fmax:
-	$(SBT) "runMain wildcat.pipeline.SynthTopFmax a.bin"
+	$(SBT) "runMain wildcat.pipeline.SynthTopFmax a.out"
 
 hw-single:
-	$(SBT) "runMain wildcat.single.SingleCycleTop a.bin"
+	$(SBT) "runMain wildcat.single.SingleCycleTop a.out"
 
 # Synthesize and copy targets
 

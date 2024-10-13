@@ -22,7 +22,6 @@
    - ecall, ebreak
    - csrrw, csrrs, csrrc, csrrwi, csrrsi, csrrci
  * Better names for signals (e.g., for those with a feedback, e.g., RF write)
- * Read .elf files in Scala
  * Maybe commit the .elf files for faster tests
  * Maybe add some tracing facility
  * Get C compiled apps running
@@ -38,7 +37,6 @@
    - Maybe this is not needed as the compiler does this already
  * JALR should check for func3 being 0 - it uses this 0 for ALU op
  * What are the types of immediate values? mostly signed or mostly unsigned?
- * Check ALU with the decoding (what did I mean?)
  * And much more not listed here, e.g. caches, interconnect, newlib, ...
  * Write documentation
 

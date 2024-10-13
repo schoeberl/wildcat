@@ -15,19 +15,12 @@ package wildcat
 import java.io.File
 import java.nio.file.{Files, Paths}
 import scala.io.Source
+import net.fornwall.jelf.ElfFile
 
 object Util {
 
-  /**
-   * Read a binary file into an array vector
-   */
-  def readBin(fileName: String): Array[Int] = {
 
-    // println("Reading " + fileName)
-
-    val byteArray = Files.readAllBytes(Paths.get(fileName))
-
-    // use an array to convert input
+  private def byteToWord(byteArray: Array[Byte]) = {
     val arr = new Array[Int](math.max(1, byteArray.length / 4))
 
     if (byteArray.length == 0) {
@@ -44,8 +37,14 @@ object Util {
       // printf("%08x\n", word)
       arr(i) = word
     }
-
     arr
+  }
+  /**
+   * Read a binary file into an array vector
+   */
+  def readBin(fileName: String): Array[Int] = {
+    val byteArray = Files.readAllBytes(Paths.get(fileName))
+    byteToWord(byteArray)
   }
 
   /**
@@ -73,16 +72,22 @@ object Util {
     arr
   }
 
+  def readElf(fileName: String): Array[Int] = {
+    val elf = ElfFile.from(new File(fileName))
+    if (!elf.is32Bits() || elf.e_machine != 0xf3) throw new Exception("Not a RV32I executable")
+    val section = elf.firstSectionByName(".text")
+    val data = section.getData
+    // println(s"program start ${elf.e_entry}")
+    // println(s"start of .text ${section.header.sh_addr}")
+    byteToWord(data)
+  }
+
   def getCode(name: String): (Array[Int], Int) = {
     val (code, start) =
-      if (name == null) {
-        // No program given, do something very minimal
-        (Array(0x00200093, //	addi x1 x0 2
-          0x00300113, //	addi x2 x0 3
-          0x002081b3 // add x3 x1 x2
-        ), 0)
-      } else if (name.endsWith(".bin")) {
+      if (name.endsWith(".bin")) {
         (Util.readBin(name), 0)
+      } else if (name.endsWith(".out")) {
+        (Util.readElf(name), 0)
       } else if (name.endsWith(".hex")) {
         (Util.readHex(name), 0x200)
       } else {

@@ -21,10 +21,10 @@ class WildcatTest() extends AnyFlatSpec with ChiselScalatestTester {
   progs.foreach(p => {
     println(s"Running test $p")
     s"Program $p" should "pass" in {
-      "rm a.bin".!
+      "rm a.out".!
       s"make app APP=$p".!
-      //    test(new FiveCats(Array("a.bin"))).withAnnotations(Seq(WriteVcdAnnotation)) {
-      test(new WildcatTestTop("a.bin")).withAnnotations(Seq(WriteVcdAnnotation)) {
+      //    test(new FiveCats(Array("a.out"))).withAnnotations(Seq(WriteVcdAnnotation)) {
+      test(new WildcatTestTop("a.out")).withAnnotations(Seq(WriteVcdAnnotation)) {
         d => {
           var stop = false
           var cnt = 0
