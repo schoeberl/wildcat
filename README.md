@@ -55,7 +55,7 @@ make APP=asm/apps/blink.s hw
 ```
 
 For resource and timing analysis there is a top-level with
-connections to the insrtuction and data memory:
+connections to the instruction and data memory:
 
 ```
 make hw-fmax
@@ -65,6 +65,12 @@ Tests are run with
 ```
 make test
 ```
+
+### Memory Mapping
+
+ * Current memory starts at 0
+ * Simulator has a simple text output at address 0xf000_0000
+ * LED is mapped to, maybe 0xe000_0000
 
 ## Results
 

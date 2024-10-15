@@ -1,7 +1,7 @@
 #
 # Blink an LED
 #
-    li      x4, 0
+    li      x4, 0xe0000000
 begin:
     li      x1, 0x7ff
 loop:
