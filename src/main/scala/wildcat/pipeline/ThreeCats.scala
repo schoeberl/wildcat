@@ -1,7 +1,9 @@
 package wildcat.pipeline
 
 import chisel3._
+import chisel3.util._
 import wildcat.Opcode._
+import wildcat.LoadStoreFunct._
 import wildcat.pipeline.Functions._
 
 /*
@@ -27,8 +29,6 @@ class ThreeCats() extends Wildcat() {
 
   val doBranch = WireDefault(false.B)
   val branchTarget = WireDefault(0.U)
-
-
 
   // The ROM has a register that is reset to 0, therefore clock cycle 1 is the first instruction.
   // Needed if we want to start from a different address.
@@ -89,6 +89,13 @@ class ThreeCats() extends Wildcat() {
   }
   val exFwdReg = RegInit(0.U.asTypeOf(exFwd))
 
+  // Forwarding to memory
+  val address = Mux(wrEna && (wbDest =/= 0.U) && wbDest === decEx.rs1, wbData, rs1Val)
+  val data = Mux(wrEna && (wbDest =/= 0.U) && wbDest === decEx.rs2, wbData, rs2Val)
+
+  val memAddress = (address.asSInt + decOut.imm).asUInt
+
+
   // Forwarding
   val v1 = Mux(exFwdReg.valid && exFwdReg.wbDest === decExReg.rs1, exFwdReg.wbData, decExReg.rs1Val)
   val v2 = Mux(exFwdReg.valid && exFwdReg.wbDest === decExReg.rs2, exFwdReg.wbData, decExReg.rs2Val)
@@ -104,6 +111,25 @@ class ThreeCats() extends Wildcat() {
   }
   when (decExReg.decOut.isLoad) {
     res := io.dmem.rdData
+    switch(decExReg.func3) {
+      is(LBU.U) {
+        // TODO: make it explicit
+        switch(RegNext(memAddress(1, 0))) {
+          is(0.U) {
+            res := io.dmem.rdData(7, 0).asUInt
+          }
+          is(1.U) {
+            res := io.dmem.rdData(15, 8).asUInt
+          }
+          is(2.U) {
+            res := io.dmem.rdData(23, 16).asUInt
+          }
+          is(3.U) {
+            res := io.dmem.rdData(31, 24).asUInt
+          }
+        }
+      }
+    }
   }
 
   wbDest := decExReg.rd
@@ -120,11 +146,6 @@ class ThreeCats() extends Wildcat() {
   wrEna := decExReg.valid && decExReg.decOut.rfWrite
 
   // Memory access
-  // Forwarding to memory
-  val address = Mux(wrEna && (wbDest =/= 0.U) && wbDest === decEx.rs1, wbData, rs1Val)
-  val data = Mux(wrEna && (wbDest =/= 0.U) && wbDest === decEx.rs2, wbData, rs2Val)
-
-  val memAddress = (address.asSInt + decOut.imm).asUInt
   io.dmem.rdAddress := memAddress
   io.dmem.wrAddress := memAddress
   io.dmem.wrData := data

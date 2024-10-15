@@ -16,7 +16,7 @@
  * 3/4/5 load and use as address is wrong (need a forward to the adder)
    - test missing
  * Later
-   - lb, lh, lbu, lhu
+   - lb, lh, lhu
    - sb, sh
    - ecall, ebreak
    - csrrw, csrrs, csrrc, csrrwi, csrrsi, csrrci
