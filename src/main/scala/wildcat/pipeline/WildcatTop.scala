@@ -36,9 +36,11 @@ class WildcatTop(file: String) extends Module {
   when (cpu.io.dmem.wrEnable === 15.U && cpu.io.dmem.wrAddress === 0.U) {
     ledReg := cpu.io.dmem.wrData(7, 0)
   }
-  when((cpu.io.dmem.wrAddress === 0xe000_0000L.U) && cpu.io.dmem.wrEnable === 15.U) {
+  when ((cpu.io.dmem.wrAddress === 0xe000_0000L.U) && cpu.io.dmem.wrEnable === 15.U) {
     ledReg := cpu.io.dmem.wrData(7, 0)
     dmem.io.wrEnable := 0.U
+  } .elsewhen ((cpu.io.dmem.wrAddress === 0xf000_0000L.U) && cpu.io.dmem.wrEnable === 15.U) {
+    printf("%c", cpu.io.dmem.wrData(7, 0))
   }
   io.led := RegNext(ledReg)
 }
