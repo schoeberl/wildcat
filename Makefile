@@ -63,10 +63,10 @@ synpath:
 	source /home/shared/Xilinx/Vivado/2017.4/settings64.sh
 
 synth:
-	./vivado_synth.sh -t SynthTopFmax -p xc7a100tcsg324-1 -x nexysA7.xdc -o build generated/SynthTopFmax.v
-
-synth-for-real:
 	./vivado_synth.sh -t WildcatTop -p xc7a100tcsg324-1 -x nexysA7.xdc -o build generated/WildcatTop.v
+
+synth-fmax:
+	./vivado_synth.sh -t SynthTopFmax -p xc7a100tcsg324-1 -x nexysA7.xdc -o build generated/SynthTopFmax.v
 
 cp-bit:
 	-mkdir build
