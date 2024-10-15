@@ -31,6 +31,11 @@ app:
 run:
 	sbt "runMain wildcat.isasim.SimRV a.out"
 
+hello:
+	make -C c
+	sbt "runMain wildcat.isasim.SimRV c/a.out"
+
+
 risc-v-lab:
 	git clone https://github.com/schoeberl/risc-v-lab.git
 	make -C risc-v-lab/tests/simple

@@ -4,7 +4,6 @@
    - should be able to run the standard tests
  * For load tests: simply load binary into imem and dmem
  * have isBranch in decode (not in core)
- * Should fail when not given a program (no default to silly program)
  * Something is fishy with testing, as SingleCycle works (even without branch)
  * width.s should not fail in the ISA simulator
    - string should work as well, do we need a linker script?

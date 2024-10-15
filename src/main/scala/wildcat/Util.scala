@@ -75,11 +75,16 @@ object Util {
   def readElf(fileName: String): Array[Int] = {
     val elf = ElfFile.from(new File(fileName))
     if (!elf.is32Bits() || elf.e_machine != 0xf3) throw new Exception("Not a RV32I executable")
-    val section = elf.firstSectionByName(".text")
-    val data = section.getData
+    val textSection = elf.firstSectionByName(".text")
+    val dataSection = elf.firstSectionByName(".data")
     // println(s"program start ${elf.e_entry}")
-    // println(s"start of .text ${section.header.sh_addr}")
-    byteToWord(data)
+    println(s"start of .text ${textSection.header.sh_addr}")
+    // println(s"start of .data ${dataSection.header.sh_addr}")
+    println(s"length of .text ${textSection.getData.length}")
+    // println(s"length of .data ${dataSection.getData.length}")
+    // val data = byteToWord(dataSection.getData)
+    // data.foreach(x => println(f"$x%08x"))
+    byteToWord(textSection.getData)
   }
 
   def getCode(name: String): (Array[Int], Int) = {
@@ -99,6 +104,10 @@ object Util {
 
   def getAsmFiles(path: String = "asm", ext: String = ".s") = {
     new File(path).listFiles.filter(_.isFile).toList.filter(_.getName.endsWith(ext)).map(_.toString)
+  }
+
+  def getAllTests() = {
+    getAsmFiles() ++ getAsmFiles("rv32ui") //  ++ getAsmFiles("risc-v-lab/tests/ripes") ++ getAsmFiles("risc-v-lab/tests/riscv-tests")
   }
 
   def getSimpleTests(path: String) = {
