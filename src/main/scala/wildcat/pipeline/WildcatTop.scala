@@ -18,15 +18,15 @@ class WildcatTop(file: String) extends Module {
     val led = Output(UInt(8.W))
   })
 
-  val (code, start) = Util.getCode(file)
+  val (memory, start) = Util.getCode(file)
 
   // Here switch between different designs
   val cpu = Module(new ThreeCats())
   // val cpu = Module(new WildFour())
   // val cpu = Module(new StandardFive())
-  val dmem = Module(new ScratchPadMem())
+  val dmem = Module(new ScratchPadMem(memory))
   cpu.io.dmem <> dmem.io
-  val imem = Module(new InstructionROM(code))
+  val imem = Module(new InstructionROM(memory))
   imem.io.address := cpu.io.imem.address
   cpu.io.imem.data := imem.io.data
   cpu.io.imem.stall := imem.io.stall
