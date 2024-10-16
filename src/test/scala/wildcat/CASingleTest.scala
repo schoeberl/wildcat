@@ -27,7 +27,7 @@ class CASingleTest extends AnyFlatSpec with ChiselScalatestTester {
             for (i <- 0 until 32) {
               val r = d.io.regs(i).peekInt()
               val e = result(i).toLong & 0xffffffffL
-              println(f"reg($i) = ${r}, expected ${result(i)}")
+              // println(f"reg($i) = ${r}, expected ${result(i)}")
               d.io.regs(i).expect(e.U)
             }
           }

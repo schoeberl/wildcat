@@ -75,16 +75,27 @@ object Util {
   def readElf(fileName: String): Array[Int] = {
     val elf = ElfFile.from(new File(fileName))
     if (!elf.is32Bits() || elf.e_machine != 0xf3) throw new Exception("Not a RV32I executable")
+    /*
+    for (i <- 1 until elf.e_shnum) {
+      val sect = elf.getSection(i)
+      println(s"section $i: ${sect.header.getName} ${sect.header.sh_name} ${sect.header.sh_addr} ${sect.header.sh_size}")
+    }
+     */
     val textSection = elf.firstSectionByName(".text")
+    val text = byteToWord(textSection.getData)
     val dataSection = elf.firstSectionByName(".data")
-    // println(s"program start ${elf.e_entry}")
-    println(s"start of .text ${textSection.header.sh_addr}")
-    // println(s"start of .data ${dataSection.header.sh_addr}")
-    println(s"length of .text ${textSection.getData.length}")
-    // println(s"length of .data ${dataSection.getData.length}")
-    // val data = byteToWord(dataSection.getData)
-    // data.foreach(x => println(f"$x%08x"))
-    byteToWord(textSection.getData)
+    if (dataSection == null) return text
+
+    val data = byteToWord(dataSection.getData)
+    val length = text.length + data.length + ((dataSection.header.sh_addr - textSection.header.sh_size) / 4)
+    val mem = new Array[Int](length.toInt)
+    for (i <- 0 until text.length) {
+      mem(i) = text(i)
+    }
+    for (i <- 0 until data.length) {
+      mem((dataSection.header.sh_addr/4 + i).toInt) = data(i)
+    }
+    mem
   }
 
   def getCode(name: String): (Array[Int], Int) = {

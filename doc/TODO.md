@@ -1,14 +1,11 @@
 # TODO
 
- * Work on simulator: read .elf file and put stuff into right memory places
-   - should be able to run the standard tests
- * For load tests: simply load binary into imem and dmem
  * have isBranch in decode (not in core)
+ * have a rdEna for the memory interface (needed when caching)
  * Something is fishy with testing, as SingleCycle works (even without branch)
  * width.s should not fail in the ISA simulator
    - string should work as well, do we need a linker script?
- * Simulator should also be tested with the standard tests
- * Work on failing simple tests
+ * Work on failing simple tests (Simulator?)
  * Aim to have same interface for pipeline and single cycle
    - reuse tests 
  * Forwarding from ALU/memory to address computation is missing.
