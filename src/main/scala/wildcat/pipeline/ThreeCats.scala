@@ -187,37 +187,26 @@ class ThreeCats() extends Wildcat() {
   io.dmem.wrData := data
   io.dmem.wrEnable := VecInit(Seq.fill(4)(false.B))
   when(decOut.isStore) {
-    io.dmem.wrEnable := VecInit(Seq.fill(4)(true.B))
     switch(decEx.func3) {
       is(LSB.U) {
         io.dmem.wrData := data(7, 0) ## data(7, 0) ## data(7, 0) ## data(7, 0)
+        io.dmem.wrEnable(memAddress(1,0)) := true.B
+      }
+      is(LSH.U) {
+        io.dmem.wrData := data(15, 0) ## data(15, 0)
         switch(memAddress(1, 0)) {
           is(0.U) {
             io.dmem.wrEnable(0) := true.B
-          }
-          is(1.U) {
             io.dmem.wrEnable(1) := true.B
           }
           is(2.U) {
             io.dmem.wrEnable(2) := true.B
-          }
-          is(3.U) {
             io.dmem.wrEnable(3) := true.B
           }
         }
       }
-      is(LSH.U) {
-        // io.dmem.wrData := data(15, 0) ## data(15, 0)
-        switch(memAddress(1, 0)) {
-          is(0.U) {
-            io.dmem.wrEnable(0) := true.B
-            io.dmem.wrEnable(1) := true.B
-          }
-          is(2.U) {
-            io.dmem.wrEnable(2) := true.B
-            io.dmem.wrEnable(3) := true.B
-          }
-        }
+      is(LSW.U) {
+        io.dmem.wrEnable := VecInit(Seq.fill(4)(true.B))
       }
     }
   }

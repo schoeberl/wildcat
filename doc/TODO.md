@@ -1,9 +1,10 @@
 # TODO
 
+ * split constants for load and store, e.g. LSB shall be LB and SB
  * adapt other benchmarks to use 1 as a result
+ * Check skipped bin tests
  * have isBranch in decode (not in core)
  * have a rdEna for the memory interface (needed when caching)
- * split constants for load and store, e.g. LSB shall be LB and SB
  * Something is fishy with testing, as SingleCycle works (even without branch)
  * width.s should not fail in the ISA simulator
    - string should work as well, do we need a linker script?
@@ -14,10 +15,8 @@
  * 4/5 stages stall on load use hazard is missing (not covered by the tests)
  * 3/4/5 load and use as address is wrong (need a forward to the adder)
    - test missing
- * Later
-   - sb, sh
-   - ecall, ebreak
-   - csrrw, csrrs, csrrc, csrrwi, csrrsi, csrrci
+ * ecall, ebreak
+ * csrrw, csrrs, csrrc, csrrwi, csrrsi, csrrci
  * At some point try to run the "real" RISC-V tests (need quite some infra)
  * Traps on not implemented instructions and unaligned access
  * Better names for signals (e.g., for those with a feedback, e.g., RF write)
