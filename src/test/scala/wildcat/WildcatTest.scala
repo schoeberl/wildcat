@@ -14,9 +14,8 @@ class WildcatTest() extends AnyFlatSpec with ChiselScalatestTester {
     case Some(t) => List(t)
     case None => getAsmFiles() ++ getAsmFiles("rv32ui") // ++ getAsmFiles("risc-v-lab/tests/ripes")  ++ getAsmFiles("risc-v-lab/tests/riscv-tests")
   }
-  val failed = List("asm/riscv-v1_lw.s", "rv32ui/lwu.s", "lrsc.s", "rv32ui/jalr.s", "rv32ui/sb.s", "rv32ui/sh.s", "rv32ui/jal.s", "rv32ui/bgeu.s",
-  "rv32ui/auipc.s", "rv32ui/lhu.s", "rv32ui/sw.s", "rv32ui/bltu.s", "rv32ui/lw.s",
-    "rv32ui/lh.s")
+  val failed = List("asm/riscv-v1_lw.s", "lrsc.s", "rv32ui/jalr.s", "rv32ui/sb.s", "rv32ui/sh.s", "rv32ui/jal.s", "rv32ui/bgeu.s",
+  "rv32ui/auipc.s", "rv32ui/bltu.s")
   //List("risc-v-lab/tests/ripes/memory.s", "risc-v-lab/tests/riscv-tests/jalr.s", "asm/riscv-v1_lw.s")
   val progs = allProgs.filterNot(failed.contains(_))
   progs.foreach(p => {

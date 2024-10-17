@@ -111,7 +111,6 @@ class ThreeCats() extends Wildcat() {
   }
   when(decExReg.decOut.isLoad) {
     res := io.dmem.rdData
-
     switch(decExReg.func3) {
       is(LBU.U) {
         switch(RegNext(memAddress(1, 0))) {
@@ -143,6 +142,26 @@ class ThreeCats() extends Wildcat() {
           }
           is(3.U) {
             res := Fill(24, io.dmem.rdData(31)) ## io.dmem.rdData(31, 24)
+          }
+        }
+      }
+      is(LHU.U) {
+        switch(RegNext(memAddress(1, 0))) {
+          is(0.U) {
+            res := io.dmem.rdData(15, 0)
+          }
+          is(2.U) {
+            res := io.dmem.rdData(31, 16)
+          }
+        }
+      }
+      is(LSH.U) {
+        switch(RegNext(memAddress(1, 0))) {
+          is(0.U) {
+            res := Fill(16, io.dmem.rdData(15)) ## io.dmem.rdData(15, 0)
+          }
+          is(2.U) {
+            res := Fill(16, io.dmem.rdData(31)) ## io.dmem.rdData(31, 16)
           }
         }
       }
