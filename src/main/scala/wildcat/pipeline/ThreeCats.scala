@@ -33,7 +33,7 @@ class ThreeCats() extends Wildcat() {
   // The ROM has a register that is reset to 0, therefore clock cycle 1 is the first instruction.
   // Needed if we want to start from a different address.
   // PC generation
-//  val pcReg = RegInit(-4.S(32.W).asUInt)
+  //  val pcReg = RegInit(-4.S(32.W).asUInt)
   val pcReg = RegInit(0.S(32.W).asUInt) // keep it simpler for now for the waveform viewing
 
   val pcNext = Mux(doBranch, branchTarget, pcReg + 4.U)
@@ -103,29 +103,46 @@ class ThreeCats() extends Wildcat() {
   val res = Wire(UInt(32.W))
   val val2 = Mux(decExReg.decOut.isImm, decExReg.decOut.imm.asUInt, v2)
   res := alu(decExReg.decOut.aluOp, v1, val2)
-  when (decExReg.decOut.isLui) {
+  when(decExReg.decOut.isLui) {
     res := decExReg.decOut.imm.asUInt
   }
-  when (decExReg.decOut.isAuiPc) {
+  when(decExReg.decOut.isAuiPc) {
     res := (decExReg.pc.asSInt + decExReg.decOut.imm).asUInt
   }
-  when (decExReg.decOut.isLoad) {
+  when(decExReg.decOut.isLoad) {
     res := io.dmem.rdData
+
     switch(decExReg.func3) {
       is(LBU.U) {
-        // TODO: make it explicit
         switch(RegNext(memAddress(1, 0))) {
           is(0.U) {
-            res := io.dmem.rdData(7, 0).asUInt
+            res := io.dmem.rdData(7, 0)
           }
           is(1.U) {
-            res := io.dmem.rdData(15, 8).asUInt
+            res := io.dmem.rdData(15, 8)
           }
           is(2.U) {
-            res := io.dmem.rdData(23, 16).asUInt
+            res := io.dmem.rdData(23, 16)
           }
           is(3.U) {
-            res := io.dmem.rdData(31, 24).asUInt
+            res := io.dmem.rdData(31, 24)
+          }
+        }
+      }
+      is(LSB.U) {
+        switch(RegNext(memAddress(1, 0))) {
+          is(0.U) {
+            res := Fill(24, io.dmem.rdData(7)) ## io.dmem.rdData(7, 0)
+          }
+          is(1.U) {
+            res := Fill(24, io.dmem.rdData(15)) ## io.dmem.rdData(15, 8)
+          }
+          is(2.U) {
+            res := Fill(24, io.dmem.rdData(23)) ## io.dmem.rdData(23, 16)
+
+          }
+          is(3.U) {
+            res := Fill(24, io.dmem.rdData(31)) ## io.dmem.rdData(31, 24)
           }
         }
       }
@@ -134,12 +151,12 @@ class ThreeCats() extends Wildcat() {
 
   wbDest := decExReg.rd
   wbData := res
-  when (decExReg.decOut.isJal || decExReg.decOut.isJalr) {
+  when(decExReg.decOut.isJal || decExReg.decOut.isJalr) {
     wbData := decExReg.pc + 4.U
   }
   // Branching
   branchTarget := (decExReg.pc.asSInt + decExReg.decOut.imm).asUInt
-  when (decExReg.decOut.isJalr) {
+  when(decExReg.decOut.isJalr) {
     branchTarget := res
   }
   doBranch := ((compare(decExReg.func3, v1, v2) && decExReg.branchInstr) || decExReg.decOut.isJal || decExReg.decOut.isJalr) && decExReg.valid
