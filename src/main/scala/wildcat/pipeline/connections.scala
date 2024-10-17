@@ -13,7 +13,7 @@ class MemIO extends Bundle {
   val rdData = Input(UInt(32.W))
   val wrAddress = Output(UInt(32.W))
   val wrData = Output(UInt(32.W))
-  val wrEnable = Output(UInt(4.W))
+  val wrEnable = Output(Vec (4, Bool()))
   val stall = Input(Bool())
 }
 
