@@ -41,7 +41,7 @@ object Functions {
         decOut.rs2Valid := true.B
       }
       is(Branch.U) {
-        decOut.instrType := SB.id.U
+        decOut.instrType := SBT.id.U
         decOut.isImm := true.B
       }
       is(Load.U) {
@@ -177,7 +177,7 @@ object Functions {
       is(S.id.U) {
         imm := (Fill(20, instruction(31)) ## instruction(31, 25) ## instruction(11, 7)).asSInt
       }
-      is(SB.id.U) {
+      is(SBT.id.U) {
         imm := (Fill(19, instruction(31)) ## instruction(7) ## instruction(30, 25) ## instruction(11, 8) ## 0.U(1.W)).asSInt
       }
       is(U.id.U) {

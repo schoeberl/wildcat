@@ -1,6 +1,5 @@
 # TODO
 
- * split constants for load and store, e.g. LSB shall be LB and SB
  * adapt other benchmarks to use 1 as a result
  * Check skipped bin tests
  * have isBranch in decode (not in core)

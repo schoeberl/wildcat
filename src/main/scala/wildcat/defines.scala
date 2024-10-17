@@ -16,7 +16,7 @@ object Opcode {
 
 object InstrType extends Enumeration {
   type InstrType = Value
-  val R, I, S, SB, U, UJ = Value
+  val R, I, S, SBT, U, UJ = Value
 }
 
 object AluType extends Enumeration {
@@ -50,9 +50,12 @@ object BranchFunct {
 }
 
 object LoadStoreFunct {
-  val LSB = 0x00
-  val LSH = 0x01
-  val LSW = 0x02
+  val LB = 0x00
+  val LH = 0x01
+  val LW = 0x02
   val LBU = 0x04
   val LHU = 0x05
+  val SB = 0x00
+  val SH = 0x01
+  val SW = 0x02
 }

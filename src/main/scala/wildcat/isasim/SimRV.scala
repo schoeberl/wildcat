@@ -54,7 +54,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       val instrType: InstrType = opcode match {
         case AluImm => I
         case Alu => R
-        case Branch => SB
+        case Branch => SBT
         case Load => I
         case Store => S
         case Lui => U
@@ -90,7 +90,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       }
       val imm10_5 = if (instrType == U) 0 else instr30_25
       val imm11 = instrType match {
-        case SB => instr7
+        case SBT => instr7
         case U => 0
         case UJ => instr20
         case _ => instr31
@@ -138,9 +138,9 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       val addr = ((base + displ) & 0xfffff) // 1 MB wrap around
       val data = mem(addr >>> 2)
       funct3 match {
-        case LSB => (((data >> (8 * (addr & 0x03))) & 0xff) << 24) >> 24
-        case LSH => (((data >> (8 * (addr & 0x03))) & 0xffff) << 16) >> 16
-        case LSW => data
+        case LB => (((data >> (8 * (addr & 0x03))) & 0xff) << 24) >> 24
+        case LH => (((data >> (8 * (addr & 0x03))) & 0xffff) << 16) >> 16
+        case LW => data
         case LBU => (data >> (8 * (addr & 0x03))) & 0xff
         case LHU => (data >> (8 * (addr & 0x03))) & 0xffff
       }
@@ -150,7 +150,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       val addr = base + displ
       val wordAddr = addr >>> 2
       funct3 match {
-        case LSB => {
+        case SB => {
           val mask = (addr & 0x03) match {
             case 0 => 0xffffff00
             case 1 => 0xffff00ff
@@ -159,14 +159,14 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
           }
           mem(wordAddr) = (mem(wordAddr) & mask) | ((value & 0xff) << (8 * (addr & 0x03)))
         }
-        case LSH => {
+        case SH => {
           val mask = (addr & 0x03) match {
             case 0 => 0xffff0000
             case 2 => 0x0000ffff
           }
           mem(wordAddr) = (mem(wordAddr) & mask) | ((value & 0xffff) << (8 * (addr & 0x03)))
         }
-        case LSW => {
+        case SW => {
           // very primitive IO simulation
           if (addr == 0xf0000000) {
             println("out: " + value.toChar)
