@@ -1,7 +1,12 @@
 # TODO
 
+ * split memory to support write enable
+   * add read Enable
+   * check also if I implemeted the correct endieness
+ * adapt other benchmarks to use 1 as a result
  * have isBranch in decode (not in core)
  * have a rdEna for the memory interface (needed when caching)
+ * split constants for load and store, e.g. LSB shall be LB and SB
  * Something is fishy with testing, as SingleCycle works (even without branch)
  * width.s should not fail in the ISA simulator
    - string should work as well, do we need a linker script?
@@ -16,6 +21,8 @@
    - sb, sh
    - ecall, ebreak
    - csrrw, csrrs, csrrc, csrrwi, csrrsi, csrrci
+ * At some point try to run the "real" RISC-V tests (need quite some infra)
+ * Traps on not implemented instructions and unaligned access
  * Better names for signals (e.g., for those with a feedback, e.g., RF write)
  * Maybe commit the .elf files for faster tests
  * Maybe add some tracing facility
@@ -41,7 +48,7 @@
 
 # Docu Start
 
-Branch is currently executed in the EX stage.On a taken branch the
+Branch is currently executed in the EX stage. On a taken branch the
 FE and DEC stages are flushed by changing ```instrReg``` to ```NOP```
 and setting ```decExReg.vald``` to ```false.B ```.
 

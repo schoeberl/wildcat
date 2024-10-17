@@ -185,7 +185,41 @@ class ThreeCats() extends Wildcat() {
   io.dmem.rdAddress := memAddress
   io.dmem.wrAddress := memAddress
   io.dmem.wrData := data
-  io.dmem.wrEnable := Mux(decOut.isStore, 15.U, 0.U)
+  io.dmem.wrEnable := 0.U
+    // Mux(decOut.isStore, 15.U, 0.U)
+  when(decOut.isStore) {
+    io.dmem.wrEnable := 15.U
+    switch(decEx.func3) {
+      is(LSB.U) {
+        io.dmem.wrData := data(7, 0) ## data(7, 0) ## data(7, 0) ## data(7, 0)
+        switch(memAddress(1, 0)) {
+          is(0.U) {
+            io.dmem.wrEnable := 1.U
+          }
+          is(1.U) {
+            io.dmem.wrEnable := 2.U
+          }
+          is(2.U) {
+            io.dmem.wrEnable := 4.U
+          }
+          is(3.U) {
+            io.dmem.wrEnable := 8.U
+          }
+        }
+      }
+      is(LSH.U) {
+        // io.dmem.wrData := data(15, 0) ## data(15, 0)
+        switch(memAddress(1, 0)) {
+          is(0.U) {
+            io.dmem.wrEnable := 3.U
+          }
+          is(2.U) {
+            io.dmem.wrEnable := 12.U
+          }
+        }
+      }
+    }
+  }
 
   // Forwarding register values to ALU
   exFwdReg.valid := wrEna && (wbDest =/= 0.U)
