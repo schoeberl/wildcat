@@ -4,6 +4,7 @@
    * add read Enable
    * check also if I implemeted the correct endieness
  * adapt other benchmarks to use 1 as a result
+ * write enable should be a Vec of Bool
  * have isBranch in decode (not in core)
  * have a rdEna for the memory interface (needed when caching)
  * split constants for load and store, e.g. LSB shall be LB and SB
