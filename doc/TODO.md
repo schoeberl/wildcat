@@ -1,17 +1,18 @@
 # TODO
 
  * adapt other benchmarks to use 1 as a result
- * Check skipped bin tests
  * have isBranch in decode (not in core)
  * have a rdEna for the memory interface (needed when caching)
  * Something is fishy with testing, as SingleCycle works (even without branch)
  * width.s should not fail in the ISA simulator
    - string should work as well, do we need a linker script?
- * Work on failing simple tests (Simulator?)
+   - Work on failing simple tests (Simulator and Wildcat)
+ * Memory range checks
  * Aim to have same interface for pipeline and single cycle
    - reuse tests 
  * Forwarding from ALU/memory to address computation is missing.
  * 4/5 stages stall on load use hazard is missing (not covered by the tests)
+ * Single cycle is not finished
  * 3/4/5 load and use as address is wrong (need a forward to the adder)
    - test missing
  * ecall, ebreak

@@ -4,6 +4,8 @@ import chisel3._
 import chiseltest._
 import chisel3.util.experimental.BoringUtils
 import org.scalatest.flatspec.AnyFlatSpec
+import java.io.File
+
 import wildcat.pipeline.ThreeCats
 
 import scala.sys.process._
@@ -15,7 +17,11 @@ import scala.sys.process._
 class CATest extends AnyFlatSpec with ChiselScalatestTester {
 
   val files = Util.getSimpleTests("risc-v-lab/tests/simple")
-  val failed = List("shift2.bin", "shift.bin", "recursive.bin", "branchcnt.bin", "branchmany.bin", "branchtrap.bin", "loop.bin","string.bin", "width.bin")
+  // val files = List(new File("risc-v-lab/tests/simple/loop.bin"))
+  val tooLong = List("recursive.bin", "loop.bin")
+  val forever = List("branchtrap.bin")
+  val broken = List("string.bin", "width.bin")
+  val failed = tooLong ++ forever ++ broken
 
   for (f <- files) {
     s"Pipeline CA test (simple) $f" should "pass" in {
@@ -24,9 +30,21 @@ class CATest extends AnyFlatSpec with ChiselScalatestTester {
         println(s"Skipping $f")
         succeed
       } else {
-        test(new WildcatTestTop(f.getAbsolutePath)) {
+        test(new WildcatTestTop(f.getAbsolutePath)).withAnnotations(Seq(WriteVcdAnnotation)) {
           d => {
-            d.clock.step(100)
+            d.clock.setTimeout(10000)
+            var stop = false
+            var cnt = 0
+            while(!stop && cnt < 10000) {
+              d.clock.step(1)
+              if (d.io.stop.peekBoolean()) {
+                stop = true
+                // tests from Ripes are OK when 0 (risc-v tests OK when 1)
+              }
+              cnt += 1
+            }
+            assert(stop, "Timeout")
+            println(s"$f ran $cnt cycles")
             for (i <- 0 until 32) {
               val r = d.io.regFile(i).peekInt()
               val e = result(i).toLong & 0xffffffffL

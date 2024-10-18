@@ -23,6 +23,7 @@ class CASingleTest extends AnyFlatSpec with ChiselScalatestTester {
       } else {
         test(new SingleCycle(f.getAbsolutePath)).withAnnotations(Seq(WriteVcdAnnotation)) {
           d => {
+            assert(true, "We need to check stop")
             d.clock.step(100)
             for (i <- 0 until 32) {
               val r = d.io.regs(i).peekInt()
