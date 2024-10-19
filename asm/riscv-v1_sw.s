@@ -44,11 +44,11 @@
 
         # If we get here then we passed
 
-        addi x28, x0, 1
+        addi a0, x0, 1
         beq   x0, x0, pass
 
 fail:
-        addi x28, x0, 2
+        addi a0, x0, 2
 	ecall
 1:      beq   x0, x0, 1b
 

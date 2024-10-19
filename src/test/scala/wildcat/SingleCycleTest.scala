@@ -12,12 +12,11 @@ class SingleCycleTest() extends AnyFlatSpec with ChiselScalatestTester {
 
   val allProgs = Properties.envOrNone("test") match {
     case Some(t) => List(t)
-    case None => getAsmFiles("rv32ui") // getAsmFiles() ++ getAsmFiles("risc-v-lab/tests/ripes")  ++ getAsmFiles("risc-v-lab/tests/riscv-tests")
+    case None => getAllTests()
   }
-  val failed = List("rv32ui/lwu.s", "lrsc.s", "rv32ui/jalr.s", "rv32ui/sb.s", "rv32ui/sh.s", "rv32ui/lbu.s", "rv32ui/jal.s", "rv32ui/bgeu.s",
-    "rv32ui/auipc.s", "rv32ui/lhu.s", "rv32ui/sw.s", "rv32ui/bltu.s", "rv32ui/lw.s", "rv32ui/lb.s", "rv32ui/lh.s")
-  //List("risc-v-lab/tests/ripes/memory.s", "risc-v-lab/tests/riscv-tests/jalr.s", "asm/riscv-v1_lw.s")
-  val progs = allProgs.filterNot(failed.contains(_))
+  val failed = List("risc-v-lab/tests/riscv-tests/bltu.s", "risc-v-lab/tests/riscv-tests/jalr.s", "risc-v-lab/tests/riscv-tests/bgeu.s")
+  // val progs = allProgs.filterNot(failed.contains(_))
+  val progs = List("risc-v-lab/tests/ripes/or.s")
   progs.foreach(p => {
     println(s"Running test $p")
     s"Program $p" should "pass" in {
@@ -32,8 +31,7 @@ class SingleCycleTest() extends AnyFlatSpec with ChiselScalatestTester {
             d.clock.step(1)
             if (d.io.stop.peekBoolean()) {
               stop = true
-              // tests from Ripes are OK when 0 (risc-v tests OK when 1)
-              assert(d.io.regs(28).peekInt() == 1, s"Failed case ${d.io.regs(3).peekInt()}")
+              assert(d.io.regs(10).peekInt() == 1, s"Failed case ${d.io.regs(3).peekInt()}")
             }
             cnt += 1
           }

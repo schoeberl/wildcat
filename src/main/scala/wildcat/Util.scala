@@ -118,7 +118,7 @@ object Util {
   }
 
   def getAllTests() = {
-    getAsmFiles() ++ getAsmFiles("rv32ui") //  ++ getAsmFiles("risc-v-lab/tests/ripes") ++ getAsmFiles("risc-v-lab/tests/riscv-tests")
+    getAsmFiles() ++ getAsmFiles("risc-v-lab/tests/ripes") ++ getAsmFiles("risc-v-lab/tests/riscv-tests")
   }
 
   def getSimpleTests(path: String) = {

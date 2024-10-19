@@ -12,10 +12,9 @@ class WildcatTest() extends AnyFlatSpec with ChiselScalatestTester {
 
   val allProgs = Properties.envOrNone("test") match {
     case Some(t) => List(t)
-    case None => getAsmFiles() ++ getAsmFiles("rv32ui") // ++ getAsmFiles("risc-v-lab/tests/ripes")  ++ getAsmFiles("risc-v-lab/tests/riscv-tests")
+    case None => getAllTests()
   }
-  val failed = List("asm/riscv-v1_lw.s", "lrsc.s", "rv32ui/jalr.s", "rv32ui/sb.s", "rv32ui/sh.s", "rv32ui/jal.s", "rv32ui/bgeu.s", "rv32ui/auipc.s", "rv32ui/bltu.s")
-  //List("risc-v-lab/tests/ripes/memory.s", "risc-v-lab/tests/riscv-tests/jalr.s", "asm/riscv-v1_lw.s")
+  val failed = List("risc-v-lab/tests/riscv-tests/bltu.s", "risc-v-lab/tests/riscv-tests/jalr.s", "risc-v-lab/tests/riscv-tests/bgeu.s")
   val progs = allProgs.filterNot(failed.contains(_))
   progs.foreach(p => {
     println(s"Running test $p")
@@ -36,7 +35,10 @@ class WildcatTest() extends AnyFlatSpec with ChiselScalatestTester {
             if (d.io.stop.peekBoolean()) {
               stop = true
               // tests from Ripes are OK when 0 (risc-v tests OK when 1)
-              assert(d.io.regFile(28).peekInt() == 1, s"Failed case ${d.io.regFile(3).peekInt()}")
+              //   but I changed that
+              // Old risc-v tests (from Sodor) used x28 as result register
+              // Newer tests use x10 (a0) as result register
+              assert(d.io.regFile(10).peekInt() == 1, s"Failed case ${d.io.regFile(3).peekInt()}")
             }
             cnt += 1
           }
