@@ -21,6 +21,7 @@ object Functions {
     decOut.isAuiPc := false.B
     decOut.isLoad := false.B
     decOut.isStore := false.B
+    decOut.isBranch := false.B
     decOut.isJal := false.B
     decOut.isJalr := false.B
     decOut.rfWrite := false.B
@@ -43,6 +44,7 @@ object Functions {
       is(Branch.U) {
         decOut.instrType := SBT.id.U
         decOut.isImm := true.B
+        decOut.isBranch := true.B
       }
       is(Load.U) {
         decOut.instrType := I.id.U
@@ -156,6 +158,8 @@ object Functions {
       }
       // How did I come up with this?
       // Better use Tommy's code.
+      // This is actually broken, according to the tests
+      // Maybe use the code from the simulator
       is(BLTU.U) {
         res := (op1 < op2) ^ (op1(31) ^ op2(31))
       }

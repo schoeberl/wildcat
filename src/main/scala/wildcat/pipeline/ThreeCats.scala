@@ -33,7 +33,7 @@ class ThreeCats() extends Wildcat() {
   // The ROM has a register that is reset to 0, therefore clock cycle 1 is the first instruction.
   // Needed if we want to start from a different address.
   // PC generation
-  //  val pcReg = RegInit(-4.S(32.W).asUInt)
+  // val pcReg = RegInit(-4.S(32.W).asUInt)
   val pcReg = RegInit(0.S(32.W).asUInt) // keep it simpler for now for the waveform viewing
 
   val pcNext = Mux(doBranch, branchTarget, pcReg + 4.U)
@@ -64,7 +64,6 @@ class ThreeCats() extends Wildcat() {
     val rs1Val = UInt(32.W)
     val rs2Val = UInt(32.W)
     val func3 = UInt(3.W)
-    val branchInstr = Bool()
   })
   decEx.decOut := decOut
   decEx.valid := !doBranch
@@ -75,7 +74,6 @@ class ThreeCats() extends Wildcat() {
   decEx.rs1Val := rs1Val
   decEx.rs2Val := rs2Val
   decEx.func3 := instrReg(14, 12)
-  decEx.branchInstr := instrReg(6, 0) === Branch.U
 
   // Execute
   val decExReg = RegInit(0.U.asTypeOf(decEx))
@@ -178,7 +176,7 @@ class ThreeCats() extends Wildcat() {
   when(decExReg.decOut.isJalr) {
     branchTarget := res
   }
-  doBranch := ((compare(decExReg.func3, v1, v2) && decExReg.branchInstr) || decExReg.decOut.isJal || decExReg.decOut.isJalr) && decExReg.valid
+  doBranch := ((compare(decExReg.func3, v1, v2) && decExReg.decOut.isBranch) || decExReg.decOut.isJal || decExReg.decOut.isJalr) && decExReg.valid
   wrEna := decExReg.valid && decExReg.decOut.rfWrite
 
   // Memory access
