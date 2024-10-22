@@ -30,9 +30,10 @@ class ThreeCats() extends Wildcat() {
   val doBranch = WireDefault(false.B)
   val branchTarget = WireDefault(0.U)
 
+
+  // PC generation
   // The ROM has a register that is reset to 0, therefore clock cycle 1 is the first instruction.
   // Needed if we want to start from a different address.
-  // PC generation
   // val pcReg = RegInit(-4.S(32.W).asUInt)
   val pcReg = RegInit(0.S(32.W).asUInt) // keep it simpler for now for the waveform viewing
 

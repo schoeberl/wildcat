@@ -1,6 +1,6 @@
 # TODO
 
- * Do the branch issues - just copy the code from the simulator - shouled be easy
+ * Move the load and store code into a function
  * Check the missing tests
  * have a rdEna for the memory interface (needed when caching)
  * Something is fishy with testing, as SingleCycle works (even without branch)
@@ -22,6 +22,7 @@
  * Better names for signals (e.g., for those with a feedback, e.g., RF write)
  * Maybe commit the .elf files for faster tests
  * Maybe add some tracing facility
+ * compare code can be optimized (see Tommy's code, or JOP code)
  * Get C compiled apps running (more than hello)
  * Get Rust bare metal running
  * Move selection between register and imm back into decode
