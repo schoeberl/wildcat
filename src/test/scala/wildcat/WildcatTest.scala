@@ -14,7 +14,7 @@ class WildcatTest() extends AnyFlatSpec with ChiselScalatestTester {
     case Some(t) => List(t)
     case None => getAllTests()
   }
-  val failed = List("risc-v-lab/tests/riscv-tests/jalr.s")
+  val failed = List("")
   val progs = allProgs.filterNot(failed.contains(_))
   progs.foreach(p => {
     println(s"Running test $p")

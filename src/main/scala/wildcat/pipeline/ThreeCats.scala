@@ -175,7 +175,9 @@ class ThreeCats() extends Wildcat() {
   // Branching
   branchTarget := (decExReg.pc.asSInt + decExReg.decOut.imm).asUInt
   when(decExReg.decOut.isJalr) {
-    branchTarget := res
+    // We could reuse the alu result
+    // branchTarget := res
+    branchTarget := (v1.asSInt + decExReg.decOut.imm).asUInt // do we need to shift the immediate?
   }
   doBranch := ((compare(decExReg.func3, v1, v2) && decExReg.decOut.isBranch) || decExReg.decOut.isJal || decExReg.decOut.isJalr) && decExReg.valid
   wrEna := decExReg.valid && decExReg.decOut.rfWrite
