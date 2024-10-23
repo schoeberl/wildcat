@@ -28,14 +28,22 @@
    - probably branch target computation
    - or the whole branching itself
  * ecall
- * Use Java to read .elf files
-   - maybe check them in for faster tests
- * JALR: The target address is obtained by adding the 12-bit signed I-immediate to the register rs1, then setting the least-significant bit of the result to zero.
-   - Maybe this is not needed as the compiler does this already
- * JALR should check for func3 being 0 - it uses this 0 for ALU op
+ * Maybe check the .elf files in for faster tests
  * What are the types of immediate values? mostly signed or mostly unsigned?
  * And much more not listed here, e.g. caches, interconnect, newlib, ...
  * Write documentation
+
+## Student Projects
+
+ * Bootloader
+   - can be code running on the core or a serial port based FSM accessing memory and reset
+ * Caches (I\$ and D\$)
+ * newlib
+ * Memory controller (DDR on Nexys A7)
+ * Rust
+ * Compater Ibex, Wildcat, and a third RISC-V core
+ * Towards booting Linux
+ * SoC stuff: interconnect, peripherals, ...
 
 ## Better Naming
 
