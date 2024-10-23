@@ -31,7 +31,7 @@ class SingleCycleTest() extends AnyFlatSpec with ChiselScalatestTester {
             d.clock.step(1)
             if (d.io.stop.peekBoolean()) {
               stop = true
-              assert(d.io.regs(10).peekInt() == 1, s"Failed case ${d.io.regs(3).peekInt()}")
+              assert(d.io.regs(10).peekInt() == 0, s"Failed case ${d.io.regs(3).peekInt()}")
             }
             cnt += 1
           }

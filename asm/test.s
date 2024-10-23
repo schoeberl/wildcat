@@ -14,7 +14,6 @@
 	or	x3, x1, x2
 	and	x3, x1, x2
 	addi a0, x3, -12
-	addi a0, x0, 1
 
 # notify success to the simulator
     ecall

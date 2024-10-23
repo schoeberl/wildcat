@@ -52,7 +52,7 @@
 
         # If we get here then we passed
 
-        addi a0, x0, 1
+        addi a0, x0, 0
         beq   x0, x0, pass
 
 fail:

@@ -18,7 +18,7 @@ fail:
     nop
 
 pass:
-    addi a0, x0, 1
+    addi a0, x0, 0
 	ecall
 1:  beq   x0, x0, 1b
 

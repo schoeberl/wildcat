@@ -34,11 +34,7 @@ class WildcatTest() extends AnyFlatSpec with ChiselScalatestTester {
             d.clock.step(1)
             if (d.io.stop.peekBoolean()) {
               stop = true
-              // tests from Ripes are OK when 0 (risc-v tests OK when 1)
-              //   but I changed that
-              // Old risc-v tests (from Sodor) used x28 as result register
-              // Newer tests use x10 (a0) as result register
-              assert(d.io.regFile(10).peekInt() == 1, s"Failed case ${d.io.regFile(3).peekInt()}")
+              assert(d.io.regFile(10).peekInt() == 0, s"Failed case ${d.io.regFile(3).peekInt()}")
             }
             cnt += 1
           }

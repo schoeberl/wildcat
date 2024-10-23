@@ -32,13 +32,12 @@ The meaning of parameters is on purpose not defined in the RISC-V ISA.
 
 However, following uses have been observed:
 
- * Assembler tests (old, from Sodor?), as included in this repo, use x28 with
-   1 as a notion of pass and 2 as a notion to fail. This has been implemented
-   in Wildcat.
 * Current ISA tests use a0/x10 and ecall for pass/fail, including a failed test case number.
-  A value of 1 is pass, fail is the test number multiplied by 2 added 1.
-  Probably spike implements this semantic.
- * Tests from ripes (and adapted riscv-tests) ecall a7/x17 93, a0/x10 0 pass, 1 fail; test number in gp
+  - `li a0, 0; li a7, 93`
+  - A value of 0 is pass, fail is the test number multiplied by 2 added 1.
+  - failing test is also in gp/x3 (somtimes multiplied by 2 and 1 added)
+  - Probably spike implements this semantic.
+  - Tests from ripes (and adapted riscv-tests) ecall a7/x17 93, a0/x10 0 pass, 1 fail; test number in gp/x3
  * Venus, a JavaScript based simulator, implements
    [environment calls](https://github.com/kvakil/venus/wiki/Environmental-Calls)
    some of the [system calls](https://www.doc.ic.ac.uk/lab/secondyear/spim/node8.html)

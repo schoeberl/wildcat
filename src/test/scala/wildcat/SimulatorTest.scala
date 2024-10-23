@@ -12,7 +12,7 @@ class SimulatorTest extends AnyFlatSpec {
     s"Simulator $f" should "pass" in {
       s"make app APP=$f".!
       val sim = SimRV.runSimRV("a.out")
-      assert(sim.reg(10) == 1, f"Failed case ${sim.reg(3)}")
+      assert(sim.reg(10) == 0, f"Failed case ${sim.reg(3)}")
     }
   }
 }
