@@ -1,6 +1,5 @@
 # TODO
 
- * Move the load and store code into a function
  * have a rdEna for the memory interface (needed when caching)
  * Something is fishy with testing, as SingleCycle works (even without branch)
  * width.s should not fail in the ISA simulator

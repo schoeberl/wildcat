@@ -6,6 +6,7 @@ import wildcat.AluFunct3._
 import wildcat.AluType._
 import wildcat.BranchFunct._
 import wildcat.InstrType._
+import wildcat.LoadStoreFunct._
 import wildcat.Opcode._
 
 
@@ -72,6 +73,7 @@ object Functions {
       }
       is(JalR.U) {
         decOut.instrType := I.id.U
+        decOut.isImm := true.B
         decOut.rfWrite := true.B
         decOut.isJalr := true.B
       }
@@ -95,7 +97,7 @@ object Functions {
     switch(func3) {
       is(F3_ADD_SUB.U) {
         aluOp := ADD.id.U
-        when(opcode =/= AluImm.U && func7 =/= 0.U) {
+        when(opcode =/= AluImm.U && opcode =/= JalR.U && func7 =/= 0.U) {
           aluOp := SUB.id.U
         }
       }
@@ -240,5 +242,94 @@ object Functions {
       }
     }
     res
+  }
+
+  def selectLoadData(data: UInt, func3: UInt, memLow: UInt): UInt = {
+    val res = Wire(UInt(32.W))
+    res := data
+    switch(func3) {
+      is(LB.U) {
+        switch(memLow) {
+          is(0.U) {
+            res := Fill(24, data(7)) ## data(7, 0)
+          }
+          is(1.U) {
+            res := Fill(24, data(15)) ## data(15, 8)
+          }
+          is(2.U) {
+            res := Fill(24, data(23)) ## data(23, 16)
+
+          }
+          is(3.U) {
+            res := Fill(24, data(31)) ## data(31, 24)
+          }
+        }
+      }
+      is(LH.U) {
+        switch(memLow) {
+          is(0.U) {
+            res := Fill(16, data(15)) ## data(15, 0)
+          }
+          is(2.U) {
+            res := Fill(16, data(31)) ## data(31, 16)
+          }
+        }
+      }
+      is(LBU.U) {
+        switch(memLow) {
+          is(0.U) {
+            res := data(7, 0)
+          }
+          is(1.U) {
+            res := data(15, 8)
+          }
+          is(2.U) {
+            res := data(23, 16)
+          }
+          is(3.U) {
+            res := data(31, 24)
+          }
+        }
+      }
+      is(LHU.U) {
+        switch(memLow) {
+          is(0.U) {
+            res := data(15, 0)
+          }
+          is(2.U) {
+            res := data(31, 16)
+          }
+        }
+      }
+    }
+    res
+  }
+
+  def getWriteData(data: UInt, func3: UInt, memLow: UInt) = {
+    val wrData = WireDefault(data)
+    val wrEnable = VecInit(Seq.fill(4)(false.B))
+    switch(func3) {
+      is(SB.U) {
+        wrData := data(7, 0) ## data(7, 0) ## data(7, 0) ## data(7, 0)
+        wrEnable(memLow) := true.B
+      }
+      is(SH.U) {
+        wrData := data(15, 0) ## data(15, 0)
+        switch(memLow) {
+          is(0.U) {
+            wrEnable(0) := true.B
+            wrEnable(1) := true.B
+          }
+          is(2.U) {
+            wrEnable(2) := true.B
+            wrEnable(3) := true.B
+          }
+        }
+      }
+      is(SW.U) {
+        wrEnable := VecInit(Seq.fill(4)(true.B))
+      }
+    }
+    (wrData, wrEnable)
   }
 }

@@ -1,9 +1,6 @@
 package wildcat.pipeline
 
 import chisel3._
-import chisel3.util._
-import wildcat.Opcode._
-import wildcat.LoadStoreFunct._
 import wildcat.pipeline.Functions._
 
 /*
@@ -65,6 +62,7 @@ class ThreeCats() extends Wildcat() {
     val rs1Val = UInt(32.W)
     val rs2Val = UInt(32.W)
     val func3 = UInt(3.W)
+    val memLow = UInt(2.W)
   })
   decEx.decOut := decOut
   decEx.valid := !doBranch
@@ -93,6 +91,7 @@ class ThreeCats() extends Wildcat() {
   val data = Mux(wrEna && (wbDest =/= 0.U) && wbDest === decEx.rs2, wbData, rs2Val)
 
   val memAddress = (address.asSInt + decOut.imm).asUInt
+  decEx.memLow := memAddress(1, 0)
 
 
   // Forwarding
@@ -109,62 +108,7 @@ class ThreeCats() extends Wildcat() {
     res := (decExReg.pc.asSInt + decExReg.decOut.imm).asUInt
   }
   when(decExReg.decOut.isLoad) {
-    res := io.dmem.rdData
-    switch(decExReg.func3) {
-      is(LB.U) {
-        switch(RegNext(memAddress(1, 0))) {
-          is(0.U) {
-            res := Fill(24, io.dmem.rdData(7)) ## io.dmem.rdData(7, 0)
-          }
-          is(1.U) {
-            res := Fill(24, io.dmem.rdData(15)) ## io.dmem.rdData(15, 8)
-          }
-          is(2.U) {
-            res := Fill(24, io.dmem.rdData(23)) ## io.dmem.rdData(23, 16)
-
-          }
-          is(3.U) {
-            res := Fill(24, io.dmem.rdData(31)) ## io.dmem.rdData(31, 24)
-          }
-        }
-      }
-      is(LH.U) {
-        switch(RegNext(memAddress(1, 0))) {
-          is(0.U) {
-            res := Fill(16, io.dmem.rdData(15)) ## io.dmem.rdData(15, 0)
-          }
-          is(2.U) {
-            res := Fill(16, io.dmem.rdData(31)) ## io.dmem.rdData(31, 16)
-          }
-        }
-      }
-      is(LBU.U) {
-        switch(RegNext(memAddress(1, 0))) {
-          is(0.U) {
-            res := io.dmem.rdData(7, 0)
-          }
-          is(1.U) {
-            res := io.dmem.rdData(15, 8)
-          }
-          is(2.U) {
-            res := io.dmem.rdData(23, 16)
-          }
-          is(3.U) {
-            res := io.dmem.rdData(31, 24)
-          }
-        }
-      }
-      is(LHU.U) {
-        switch(RegNext(memAddress(1, 0))) {
-          is(0.U) {
-            res := io.dmem.rdData(15, 0)
-          }
-          is(2.U) {
-            res := io.dmem.rdData(31, 16)
-          }
-        }
-      }
-    }
+    res := selectLoadData(io.dmem.rdData, decExReg.func3, decExReg.memLow)
   }
 
   wbDest := decExReg.rd
@@ -172,12 +116,10 @@ class ThreeCats() extends Wildcat() {
   when(decExReg.decOut.isJal || decExReg.decOut.isJalr) {
     wbData := decExReg.pc + 4.U
   }
-  // Branching
+  // Branching and jumping
   branchTarget := (decExReg.pc.asSInt + decExReg.decOut.imm).asUInt
   when(decExReg.decOut.isJalr) {
-    // We could reuse the alu result
-    // branchTarget := res
-    branchTarget := (v1.asSInt + decExReg.decOut.imm).asUInt // do we need to shift the immediate?
+    branchTarget := res
   }
   doBranch := ((compare(decExReg.func3, v1, v2) && decExReg.decOut.isBranch) || decExReg.decOut.isJal || decExReg.decOut.isJalr) && decExReg.valid
   wrEna := decExReg.valid && decExReg.decOut.rfWrite
@@ -188,28 +130,9 @@ class ThreeCats() extends Wildcat() {
   io.dmem.wrData := data
   io.dmem.wrEnable := VecInit(Seq.fill(4)(false.B))
   when(decOut.isStore) {
-    switch(decEx.func3) {
-      is(SB.U) {
-        io.dmem.wrData := data(7, 0) ## data(7, 0) ## data(7, 0) ## data(7, 0)
-        io.dmem.wrEnable(memAddress(1,0)) := true.B
-      }
-      is(SH.U) {
-        io.dmem.wrData := data(15, 0) ## data(15, 0)
-        switch(memAddress(1, 0)) {
-          is(0.U) {
-            io.dmem.wrEnable(0) := true.B
-            io.dmem.wrEnable(1) := true.B
-          }
-          is(2.U) {
-            io.dmem.wrEnable(2) := true.B
-            io.dmem.wrEnable(3) := true.B
-          }
-        }
-      }
-      is(SW.U) {
-        io.dmem.wrEnable := VecInit(Seq.fill(4)(true.B))
-      }
-    }
+    val (wrd, wre) = getWriteData(data, decEx.func3, memAddress(1, 0))
+    io.dmem.wrData := wrd
+    io.dmem.wrEnable := wre
   }
 
   // Forwarding register values to ALU
