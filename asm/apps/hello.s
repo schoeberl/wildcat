@@ -20,7 +20,7 @@
 	sw      x1, 0(x4)
     li      x1, 'r'
 	sw      x1, 0(x4)
-    li      x1, 'k'
+    li      x1, 'l'
 	sw      x1, 0(x4)
     li      x1, 'd'
 	sw      x1, 0(x4)

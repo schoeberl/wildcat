@@ -15,7 +15,7 @@ import wildcat.Util
 class WildcatTop(file: String) extends Module {
 
   val io = IO(new Bundle {
-    val led = Output(UInt(8.W))
+    val led = Output(UInt(16.W))
   })
 
   val (memory, start) = Util.getCode(file)
@@ -44,7 +44,7 @@ class WildcatTop(file: String) extends Module {
     dmem.io.wrEnable := VecInit(Seq.fill(4)(false.B))
   }
 
-  io.led := RegNext(ledReg)
+  io.led := 1.U ## 0.U(7.W) ## RegNext(ledReg)
 }
 
 object WildcatTop extends App {

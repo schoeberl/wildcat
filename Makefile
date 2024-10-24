@@ -47,7 +47,7 @@ test: risc-v-lab
 sim-test:
 	sbt "testOnly wildcat.SimulatorTest"
 
-hw:
+hw: app
 	$(SBT) "runMain wildcat.pipeline.WildcatTop a.out"
 
 hw-fmax:

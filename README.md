@@ -47,11 +47,17 @@ make app run APP=asm/mem.s
 ```
 ### More make targets
 
+Running the simulation on one example (and generate .vcd files):
+
+```
+make APP=asm/test.s work
+```
+
 To generate Verilog code for synthesis, e.g., running a blinking
 LED:
 
 ```
-make APP=asm/apps/blink.s app hw
+make APP=asm/apps/blink.s hw
 make synth
 ```
 
