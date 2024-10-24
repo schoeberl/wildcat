@@ -51,7 +51,8 @@ To generate Verilog code for synthesis, e.g., running a blinking
 LED:
 
 ```
-make APP=asm/apps/blink.s hw
+make APP=asm/apps/blink.s app hw
+make synth
 ```
 
 For resource and timing analysis there is a top-level with

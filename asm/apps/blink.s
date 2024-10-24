@@ -2,6 +2,7 @@
 # Blink an LED
 #
     li      x4, 0xf0010000
+    li      x3, 0
 begin:
     li      x1, 0x7ff
 loop:
@@ -11,7 +12,6 @@ inner:
 	bnez	x2, inner
 	addi	x1, x1, -1
 	bnez	x1, loop
-	sw      x4, 0(x0)
-    addi    x4, x4, 1
-#    j       begin
+	sw      x3, 0(x4)
+    addi    x3, x3, 1
     beqz      x0, begin
