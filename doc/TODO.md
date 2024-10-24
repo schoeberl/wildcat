@@ -1,6 +1,7 @@
 # TODO
 
- * have a rdEna for the memory interface (needed when caching)
+ * UART
+ * have a `rdEna` for the memory interface (needed when caching)
  * Something is fishy with testing, as SingleCycle works (even without branch)
  * width.s should not fail in the ISA simulator
    - string should work as well, do we need a linker script?
@@ -41,7 +42,7 @@
  * newlib
  * Memory controller (DDR on Nexys A7)
  * Rust
- * Compater Ibex, Wildcat, and a third RISC-V core
+ * Compare Ibex, Wildcat, and a third RISC-V core
  * Towards booting Linux
  * SoC stuff: interconnect, peripherals, ...
 

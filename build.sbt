@@ -1,16 +1,15 @@
-scalaVersion := "2.13.10"
+scalaVersion := "2.12.13"
 
 scalacOptions ++= Seq(
-  "-deprecation",
   "-feature",
-  "-unchecked",
   "-language:reflectiveCalls",
 )
 
-val chiselVersion = "3.5.5"
-addCompilerPlugin("edu.berkeley.cs" %% "chisel3-plugin" % chiselVersion cross CrossVersion.full)
-libraryDependencies += "edu.berkeley.cs" %% "chisel3" % chiselVersion
-libraryDependencies += "edu.berkeley.cs" %% "chiseltest" % "0.5.5"
+// Chisel 3.5
+addCompilerPlugin("edu.berkeley.cs" % "chisel3-plugin" % "3.5.6" cross CrossVersion.full)
+libraryDependencies += "edu.berkeley.cs" %% "chisel3" % "3.5.6"
+libraryDependencies += "edu.berkeley.cs" %% "chiseltest" % "0.5.6"
+libraryDependencies += "edu.berkeley.cs" % "ip-contributions" % "0.5.1"
 
 libraryDependencies += "net.fornwall" % "jelf" % "0.9.0"
 

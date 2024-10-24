@@ -33,13 +33,17 @@ class WildcatTop(file: String) extends Module {
 
   // quick hack to get the LED output, should do some decoding
   val ledReg = RegInit(0.U(8.W))
-  when ((cpu.io.dmem.wrAddress === 0xe000_0000L.U) && cpu.io.dmem.wrEnable(0)) {
-    ledReg := cpu.io.dmem.wrData(7, 0)
-    dmem.io.wrEnable := VecInit(Seq.fill(4)(false.B))
-  } .elsewhen ((cpu.io.dmem.wrAddress === 0xf000_0000L.U) && cpu.io.dmem.wrEnable(0)) {
-    printf("%c", cpu.io.dmem.wrData(7, 0))
+  // IO is mapped ot 0xf000_0000
+  // use lower wits to select IOs
+  when ((cpu.io.dmem.wrAddress(31, 28) === 0xfL.U) && cpu.io.dmem.wrEnable(0)) {
+    when (cpu.io.dmem.wrAddress(19,16) === 0.U) {
+      printf("%c", cpu.io.dmem.wrData(7, 0))
+    } .elsewhen (cpu.io.dmem.wrAddress(19,16) === 1.U) {
+      ledReg := cpu.io.dmem.wrData(7, 0)
+    }
     dmem.io.wrEnable := VecInit(Seq.fill(4)(false.B))
   }
+
   io.led := RegNext(ledReg)
 }
 
