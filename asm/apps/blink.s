@@ -9,10 +9,8 @@
 
 begin:
     li      x1, 0x7ff
-    li x1, 10
 loop:
     li      x2, 0x7ff
-    li x2, 10
 inner:
 	addi	x2, x2, -1
 	bnez	x2, inner

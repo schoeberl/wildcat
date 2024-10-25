@@ -31,7 +31,6 @@ class WildcatTop(file: String) extends Module {
   cpu.io.imem.data := imem.io.data
   cpu.io.imem.stall := imem.io.stall
 
-  // quick hack to get the LED output, should do some decoding
   val ledReg = RegInit(0.U(8.W))
   // IO is mapped ot 0xf000_0000
   // use lower wits to select IOs
