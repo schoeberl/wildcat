@@ -100,7 +100,7 @@ alu-speed:
 	quartus_asm quartus/$(BOARD)/AluSpeed
 	quartus_sta quartus/$(BOARD)/AluSpeed
 
-# need to change sign in into nix with
+# need start into nix with:
 # nix-shell shell.nix
 openlane:
 	openlane wildcat.json
@@ -109,6 +109,13 @@ openlane:
 experiments:
 	openlane verilog/experiments.json
 	openlane --last-run --flow openinklayout experiments.json
+
+# serial port on Mac
+listen:
+	ls /dev/tty.*
+	screen /dev/tty.usbserial-210292B408601 115200
+
+# stop with Ctrl+A and Ctrl+\
 
 clean:
 	git clean -fd
