@@ -3,7 +3,7 @@
 
 # Wildcat
 
-Implementation variations of RISC-V for education.
+Implementation of variations of RISC-V cores for education.
 
 This repository contains an ISA simulator and hardware
 implementations of the RISC-V instruction set architecture.
