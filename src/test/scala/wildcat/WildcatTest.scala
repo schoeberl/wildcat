@@ -34,7 +34,7 @@ class WildcatTest() extends AnyFlatSpec with ChiselScalatestTester {
             d.clock.step(1)
             if (d.io.stop.peekBoolean()) {
               stop = true
-              assert(d.io.regFile(10).peekInt() == 0, s"Failed case ${d.io.regFile(3).peekInt()}")
+              assert(d.io.regFile(10).peekInt() == 0, s"Failed test case ${d.io.regFile(3).peekInt()}")
             }
             cnt += 1
           }

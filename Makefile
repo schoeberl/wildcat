@@ -16,7 +16,7 @@ APP=asm/test.s
 all:
 	echo "Select your make target"
 
-work:
+work: app
 	test=$(APP) sbt "testOnly wildcat.WildcatTest"
 
 app:

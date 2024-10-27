@@ -129,7 +129,7 @@ class ThreeCats() extends Wildcat() {
   io.dmem.wrAddress := memAddress
   io.dmem.wrData := data
   io.dmem.wrEnable := VecInit(Seq.fill(4)(false.B))
-  when(decOut.isStore) {
+  when(decOut.isStore && !doBranch) {
     val (wrd, wre) = getWriteData(data, decEx.func3, memAddress(1, 0))
     io.dmem.wrData := wrd
     io.dmem.wrEnable := wre

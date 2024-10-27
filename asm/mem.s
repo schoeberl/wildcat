@@ -1,17 +1,29 @@
 #
 # Memory tests
 #
+    li gp, 1
     li x1, 0x40
     li x2, 0x12345678
     sw x2, 4(x1)
     lw x3, 4(x1)
     bne x2, x3, fail
 
+    li gp, 2
     li x2, 0xdeadbeef
     li x1, 0x50
     sw x2, 8(x1)
-    lw x3, 8(x1)
-    bne x2, x3, fail
+    lw t0, 8(x1)
+    bne x2, t0, fail
+
+    li gp, 3
+    li x2, 0x12345678
+    sw x2, (x1)
+    li x2, 0x0001234
+    beq x0, x0, over
+    sw x2, (x1)
+over:
+    lw t0, (x1)
+    beq x2, t0, fail
 
 pass:
     addi a0, x0, 0
