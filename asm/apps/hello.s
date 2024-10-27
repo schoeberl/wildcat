@@ -28,23 +28,19 @@ start:
     jal     put_char
     li      x2, '!'
     jal     put_char
+    li      x2, '\r'
+    jal     put_char
     li      x2, '\n'
     jal     put_char
 exit:
     addi x28, x0, 1
 	ecall
 1:  beq   x0, x0, 1b
-    nop
+
 
 put_char:
     lw      x3, 0(x4)
-    nop # there should be no load use issue
     andi    x3, x3, 1
     beqz    x3, put_char
-    nop
-    nop
     sw      x2, 4(x4)
     ret
-
-
-

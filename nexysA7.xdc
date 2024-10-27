@@ -8,7 +8,7 @@ set_property IOSTANDARD LVCMOS33 [get_ports *]
 
 ## Clock signal (push synth with 200 MHz)
 set_property -dict { PACKAGE_PIN E3    IOSTANDARD LVCMOS33 } [get_ports { clock }]; #IO_L12P_T1_MRCC_35 Sch=clk100mhz
-create_clock -add -name sys_clk_pin -period 5.00 -waveform {0 2.5} [get_ports {clock}];
+create_clock -add -name sys_clk_pin -period 10.00 -waveform {0 5} [get_ports {clock}];
 
 
 ##Switches
