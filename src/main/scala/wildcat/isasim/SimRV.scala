@@ -210,7 +210,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       case JalR => (pc + 4, true, (rs1Val + imm) & 0xfffffffe)
       case Fence => (0, false, pcNext)
       case ECall => (ecall(), true, pcNext)
-      case _ => throw new Exception("Opcode " + opcode + " not (yet) implemented")
+      case _ => throw new Exception("Opcode " + opcode + " at " + pc + " not (yet) implemented")
     }
 
     if (rd != 0 && result._2) {

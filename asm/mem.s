@@ -2,7 +2,7 @@
 # Memory tests
 #
     li gp, 1
-    li x1, 0x40
+    li x1, 0x100
     li x2, 0x12345678
     sw x2, 4(x1)
     lw x3, 4(x1)
@@ -10,7 +10,7 @@
 
     li gp, 2
     li x2, 0xdeadbeef
-    li x1, 0x50
+    li x1, 0x110
     sw x2, 8(x1)
     lw t0, 8(x1)
     bne x2, t0, fail
@@ -29,6 +29,7 @@ pass:
     addi a0, x0, 0
 	ecall
 1:  beq   x0, x0, 1b
+    nop
 
 fail:
     addi a0, x0, 2
