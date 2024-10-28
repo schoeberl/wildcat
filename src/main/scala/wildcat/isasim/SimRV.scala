@@ -168,7 +168,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
         }
         case SW => {
           // very primitive IO simulation
-          if (addr == 0xf0000000) {
+          if (addr == 0xf0000004) {
             println("out: " + value.toChar)
           } else {
             mem(wordAddr) = value

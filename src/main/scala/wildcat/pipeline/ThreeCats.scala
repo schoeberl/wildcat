@@ -107,9 +107,6 @@ class ThreeCats() extends Wildcat() {
   when(decExReg.decOut.isAuiPc) {
     res := (decExReg.pc.asSInt + decExReg.decOut.imm).asUInt
   }
-  when(decExReg.decOut.isLoad) {
-    res := selectLoadData(io.dmem.rdData, decExReg.func3, decExReg.memLow)
-  }
 
   wbDest := decExReg.rd
   wbData := res
@@ -126,9 +123,14 @@ class ThreeCats() extends Wildcat() {
 
   // Memory access
   io.dmem.rdAddress := memAddress
+  io.dmem.rdEnable := false.B
   io.dmem.wrAddress := memAddress
   io.dmem.wrData := data
   io.dmem.wrEnable := VecInit(Seq.fill(4)(false.B))
+  when(decExReg.decOut.isLoad && !doBranch) {
+    res := selectLoadData(io.dmem.rdData, decExReg.func3, decExReg.memLow)
+    io.dmem.rdEnable := true.B
+  }
   when(decOut.isStore && !doBranch) {
     val (wrd, wre) = getWriteData(data, decEx.func3, memAddress(1, 0))
     io.dmem.wrData := wrd

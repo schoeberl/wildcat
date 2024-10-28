@@ -34,6 +34,8 @@ class WildcatTop(file: String) extends Module {
   imem.io.address := cpu.io.imem.address
   cpu.io.imem.data := imem.io.data
   cpu.io.imem.stall := imem.io.stall
+  // TODO: stalling
+
 
   // Here IO stuff
   // IO is mapped ot 0xf000_0000
@@ -50,24 +52,26 @@ class WildcatTop(file: String) extends Module {
   io.tx := tx.io.txd
   rx.io.rxd := io.rx
 
-  tx.io.channel <> rx.io.channel
-  tx.io.channel.bits := rx.io.channel.bits + 1.U
-
   tx.io.channel.bits := cpu.io.dmem.wrData(7, 0)
   tx.io.channel.valid := false.B
 
+  val bufRx = Module(new Buffer())
+  bufRx.io.in <> rx.io.channel
+  bufRx.io.out.ready := false.B
+
   val uartStatusReg = RegNext(rx.io.channel.valid ## tx.io.channel.ready)
-  // TODO: stalling
-  // TODO: read enable signal for RX reading
   val memAddressReg = RegNext(cpu.io.dmem.rdAddress)
-  when (memAddressReg(31, 28) === 0xfL.U && memAddressReg(19,16) === 0.U) {
+  when (memAddressReg(31, 28) === 0xf.U && memAddressReg(19,16) === 0.U) {
     when (memAddressReg(3, 0) === 0.U) {
       cpu.io.dmem.rdData := uartStatusReg
+    } .elsewhen(memAddressReg(3, 0) === 4.U) {
+      cpu.io.dmem.rdData := bufRx.io.out.bits
+      bufRx.io.out.ready := cpu.io.dmem.rdEnable
     }
   }
 
   val ledReg = RegInit(0.U(8.W))
-  when ((cpu.io.dmem.wrAddress(31, 28) === 0xfL.U) && cpu.io.dmem.wrEnable(0)) {
+  when ((cpu.io.dmem.wrAddress(31, 28) === 0xf.U) && cpu.io.dmem.wrEnable(0)) {
     when (cpu.io.dmem.wrAddress(19,16) === 0.U && cpu.io.dmem.wrAddress(3, 0) === 4.U) {
       printf("%c", cpu.io.dmem.wrData(7, 0))
       tx.io.channel.valid := true.B

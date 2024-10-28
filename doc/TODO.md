@@ -1,8 +1,11 @@
 # TODO
 
  * UART
- * Update simulation (and C/asm code) for new address mapping
- * have a `rdEna` for the memory interface (needed when caching)
+ * Get the C code compilation better integrated (with a reasonable linker.ld)
+ * Get C compiled apps running (more than hello)
+ * Update simulation (and C/asm code) for new address mapping and checking for ready
+ * Why do I have read and write addresses in the data memory, when only one will happen at a time?
+   - Check others
  * Something is fishy with testing, as SingleCycle works (even without branch)
  * width.s should not fail in the ISA simulator
    - string should work as well, do we need a linker script?
@@ -23,7 +26,6 @@
  * Maybe commit the .elf files for faster tests
  * Maybe add some tracing facility
  * compare code can be optimized (see Tommy's code, or JOP code)
- * Get C compiled apps running (more than hello)
  * Get Rust bare metal running
  * Move selection between register and imm back into decode
    - maybe more of the muxing could be done there

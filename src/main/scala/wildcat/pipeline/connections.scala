@@ -11,6 +11,7 @@ class InstrIO extends Bundle {
 class MemIO extends Bundle {
   val rdAddress = Output(UInt(32.W))
   val rdData = Input(UInt(32.W))
+  val rdEnable = Output(Bool())
   val wrAddress = Output(UInt(32.W))
   val wrData = Output(UInt(32.W))
   val wrEnable = Output(Vec (4, Bool()))
