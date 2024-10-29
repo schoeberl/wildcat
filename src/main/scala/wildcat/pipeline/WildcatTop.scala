@@ -73,7 +73,7 @@ class WildcatTop(file: String) extends Module {
   val ledReg = RegInit(0.U(8.W))
   when ((cpu.io.dmem.wrAddress(31, 28) === 0xf.U) && cpu.io.dmem.wrEnable(0)) {
     when (cpu.io.dmem.wrAddress(19,16) === 0.U && cpu.io.dmem.wrAddress(3, 0) === 4.U) {
-      printf("%c", cpu.io.dmem.wrData(7, 0))
+      printf(" %c %d\n", cpu.io.dmem.wrData(7, 0), cpu.io.dmem.wrData(7, 0))
       tx.io.channel.valid := true.B
     } .elsewhen (cpu.io.dmem.wrAddress(19,16) === 1.U) {
       ledReg := cpu.io.dmem.wrData(7, 0)
