@@ -3,9 +3,7 @@ package wildcat.pipeline
 import chisel3._
 import wildcat.Util
 
-// import chisel.lib.uart._
-import wildcat.explore._
-
+import chisel.lib.uart._
 
 /*
  * This file is part of the RISC-V processor Wildcat.
