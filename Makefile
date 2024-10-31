@@ -73,6 +73,15 @@ cp-bit:
 	-mkdir build
 	scp masca@chipdesign1.compute.dtu.dk:~/source/wildcat/build/WildcatTop.bit build
 
+gen-uart:
+	$(SBT) "runMain wildcat.explore.UartTop"
+	./vivado_synth.sh -t UartTop -p xc7a100tcsg324-1 -x nexysA7.xdc -o build generated/UartTop.v
+
+cp-uart:
+	-mkdir build
+	scp masca@chipdesign1.compute.dtu.dk:~/source/wildcat/build/UartTop.bit build
+
+
 # Configure the Basys3 or NexysA7 board with open source tools
 config:
 	openocd -f 7series.txt
