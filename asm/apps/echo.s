@@ -4,8 +4,9 @@
 start:
     li      x4, 0xf0000000
 
-    li      x2, ':'
-    jal     put_char
+# avoid this due to we receive one character on configuration
+#    li      x2, ':'
+#    jal     put_char
 
 loop:
     jal     get_char
