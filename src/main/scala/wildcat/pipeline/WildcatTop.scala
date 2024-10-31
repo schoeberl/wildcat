@@ -45,7 +45,7 @@ class WildcatTop(file: String) extends Module {
   // UART:
   // 0xf000_0000 status:
   // bit 0 TX ready (TDE)
-  // bit 1 RX data available (RXF)
+  // bit 1 RX data available (RDF)
   // 0xf000_0004 send and receive register
 
   val tx = Module(new BufferedTx(100000000, 115200))
@@ -55,10 +55,7 @@ class WildcatTop(file: String) extends Module {
 
   tx.io.channel.bits := cpu.io.dmem.wrData(7, 0)
   tx.io.channel.valid := false.B
-
-  val bufRx = Module(new Buffer())
-  bufRx.io.in <> rx.io.channel
-  bufRx.io.out.ready := false.B
+  rx.io.channel.ready := false.B
 
   val uartStatusReg = RegNext(rx.io.channel.valid ## tx.io.channel.ready)
   val memAddressReg = RegNext(cpu.io.dmem.rdAddress)
@@ -66,8 +63,8 @@ class WildcatTop(file: String) extends Module {
     when (memAddressReg(3, 0) === 0.U) {
       cpu.io.dmem.rdData := uartStatusReg
     } .elsewhen(memAddressReg(3, 0) === 4.U) {
-      cpu.io.dmem.rdData := bufRx.io.out.bits
-      bufRx.io.out.ready := cpu.io.dmem.rdEnable
+      cpu.io.dmem.rdData := rx.io.channel.bits
+      rx.io.channel.ready := cpu.io.dmem.rdEnable
     }
   }
 
