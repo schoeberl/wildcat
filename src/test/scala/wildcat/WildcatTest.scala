@@ -30,7 +30,8 @@ class WildcatTest() extends AnyFlatSpec with ChiselScalatestTester {
         d => {
           var stop = false
           var cnt = 0
-          while(!stop && cnt < 999) {
+          d.clock.setTimeout(0)
+          while(!stop && cnt < 2000) {
             d.clock.step(1)
             if (d.io.stop.peekBoolean()) {
               stop = true

@@ -34,12 +34,16 @@ class ThreeCats() extends Wildcat() {
   // val pcReg = RegInit(-4.S(32.W).asUInt)
   val pcReg = RegInit(0.S(32.W).asUInt) // keep it simpler for now for the waveform viewing
 
-  val pcNext = Mux(doBranch, branchTarget, pcReg + 4.U)
+  val pcNext = WireDefault(Mux(doBranch, branchTarget, pcReg + 4.U))
   pcReg := pcNext
   io.imem.address := pcNext
 
   // Fetch
-  val instr = io.imem.data
+  val instr = WireDefault(io.imem.data)
+  when (io.imem.stall) {
+    instr := 0x00000013.U
+    pcNext := pcReg
+  }
 
   // Decode and register read
   val pcRegReg = RegNext(pcReg)

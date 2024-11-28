@@ -7,6 +7,7 @@
  * Why do I have read and write addresses in the data memory, when only one will happen at a time?
    - Check others
  * Something is fishy with testing, as SingleCycle works (even without branch)
+ * Two tests fail with co-simulation when adding stall to fetch (the toggle)
  * width.s should not fail in the ISA simulator
    - string should work as well, do we need a linker script?
    - Work on failing simple tests (Simulator and Wildcat)
