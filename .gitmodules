@@ -1,0 +1,3 @@
+[submodule "soc-comm"]
+	path = soc-comm
+	url = git@github.com:t-crest/soc-comm.git
