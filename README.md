@@ -159,6 +159,30 @@ Then add the tools to your PATH in .bashrc or .profile with:
 
 See also: [RISC-V Ubuntu Setup](https://github.com/schoeberl/cae-lab#vm-and-tool-installation)
 
+## Student Projects
+
+The Wildcat project shall become a complete microcontroller. Therefore, there are many possible student projects.
+Here a list of project that could be a BSc, an MSc, a special course, an AdvCA project;
+
+* Bootloader
+    - can be code running on the core or a serial port based FSM accessing memory and reset
+* Caches (I\$ and D\$)
+* newlib
+* Memory controller (SRAM on DE2-115 and DDR on Nexys A7)
+* L2 cache for multi-core
+* Tapeout
+    - Tiny Tapeout
+    - Edu4Chip
+    - eFabless
+* Rust and WCET analysis
+* Branch predictor
+* Out-of-order version
+* G extension
+* floating-point unit
+* Compare Ibex, Wildcat, and a third RISC-V core
+* Towards booting uLinux and full Linux
+* SoC stuff: interconnect, peripherals, ...
+
 ## Resources
 
 There are several RISC-V projects around. As a starting point:

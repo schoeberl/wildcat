@@ -38,18 +38,6 @@
  * And much more not listed here, e.g. caches, interconnect, newlib, ...
  * Write documentation
 
-## Student Projects
-
- * Bootloader
-   - can be code running on the core or a serial port based FSM accessing memory and reset
- * Caches (I\$ and D\$)
- * newlib
- * Memory controller (DDR on Nexys A7)
- * Rust
- * Compare Ibex, Wildcat, and a third RISC-V core
- * Towards booting Linux
- * SoC stuff: interconnect, peripherals, ...
-
 ## Better Naming
 
  * wrEna is later called valid
