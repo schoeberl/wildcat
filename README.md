@@ -177,6 +177,10 @@ Here a list of project that could be a BSc, an MSc, a special course, an AdvCA p
 * Rust and WCET analysis
 * Branch predictor
 * Out-of-order version
+* Traps to handle unimplemented features:
+  - Unaligned memory access can be trapped and handled in SW (Berkeley cores do/did this)
+  - floating point emulation
+  - compressed instructions
 * G extension
 * floating-point unit
 * Compare Ibex, Wildcat, and a third RISC-V core
