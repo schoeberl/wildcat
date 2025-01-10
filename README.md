@@ -3,17 +3,31 @@
 
 # Wildcat
 
-Implementation of variations of RISC-V cores for education.
+Variations of RISC-V cores for education and real-time systems.
 
 This repository contains an ISA simulator and hardware
-implementations of the RISC-V instruction set architecture.
-Concrete the 32-bit integer version (RV32I).
+implementations of the RISC-V instruction set architecture (ISA).
+Up to now the 32-bit integer version (RV32I).
 
 ## Why Wildcat?
 
 After listening to Andrew's PhD defense I was running
 in the Wildcat Canyon in Tilden park. A very nice area.
 The day after, I started with the RV32I simulator.
+
+## A Paper
+
+If you use Wildcat in your research or teaching, please cite:
+
+```
+@InProceedings{wildcat:2024,
+  author    = {Martin Schoeberl},
+  booktitle = {Proceedings of the Sixth Workshop on Open-Source EDA Technology (WOSET)},
+  title     = {The Educational RISC-V Microprocessor Wildcat},
+  year      = {2024},
+}
+```
+Available at the [WOSET conference page](https://woset-workshop.github.io/WOSET2024.html).
 
 ## Setup
 
@@ -167,15 +181,21 @@ Here a list of project that could be a BSc, an MSc, a special course, an AdvCA p
 * Bootloader
     - can be code running on the core or a serial port based FSM accessing memory and reset
 * Caches (I\$ and D\$)
-* newlib
+* newlib port
+* reactor-uc
+* OS support: Zyphyr or similar
 * Memory controller (SRAM on DE2-115 and DDR on Nexys A7)
 * L2 cache for multi-core
 * Tapeout
     - Tiny Tapeout
     - Edu4Chip
-    - eFabless
+    - efabless
 * Rust and WCET analysis
-* Branch predictor
+* Comparing RISC-V cores (start from https://dl-acm-org.proxy.findit.cvt.dk/doi/pdf/10.1145/3457388.3458657)
+* Branch predictor (RTS?)
+* Wildcat for real-time systems
+  - WCET analysis
+  - cache analysis (I\$ and D\$)
 * Out-of-order version
 * Traps to handle unimplemented features:
   - Unaligned memory access can be trapped and handled in SW (Berkeley cores do/did this)
