@@ -28,7 +28,7 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
-      - name: Setup sbt
+    - name: Setup sbt
       uses: sbt/setup-sbt@v1
     - name: apt-get update
       run: sudo apt-get update
