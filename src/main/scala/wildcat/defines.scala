@@ -11,7 +11,7 @@ object Opcode {
   val Jal = 0x6f
   val JalR = 0x67
   val Fence = 0x0f
-  val ECall = 0x73
+  val System = 0x73
 }
 
 object InstrType extends Enumeration {
@@ -58,4 +58,25 @@ object LoadStoreFunct {
   val SB = 0x00
   val SH = 0x01
   val SW = 0x02
+}
+
+object CSR {
+  val CYCLE = 0xc00
+  val CYCLEH = 0xc80
+  val MCYCLE = 0xb00
+  val MCYCLEH = 0xb80
+  val TIME = 0xc01
+  val TIMEH = 0xc81
+  // Disassembler does not know them
+  val MTIME = 0xb01
+  val MTIMEH = 0xb81
+
+  val INSTRET = 0xc02
+  val INSTRETH = 0xc82
+
+  val MARCHID = 0xf12
+  val WILDCAT_MARCHID = 47 // see https://github.com/riscv/riscv-isa-manual/blob/main/marchid.md
+
+  val MINSTRET = 0xb02
+  val MINSTRETH = 0xb82
 }

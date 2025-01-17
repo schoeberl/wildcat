@@ -191,6 +191,7 @@ Here a list of project that could be a BSc, an MSc, a special course, an AdvCA p
     - Edu4Chip
     - efabless
 * Rust and WCET analysis
+* ISA extensions
 * Comparing RISC-V cores (start from https://dl-acm-org.proxy.findit.cvt.dk/doi/pdf/10.1145/3457388.3458657)
 * Branch predictor (RTS?)
 * Wildcat for real-time systems
@@ -201,6 +202,7 @@ Here a list of project that could be a BSc, an MSc, a special course, an AdvCA p
   - Unaligned memory access can be trapped and handled in SW (Berkeley cores do/did this)
   - floating point emulation
   - compressed instructions
+* Interrupts and interrupt controller
 * G extension
 * floating-point unit
 * Compare Ibex, Wildcat, and a third RISC-V core

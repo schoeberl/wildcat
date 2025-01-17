@@ -37,15 +37,24 @@ class WildcatTest() extends AnyFlatSpec with ChiselScalatestTester {
               stop = true
               assert(d.io.regFile(10).peekInt() == 0, s"Failed test case ${d.io.regFile(3).peekInt()}")
             }
+            if (false) {
+              for(i <- 0 until 16) {
+                val r = d.io.regFile(i).peekInt()
+                print(f"reg($i) = ${r} ")
+              }
+              println()
+            }
             cnt += 1
           }
           assert(stop, "Timeout")
-          /*
-          for(i <- 0 until 32) {
-            val r = d.io.regFile(i).peekInt()
-            println(f"reg($i) = ${r}")
+
+          if (false) {
+            for(i <- 0 until 32) {
+              val r = d.io.regFile(i).peekInt()
+              println(f"reg($i) = ${r}")
+            }
           }
-           */
+
         }
       }
     }

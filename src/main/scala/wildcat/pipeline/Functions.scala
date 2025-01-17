@@ -15,6 +15,7 @@ object Functions {
   def decode(instruction: UInt) = {
 
     val opcode = instruction(6, 0)
+    val func3 = instruction(14, 12)
     val decOut = Wire(new DecodedInstr())
     decOut.instrType := R.id.U
     decOut.isImm := false.B
@@ -27,6 +28,7 @@ object Functions {
     decOut.isJalr := false.B
     decOut.rfWrite := false.B
     decOut.isECall := false.B
+    decOut.isCssrw := false.B
     decOut.rs1Valid := false.B
     decOut.rs2Valid := false.B
     switch(opcode) {
@@ -77,9 +79,13 @@ object Functions {
         decOut.rfWrite := true.B
         decOut.isJalr := true.B
       }
-      is(ECall.U) {
+      is(System.U) {
         decOut.instrType := I.id.U
-        decOut.isECall := true.B
+        when (func3 === 0.U) {
+          decOut.isECall := true.B
+        } .otherwise {
+          decOut.isCssrw := true.B
+        }
       }
     }
     decOut.aluOp := getAluOp(instruction)

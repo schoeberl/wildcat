@@ -61,7 +61,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
         case AuiPc => U
         case Jal => UJ
         case JalR => I
-        case ECall => I
+        case System => I
         case _ => R
       }
       // subfields of the instruction 
@@ -209,7 +209,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       case Jal => (pc + 4, true, pc + imm)
       case JalR => (pc + 4, true, (rs1Val + imm) & 0xfffffffe)
       case Fence => (0, false, pcNext)
-      case ECall => (ecall(), true, pcNext)
+      case System => (ecall(), true, pcNext)
       case _ => throw new Exception("Opcode " + opcode + " at " + pc + " not (yet) implemented")
     }
 

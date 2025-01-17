@@ -1,6 +1,7 @@
 # TODO
 
  * UART
+ * Check if gcc can do RV32E
  * Get the C code compilation better integrated (with a reasonable linker.ld)
  * Get C compiled apps running (more than hello)
  * Update simulation (and C/asm code) for new address mapping and checking for ready

@@ -32,6 +32,7 @@ class DecodedInstr extends Bundle {
   val isJalr = Bool()
   val rfWrite = Bool()
   val isECall = Bool()
+  val isCssrw = Bool()
   val rs1Valid = Bool()
   val rs2Valid = Bool()
 }
