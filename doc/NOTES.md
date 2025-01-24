@@ -4,8 +4,8 @@ Keep a log on resource needs and fmax
 
 ## Wildcat synth results:
 
-FPGA 100 MHz, ASIC 50 MHz constraint
-FPGA with register file in memory
+Xilinx/AMD FPGA 100 MHz, ASIC 50 MHz constraint
+FPGA with register file as memory
 
 ASIC size in report 13, openroad-floorplan.log at the end
 ASIC for max tt 025C 1v80 in report 54, ws.max.rpt
@@ -43,5 +43,6 @@ with register file defined as FF:
 [INFO] Floorplanned on a die area of 0.0 0.0 438.505 449.225 (um).
 max_tt_025C_1v80: 2.55
 
-Looks like the Verilog memory definition is more efficient than the register array. Probably because of the priority mux definition of the generated Verilog code.
+Looks like the Verilog memory definition is more efficient than the register array.
+Probably because of the priority mux definition of the generated Verilog code.
 

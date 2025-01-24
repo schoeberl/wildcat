@@ -36,7 +36,7 @@ the [RISC-V tools](https://github.com/riscv/riscv-tools). Chances are high that 
 them with your packet manager (see below).
 
 Furthermore, you need a Java in version >= 8 and < 21
-(sbt is broken for Java 21).
+(the Chisel/Scala version in use in this project is broken for Java 21).
 
 To build Wildcat in an FPGA you need either Quartus or Vivado.
 The repo contains configuration for the Cyclon-IV based DE2-115
@@ -176,13 +176,14 @@ See also: [RISC-V Ubuntu Setup](https://github.com/schoeberl/cae-lab#vm-and-tool
 ## Student Projects
 
 The Wildcat project shall become a complete microcontroller. Therefore, there are many possible student projects.
-Here a list of project that could be a BSc, an MSc, a special course, an AdvCA project;
+Here a list of project that could be a BSc, an MSc, a special course, an AdvCA project:
 
 * Bootloader
     - can be code running on the core or a serial port based FSM accessing memory and reset
 * Caches (I\$ and D\$)
 * newlib port
 * reactor-uc
+* Testing infrstructure (e.g., complience tests)
 * OS support: Zyphyr or similar
 * Memory controller (SRAM on DE2-115 and DDR on Nexys A7)
 * L2 cache for multi-core
