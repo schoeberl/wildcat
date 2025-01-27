@@ -1,5 +1,5 @@
 # TODO
-
+ * why does // val pcReg = RegInit(-4.S(32.W).asUInt)  result in failing tests?
  * UART
  * Check if gcc can do RV32E
  * Get the C code compilation better integrated (with a reasonable linker.ld)
