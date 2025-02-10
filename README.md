@@ -46,6 +46,7 @@ To start with Wildcat either fork the project or clone it from here with:
 
     git clone https://github.com/schoeberl/wildcat
     cd wildcat
+    git submodule update --init --recursive
 
 Here you can start the ISA simulator executing a simple program with
 
