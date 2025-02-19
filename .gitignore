@@ -5,3 +5,8 @@
 .idea/sbt.xml
 .idea/vcs.xml
 .idea/wildcat.iml
+/.idea
+/project/target
+/target
+project/build.properties
+.bsp/sbt.json
