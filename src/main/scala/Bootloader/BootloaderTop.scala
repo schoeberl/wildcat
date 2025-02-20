@@ -16,7 +16,9 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
   //val tx = Module(new BufferedTx(100000000, baudRate))
   val rx = Module(new Rx(100000000, baudRate))
   //Insert Buffer module
-  //Insert counter module
+  //Counter for keeping track of address and when 4 bytes are ready to be sent
+  val counter = RegInit(0.U(32.W))
+
 
   object State extends ChiselEnum {
     val Idle, Sample, Send = Value
@@ -28,7 +30,10 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
   val save = RegInit(0.U(1.W))
   val wrEnabled = RegInit(0.U(1.W))
 
-
+  when(incr === 1.U){
+    counter := counter + 1.U
+  }
+  val byteCount = counter % 4.U
 
   switch(stateReg){
     is(Idle){
@@ -39,16 +44,23 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
       }
     }
     is(Sample){
-      when(counter.io.byteCnt === 3.U){ //temp couner signal
+      when(byteCount === 3.U) { //temp couner signal
         wrEnabled := 1.U
         stateReg := Send
-      } .elsewhen(rx.io.channel.valid && (counter.io.byteCnt =/= 3.U)){
+      } .elsewhen(rx.io.channel.valid && (byteCount =/= 3.U)){
         stateReg := Sample
-      } .elsewhen(true.B){
+      } .elsewhen(true.B) {
         stateReg := Idle
       }
     }
     is(Send){
+      when(rx.io.channel.valid) {
+        incr := 1.U
+        save := 1.U
+        stateReg := Sample
+      } .elsewhen(true.B) {
+        stateReg := Idle
+      }
 
     }
   }
