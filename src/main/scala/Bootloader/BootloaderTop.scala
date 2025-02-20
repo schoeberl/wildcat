@@ -10,12 +10,13 @@ import chisel3.experimental.ChiselEnum
  */
 class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
   val io = IO(new Bundle {
-
+    val instrData = Output(UInt(32.W))
+    val wrEnabled = Output(UInt(1.W))
   })
 
   //val tx = Module(new BufferedTx(100000000, baudRate))
   val rx = Module(new Rx(100000000, baudRate))
-  //Insert Buffer module
+  val buffer = Module(new BootBuffer())
   //Counter for keeping track of address and when 4 bytes are ready to be sent
   val counter = RegInit(0.U(32.W))
 
@@ -34,6 +35,9 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
     counter := counter + 1.U
   }
   val byteCount = counter % 4.U
+
+  buffer.io.saveCtrl := save
+  buffer.io.dataIn := rx.io.channel.bits
 
   switch(stateReg){
     is(Idle){
@@ -65,4 +69,6 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
     }
   }
 
+  io.wrEnabled := wrEnabled
+  io.instrData := buffer.io.dataOut
 }
