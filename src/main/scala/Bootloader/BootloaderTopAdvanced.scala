@@ -8,11 +8,8 @@ import chisel3.util._
 /**
  * Bootloader by Alexander and Georg for the Wildcat
  *
- * Advanced version of the bootloader, which is designed to be a little more advanced.
- * Fixes the following problems:
- *  1.
- *  2.
- * Has the following features:
+ * Advanced version of the bootloader, which is designed to be more advanced, able to boot uCLinux.
+ * Fixes the following problems needed to run uCLinux:
  *  1.
  *  2.
  */
