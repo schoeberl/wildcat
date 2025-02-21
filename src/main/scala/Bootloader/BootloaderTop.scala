@@ -12,6 +12,7 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
   val io = IO(new Bundle {
     val instrData = Output(UInt(32.W))
     val wrEnabled = Output(UInt(1.W))
+    val rx = Input(UInt(1.W))
   })
 
   //val tx = Module(new BufferedTx(100000000, baudRate))
@@ -76,4 +77,5 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
 
   io.wrEnabled := wrEnabled
   io.instrData := buffer.io.dataOut
+  rx.io.rxd := io.rx
 }
