@@ -39,11 +39,14 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
   buffer.io.saveCtrl := save
   buffer.io.dataIn := rx.io.channel.bits
 
+  rx.io.channel.ready := false.B
+
   switch(stateReg){
     is(Idle){
       when(rx.io.channel.valid){
         stateReg := Sample
         incr := 1.U
+        rx.io.channel.ready := true.B
         save := 1.U
       }
     }
@@ -53,6 +56,7 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
         stateReg := Send
       } .elsewhen(rx.io.channel.valid && (byteCount =/= 3.U)){
         stateReg := Sample
+        rx.io.channel.ready := true.B
       } .elsewhen(true.B) {
         stateReg := Idle
       }
@@ -62,6 +66,7 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
         incr := 1.U
         save := 1.U
         stateReg := Sample
+        rx.io.channel.ready := true.B
       } .elsewhen(true.B) {
         stateReg := Idle
       }
