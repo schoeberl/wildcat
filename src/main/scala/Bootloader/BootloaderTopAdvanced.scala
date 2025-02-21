@@ -1,17 +1,22 @@
 package Bootloader
 
-import chisel3._
 import chisel.lib.uart._
-import chisel3.util._
+import chisel3._
 import chisel3.experimental.ChiselEnum
+import chisel3.util._
 
 /**
  * Bootloader by Alexander and Georg for the Wildcat
  *
- * Current version is simple and not sufficient for loading elf-files as needed for running uCLinux.
- * Current version modelled after the following figure: https://media.discordapp.net/attachments/1017062502066036897/1342132354218463233/Bootloader_fem_design.jpg?ex=67b92e68&is=67b7dce8&hm=81295ce8f7da45314c537b57b1d813111f06dd7174463621f7f2cd665a5e183b&=&format=webp&width=543&height=993
+ * Advanced version of the bootloader, which is designed to be a little more advanced.
+ * Fixes the following problems:
+ *  1.
+ *  2.
+ * Has the following features:
+ *  1.
+ *  2.
  */
-class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
+class BootloaderTopAdvanced(frequ: Int, baudRate: Int = 115200) extends Module {
   val io = IO(new Bundle {
     val instrData = Output(UInt(32.W))
     val wrEnabled = Output(UInt(1.W))

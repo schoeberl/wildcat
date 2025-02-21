@@ -7,6 +7,9 @@ import chisel3.util._
 
 /**
  * Bootloader buffer module by Alexander and Georg for the Wildcat
+ *
+ * This buffer works as a simple shift register. Goal is to receive 8x4 bit, structure them to be 1x32 bit
+ * and then output those 32bits. We only accept new data into the buffer when saveCtrl is HIGH.
  */
 class BootBuffer() extends Module {
   val io = IO(new Bundle {
@@ -18,7 +21,7 @@ class BootBuffer() extends Module {
   val buffer = RegInit(0.U(32.W))
 
   when(io.saveCtrl === 1.U){
-    buffer := buffer(24,0) ## io.dataIn
+    buffer := io.dataIn ## buffer(32,8) // little endian architecture dictates that LSB of instruction should get smallest address.
   }
 
   io.dataOut := buffer
