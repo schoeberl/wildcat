@@ -19,7 +19,7 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
   })
 
   //val tx = Module(new BufferedTx(100000000, baudRate))
-  val rx = Module(new Rx(100000000, baudRate))
+  val rx = Module(new Rx(frequ, baudRate))
   val buffer = Module(new BootBuffer())
   //Counter for keeping track of address and when 4 bytes are ready to be sent
   val counter = RegInit(0.U(32.W))
@@ -44,6 +44,10 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
   buffer.io.dataIn := rx.io.channel.bits
 
   rx.io.channel.ready := false.B
+  incr := 0.U
+  save := 0.U
+  wrEnabled := 0.U
+
 
   switch(stateReg){
     is(Idle){
@@ -55,11 +59,12 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
       }
     }
     is(Sample){
-      when(byteCount === 3.U) { //temp couner signal
+      when(byteCount === 3.U) {
         wrEnabled := 1.U
         stateReg := Send
       } .elsewhen(rx.io.channel.valid && (byteCount =/= 3.U)){
         stateReg := Sample
+        incr := 1.U
         rx.io.channel.ready := true.B
       } .elsewhen(true.B) {
         stateReg := Idle
@@ -81,4 +86,8 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
   io.wrEnabled := wrEnabled
   io.instrData := buffer.io.dataOut
   rx.io.rxd := io.rx
+}
+
+object BootloaderTopTop extends App {
+  emitVerilog(new BootloaderTop(100000000), Array("--target-dir", "generated"))
 }
