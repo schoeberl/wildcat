@@ -21,7 +21,7 @@ class BootBuffer() extends Module {
   val buffer = RegInit(0.U(32.W))
 
   when(io.saveCtrl === 1.U){
-    buffer := io.dataIn ## buffer(32,8) // little endian architecture dictates that LSB of instruction should get smallest address.
+    buffer := io.dataIn ## buffer(31,8) // little endian architecture dictates that LSB of instruction should get smallest address.
   }
 
   io.dataOut := buffer
