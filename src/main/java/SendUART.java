@@ -12,13 +12,19 @@ public class SendUART {
         }
 
         // Open the serial port (Change COM3 to your actual port)
-        SerialPort serialPort = SerialPort.getCommPort("COM7"); //Alexander's laptop had COM7
+        SerialPort serialPort = SerialPort.getCommPort("COM3"); //Alexander's laptop had COM7
         serialPort.setBaudRate(9600);  // Set baud rate (match with receiver)
         serialPort.setNumDataBits(8);
         serialPort.setNumStopBits(SerialPort.ONE_STOP_BIT);
         serialPort.setParity(SerialPort.NO_PARITY);
 
         if (!serialPort.openPort()) {
+            System.out.println("Failed to open port.");
+            return;
+        }
+
+        SerialPort serialPort4 = SerialPort.getCommPort("COM4");
+        if (!serialPort4.openPort()) {
             System.out.println("Failed to open port.");
             return;
         }
@@ -32,7 +38,13 @@ public class SendUART {
         System.out.println("Data sent: " + message);
 
         // Close the port
+        boolean varb = true;
+        while(varb)
+        {
+            varb = true;
+        }
         serialPort.closePort();
         System.out.println("Port closed.");
+
     }
 }
