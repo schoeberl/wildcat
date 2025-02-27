@@ -3,6 +3,7 @@ import com.fazecast.jSerialComm.*;
 public class SendUART {
     public static void main(String[] args) {
         // Identify available serial ports
+
         SerialPort[] ports = SerialPort.getCommPorts();
         if(ports.length == 0) System.out.println("No COM ports found ;(");
 
@@ -11,8 +12,8 @@ public class SendUART {
         }
 
         // Open the serial port (Change COM3 to your actual port)
-        SerialPort serialPort = SerialPort.getCommPort("COM3");
-        serialPort.setBaudRate(115200);  // Set baud rate (match with receiver)
+        SerialPort serialPort = SerialPort.getCommPort("COM7"); //Alexander's laptop had COM7
+        serialPort.setBaudRate(9600);  // Set baud rate (match with receiver)
         serialPort.setNumDataBits(8);
         serialPort.setNumStopBits(SerialPort.ONE_STOP_BIT);
         serialPort.setParity(SerialPort.NO_PARITY);
