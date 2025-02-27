@@ -12,7 +12,7 @@ import chisel3.util._
  * Fixes the following problems needed to run uCLinux:
  *  1. ELF files contain a .data segment consisting of constants and so forth. This section should be put in DMEM.
  *  2. ELF files contain a _start location which is where the program should execute from after booting.
- *  3. ELF files 
+ *  3. ELF files
  */
 class BootloaderTopAdvanced(frequ: Int, baudRate: Int = 115200) extends Module {
   val io = IO(new Bundle {
