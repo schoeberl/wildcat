@@ -59,6 +59,10 @@ class ThreeCats() extends Wildcat() {
   val rd = instr(11, 7)
   val (rs1Val, rs2Val, debugRegs) = registerFile(rs1, rs2, wbDest, wbData, wrEna, true)
 
+  val csr = Module(new Csr())
+  csr.io.address := instrReg(31, 20)
+  val csrVal = csr.io.data
+
   val decOut = decode(instrReg)
 
   val decEx = Wire(new Bundle() {
@@ -70,6 +74,7 @@ class ThreeCats() extends Wildcat() {
     val rd = UInt(5.W)
     val rs1Val = UInt(32.W)
     val rs2Val = UInt(32.W)
+    val csrVal = UInt(32.W)
     val func3 = UInt(3.W)
     val memLow = UInt(2.W)
   })
@@ -81,6 +86,7 @@ class ThreeCats() extends Wildcat() {
   decEx.rd := instrReg(11, 7)
   decEx.rs1Val := rs1Val
   decEx.rs2Val := rs2Val
+  decEx.csrVal := csrVal
   decEx.func3 := instrReg(14, 12)
 
   // Forwarding to memory
@@ -121,6 +127,9 @@ class ThreeCats() extends Wildcat() {
   }
   when(decExReg.decOut.isAuiPc) {
     res := (decExReg.pc.asSInt + decExReg.decOut.imm).asUInt
+  }
+  when(decExReg.decOut.isCssrw) {
+    res := decExReg.csrVal
   }
 
   wbDest := decExReg.rd

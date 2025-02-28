@@ -63,10 +63,10 @@ object LoadStoreFunct {
 object CSR {
   val CYCLE = 0xc00
   val CYCLEH = 0xc80
-  val MCYCLE = 0xb00
-  val MCYCLEH = 0xb80
   val TIME = 0xc01
   val TIMEH = 0xc81
+  val MCYCLE = 0xb00
+  val MCYCLEH = 0xb80
   // Disassembler does not know them
   val MTIME = 0xb01
   val MTIMEH = 0xb81

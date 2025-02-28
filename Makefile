@@ -29,6 +29,8 @@ app:
 #	cat text.bin data.bin > a.bin # this does not make much sense
 #	hexdump -e '"%08x\n"' a.bin
 
+dump:
+	riscv64-unknown-elf-objdump -d a.out
 run:
 	sbt "runMain wildcat.isasim.SimRV a.out"
 

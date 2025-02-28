@@ -85,6 +85,7 @@ object Functions {
           decOut.isECall := true.B
         } .otherwise {
           decOut.isCssrw := true.B
+          decOut.rfWrite := true.B
         }
       }
     }

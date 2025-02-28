@@ -6,6 +6,9 @@ import wildcat.CSR._
 
 /**
  * Control and Status Registers
+ *
+ * If needed, we can pipeline the read access to the CSR.
+ * Can be done in the pipeline itself.
  */
 class Csr() extends Module {
   val io = IO(new Bundle {
@@ -18,21 +21,21 @@ class Csr() extends Module {
 
   switch(io.address) {
     is(CYCLE.U) {
-      data := 0.U
+      data := 1.U
     }
     is(CYCLEH.U) {
-      data := 0.U
+      data := 2.U
+    }
+    is(TIME.U) {
+      data := 3.U
+    }
+    is(TIMEH.U) {
+      data := 4.U
     }
     is(MCYCLE.U) {
       data := 0.U
     }
     is(MCYCLEH.U) {
-      data := 0.U
-    }
-    is(TIME.U) {
-      data := 0.U
-    }
-    is(TIMEH.U) {
       data := 0.U
     }
     is(MTIME.U) {

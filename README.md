@@ -19,7 +19,7 @@ The day after, I started with the RV32I simulator.
 
 If you use Wildcat in your research or teaching, please cite:
 
-```
+```bibtex
 @InProceedings{wildcat:2024,
   author    = {Martin Schoeberl},
   booktitle = {Proceedings of the Sixth Workshop on Open-Source EDA Technology (WOSET)},
@@ -28,6 +28,19 @@ If you use Wildcat in your research or teaching, please cite:
 }
 ```
 Available at the [WOSET conference page](https://woset-workshop.github.io/WOSET2024.html).
+
+and
+```bibtex
+@misc{schoeberl2025wildcateducationalriscvmicroprocessors,
+      title={Wildcat: Educational RISC-V Microprocessors}, 
+      author={Martin Schoeberl},
+      year={2025},
+      eprint={2502.20197},
+      archivePrefix={arXiv},
+      primaryClass={cs.AR},
+      url={https://arxiv.org/abs/2502.20197}, 
+}
+```
 
 ## Setup
 
