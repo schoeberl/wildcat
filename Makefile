@@ -128,10 +128,21 @@ listen:
 
 # stop with Ctrl+A and Ctrl+\
 
+# Rust
+RUST_PROJECT = rust-riscv32i
+
+rust-compile:
+	make -C rust/$(RUST_PROJECT)
+
+rust-run: rust-compile
+	sbt "runMain wildcat.isasim.SimRV rust/$(RUST_PROJECT)/target/rust.bin"
+
 clean:
 	git clean -fd
 #	rm -rf ./idea
 	rm -rf ./risc-v-lab
+	rm -rf ./rust/*/target
+	rm -rf ./target
 
 #### not (yet) used
 elf:
@@ -186,8 +197,5 @@ test-old:
 
 # rv32ui tests available:
 # add addi amoadd_w amoand_w amomax_w amomaxu_w amomin_w amominu_w amoor_w amoswap_w and andi auipc beq bge bgeu blt bltu bne div divu divuw divw fence_i j jal jalr lb lbu ld lh lhu lui lw mul mulh mulhsu mulhu mulw or ori rem remu sb sh simple sll slli slt slti sra srai srl srli sub sw xor xori	
-
-
-
 
 
