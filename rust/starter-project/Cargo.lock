@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "rust-riscv32i"
+name = "starter-project"
 version = "0.1.0"
