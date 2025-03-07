@@ -11,6 +11,4 @@ all:
 
 	cat target/text.bin target/data.bin > target/rust.bin
 
-	hexdump -e '"%08x\n"' target/text.bin
-	hexdump -e '"%08x\n"' target/data.bin
-	hexdump -e '"%08x\n"' target/rust.bin
+	rust-objdump --disassemble --arch=riscv32 $(RUST_APP)
