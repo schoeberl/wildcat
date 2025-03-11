@@ -9,7 +9,7 @@ import org.scalatest.flatspec.AnyFlatSpec
  */
 class BootloaderTopTest extends AnyFlatSpec with
   ChiselScalatestTester {
-  "BootloaderTop" should "pass" in {
+  "BootloaderTop" should "receive 1 byte" in {
     test(new BootloaderTop(10000000))
       .withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
       val BIT_CNT = ((10000000 + 115200 / 2) / 115200 - 1)
@@ -48,7 +48,7 @@ class BootloaderTopTest extends AnyFlatSpec with
 
 class BootloaderTopTestFullInstr extends AnyFlatSpec with
   ChiselScalatestTester {
-  "BootloaderTop" should "Receive entire instruction and enable writing" in {
+  "BootloaderTop" should "Receive entire instruction" in {
     test(new BootloaderTop(10000000))
       .withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
         val BIT_CNT = ((10000000 + 115200 / 2) / 115200 - 1)
@@ -147,10 +147,60 @@ class BootloaderTopTestFullInstr extends AnyFlatSpec with
         dut.io.rx.poke(0.U)
         dut.clock.step(BIT_CNT)
         dut.io.rx.poke(1.U) //Last data bit of the byte
-        dut.clock.step(100)
 
+        dut.clock.step(100)
         dut.io.instrData.expect("haa54f08e".U)
         dut.io.wrEnabled.expect(0.U)
+
+
+      }
+  }
+
+}
+
+class BootloaderTopTestScala extends AnyFlatSpec with
+  ChiselScalatestTester {
+  "BootloaderTop" should "Receive entire instruction and addr and enable writing" in {
+    test(new BootloaderTop(10000000))
+      .withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
+        val BIT_CNT = ((10000000 + 115200 / 2) / 115200 - 1)
+
+        val instrData = "h12345678".U
+        val instrAddr = "haa54f08e".U
+
+        //Start protocol
+        def preByteProtocol(n: Int) = {
+          dut.io.rx.poke(1.U) // HVORFOR SKER DET HER IKKE REEEEEEEEEEEEEEEEEEEEE LEGIT SKER IKKE I VCD FILEN
+          dut.clock.step(BIT_CNT)
+          dut.io.rx.poke(0.U)
+          dut.clock.step(BIT_CNT)
+        }
+
+        def sendByte(n: UInt) = {
+          preByteProtocol(1)
+
+          for(j <- 0 until 7){
+            dut.io.rx.poke(n(j))
+            dut.clock.step(BIT_CNT)
+          }
+        }
+
+        def send32bit(n: UInt) = {
+          sendByte(n(7,0))
+          sendByte(n(15,8))
+          sendByte(n(23,16))
+          sendByte(n(31,24))
+        }
+
+        send32bit(instrAddr) //First send address
+        dut.io.instrData.expect(instrAddr) //instrAddr should be in instrData space now
+
+        send32bit(instrData) //Then send the instrData
+
+        dut.clock.step(BIT_CNT)
+        dut.io.instrAddr.expect(instrAddr)
+        dut.io.instrData.expect(instrData)
+        dut.io.wrEnabled.expect(1.U)
 
 
       }
