@@ -32,10 +32,10 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
 
 
   object State extends ChiselEnum {
-    val Idle, Sample, Send = Value
+    val Idle, Sleep = Value
   }
   import State._
-  val stateReg = RegInit(Idle)
+  val stateReg = RegInit(Sleep)
 
   val incr = RegInit(0.U(1.W))
   val save = RegInit(0.U(1.W))
@@ -56,33 +56,30 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
 
 
   switch(stateReg){
-    is(Idle){
-      when(rx.io.channel.valid){
-        stateReg := Sample
-        incr := 1.U
+    is(Sleep){
+      when(io.instrData === "hB00710AD".U){ //Magic nubmber is 0xB00710AD = BOOTLOAD
+        stateReg := Idle
+      } .elsewhen(rx.io.channel.valid){
         rx.io.channel.ready := true.B
         save := 1.U
+        stateReg := Sleep
+      } .elsewhen(true.B){
+        stateReg := Sleep
       }
     }
-    is(Sample){
-      when(byteCount === 8.U) {
-        wrEnabled := 1.U
-        stateReg := Send
-        byteCount := 0.U
-      } .elsewhen(true.B) {
-        stateReg := Idle
-      }
-    }
-    is(Send){
-      when(rx.io.channel.valid) {
-        incr := 1.U
-        save := 1.U
-        stateReg := Sample
-        rx.io.channel.ready := true.B
-      } .elsewhen(true.B) {
-        stateReg := Idle
-      }
-
+    is(Idle) {
+     when(byteCount === 8.U) {
+       wrEnabled := 1.U
+       byteCount := 0.U
+       stateReg := Idle
+     } .elsewhen(rx.io.channel.valid) {
+       incr := 1.U
+       rx.io.channel.ready := true.B
+       save := 1.U
+       stateReg := Idle
+     } .elsewhen(true.B) {
+       stateReg := Idle
+     }
     }
   }
 
