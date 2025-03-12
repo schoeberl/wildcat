@@ -4,6 +4,8 @@ import chisel3._
 import chiseltest._
 import org.scalatest.flatspec.AnyFlatSpec
 
+import scala.Console.println
+
 /**
  * Bootloader by Alexander and Georg for the Wildcat
  */
@@ -169,17 +171,17 @@ class BootloaderTopTestScala extends AnyFlatSpec with
         val instrAddr = "haa54f08e".U
 
         //Start protocol
-        def preByteProtocol(n: Int) = {
-          dut.io.rx.poke(1.U) // HVORFOR SKER DET HER IKKE REEEEEEEEEEEEEEEEEEEEE LEGIT SKER IKKE I VCD FILEN
+        def preByteProtocol() = {
+          dut.io.rx.poke(1.U)
           dut.clock.step(BIT_CNT)
           dut.io.rx.poke(0.U)
           dut.clock.step(BIT_CNT)
         }
 
         def sendByte(n: UInt) = {
-          preByteProtocol(1)
+          preByteProtocol()
 
-          for(j <- 0 until 7){
+          for(j <- 0 until 8){ //0 until 8 means it runs from 0 to and with 7
             dut.io.rx.poke(n(j))
             dut.clock.step(BIT_CNT)
           }
@@ -194,7 +196,6 @@ class BootloaderTopTestScala extends AnyFlatSpec with
 
         send32bit(instrAddr) //First send address
         dut.io.instrData.expect(instrAddr) //instrAddr should be in instrData space now
-
         send32bit(instrData) //Then send the instrData
 
         dut.clock.step(BIT_CNT)

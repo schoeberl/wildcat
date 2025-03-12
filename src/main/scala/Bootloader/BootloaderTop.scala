@@ -69,10 +69,6 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
         wrEnabled := 1.U
         stateReg := Send
         byteCount := 0.U
-      } .elsewhen(rx.io.channel.valid && (byteCount =/= 8.U)){
-        stateReg := Sample
-        incr := 1.U
-        rx.io.channel.ready := true.B
       } .elsewhen(true.B) {
         stateReg := Idle
       }
