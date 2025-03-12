@@ -13,7 +13,7 @@ import chisel.lib.uart._
  * Author: Martin Schoeberl (martin@jopdesign.com)
  *
  */
-class WildcatTop(file: String) extends Module {
+class WildcatTop(file: String, dmemNrByte: Int = 4096) extends Module {
 
   val io = IO(new Bundle {
     val led = Output(UInt(16.W))
@@ -27,7 +27,7 @@ class WildcatTop(file: String) extends Module {
   val cpu = Module(new ThreeCats())
   // val cpu = Module(new WildFour())
   // val cpu = Module(new StandardFive())
-  val dmem = Module(new ScratchPadMem(memory))
+  val dmem = Module(new ScratchPadMem(memory, nrBytes = dmemNrByte))
   cpu.io.dmem <> dmem.io
   val imem = Module(new InstructionROM(memory))
   imem.io.address := cpu.io.imem.address
