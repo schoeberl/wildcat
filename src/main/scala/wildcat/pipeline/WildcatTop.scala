@@ -12,6 +12,8 @@ import chisel.lib.uart._
  *
  * Author: Martin Schoeberl (martin@jopdesign.com)
  *
+ * Edited by Georg and Alexander to test our Bootloader
+ *
  */
 class WildcatTop(file: String) extends Module {
 

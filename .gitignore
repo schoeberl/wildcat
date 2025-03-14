@@ -1,12 +1,3 @@
-.idea/codeStyles/codeStyleConfig.xml
-.idea/codeStyles/Project.xml
-.idea/misc.xml
-.idea/modules.xml
-.idea/sbt.xml
-.idea/vcs.xml
-.idea/wildcat.iml
 /.idea
-/project/target
+/project
 /target
-project/build.properties
-.bsp/sbt.json

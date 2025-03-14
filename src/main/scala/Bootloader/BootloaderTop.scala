@@ -8,37 +8,45 @@ import chisel3.experimental.ChiselEnum
 /**
  * Bootloader by Alexander and Georg for the Wildcat
  *
- * Current version is simple and not sufficient for loading elf-files as needed for running uCLinux.
- * Current version modelled after the following figure: https://media.discordapp.net/attachments/1017062502066036897/1342132354218463233/Bootloader_fem_design.jpg?ex=67b92e68&is=67b7dce8&hm=81295ce8f7da45314c537b57b1d813111f06dd7174463621f7f2cd665a5e183b&=&format=webp&width=543&height=993
+ * Current version is simple and SHOULD BE sufficient for loading elf-files as needed for running uCLinux.
+ * Current version is NO LONGER modelled after the following figure: https://media.discordapp.net/attachments/1017062502066036897/1342132354218463233/Bootloader_fem_design.jpg?ex=67b92e68&is=67b7dce8&hm=81295ce8f7da45314c537b57b1d813111f06dd7174463621f7f2cd665a5e183b&=&format=webp&width=543&height=993
+ *    The model is outdated since Georg added address reading without adding it to the figure.
+ *    To use this new module you should first send the address through UART and then immedietly after the instr
+ *
+ * Initial state waiting for magic number: 0xB00710AD maybe?
+ * receive address, then receive data, then send data to address
+ * Then return to idle
+ *
+ * New design : Use a memory-mapped IO signal to deactivate/activate the bootloader
+ *
  */
 class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
   val io = IO(new Bundle {
     val instrData = Output(UInt(32.W))
+    val instrAddr = Output(UInt(32.W))
     val wrEnabled = Output(UInt(1.W))
     val rx = Input(UInt(1.W))
+    val sleep = Input(Bool())
   })
 
   //val tx = Module(new BufferedTx(100000000, baudRate))
   val rx = Module(new Rx(frequ, baudRate))
   val buffer = Module(new BootBuffer())
-  //Counter for keeping track of address and when 4 bytes are ready to be sent
-  val counter = RegInit(0.U(32.W))
-
 
   object State extends ChiselEnum {
-    val Idle, Sample, Send = Value
+    val Active, Sleep = Value
   }
   import State._
-  val stateReg = RegInit(Idle)
+  val stateReg = RegInit(Active)
 
   val incr = RegInit(0.U(1.W))
   val save = RegInit(0.U(1.W))
   val wrEnabled = RegInit(0.U(1.W))
+  val byteCount = RegInit(0.U(4.W))
 
   when(incr === 1.U){
-    counter := counter + 1.U
+    byteCount := byteCount + 1.U
   }
-  val byteCount = counter % 4.U
 
   buffer.io.saveCtrl := save
   buffer.io.dataIn := rx.io.channel.bits
@@ -50,44 +58,40 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
 
 
   switch(stateReg){
-    is(Idle){
-      when(rx.io.channel.valid){
-        stateReg := Sample
-        incr := 1.U
-        rx.io.channel.ready := true.B
-        save := 1.U
+    is(Sleep){
+      when(!io.sleep){
+        stateReg := Active
+      } .elsewhen(true.B){
+        stateReg := Sleep
       }
     }
-    is(Sample){
-      when(byteCount === 3.U) {
-        wrEnabled := 1.U
-        stateReg := Send
-      } .elsewhen(rx.io.channel.valid && (byteCount =/= 3.U)){
-        stateReg := Sample
-        incr := 1.U
-        rx.io.channel.ready := true.B
-      } .elsewhen(true.B) {
-        stateReg := Idle
-      }
-    }
-    is(Send){
-      when(rx.io.channel.valid) {
-        incr := 1.U
-        save := 1.U
-        stateReg := Sample
-        rx.io.channel.ready := true.B
-      } .elsewhen(true.B) {
-        stateReg := Idle
-      }
-
+    is(Active) {
+     when(io.sleep) {
+       stateReg := Sleep
+     }.elsewhen(byteCount === 8.U) {
+       wrEnabled := 1.U
+       byteCount := 0.U
+       stateReg := Active
+     } .elsewhen(rx.io.channel.valid) {
+       incr := 1.U
+       rx.io.channel.ready := true.B
+       save := 1.U
+       stateReg := Active
+     } .elsewhen(true.B) {
+       stateReg := Active
+     }
     }
   }
 
   io.wrEnabled := wrEnabled
-  io.instrData := buffer.io.dataOut
+  io.instrData := buffer.io.dataOut(63,32)
+  io.instrAddr := buffer.io.dataOut(31,0)
   rx.io.rxd := io.rx
 }
 
+//We will be implementing the Bootloader as a module together with Wildcat to test everything so we don't need this:
+/*
 object BootloaderTopTop extends App {
   emitVerilog(new BootloaderTop(100000000), Array("--target-dir", "generated"))
 }
+*/
