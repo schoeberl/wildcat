@@ -13,11 +13,9 @@ import chisel3.experimental.ChiselEnum
  *    The model is outdated since Georg added address reading without adding it to the figure.
  *    To use this new module you should first send the address through UART and then immedietly after the instr
  *
- * Initial state waiting for magic number: 0xB00710AD maybe?
+ * Initial state waiting for magic number: 0xb00710ad maybe?
  * receive address, then receive data, then send data to address
  * Then return to idle
- *
- * New design : Use a memory-mapped IO signal to deactivate/activate the bootloader
  *
  */
 class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
@@ -26,18 +24,18 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
     val instrAddr = Output(UInt(32.W))
     val wrEnabled = Output(UInt(1.W))
     val rx = Input(UInt(1.W))
-    val sleep = Input(Bool())
   })
 
   //val tx = Module(new BufferedTx(100000000, baudRate))
   val rx = Module(new Rx(frequ, baudRate))
   val buffer = Module(new BootBuffer())
 
+
   object State extends ChiselEnum {
-    val Active, Sleep = Value
+    val Idle, Sleep = Value
   }
   import State._
-  val stateReg = RegInit(Active)
+  val stateReg = RegInit(Sleep)
 
   val incr = RegInit(0.U(1.W))
   val save = RegInit(0.U(1.W))
@@ -59,26 +57,28 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
 
   switch(stateReg){
     is(Sleep){
-      when(!io.sleep){
-        stateReg := Active
+      when(io.instrData === "hB00710AD".U){ //Magic nubmber is 0xB00710AD = BOOTLOAD
+        stateReg := Idle
+      } .elsewhen(rx.io.channel.valid){
+        rx.io.channel.ready := true.B
+        save := 1.U
+        stateReg := Sleep
       } .elsewhen(true.B){
         stateReg := Sleep
       }
     }
-    is(Active) {
-     when(io.sleep) {
-       stateReg := Sleep
-     }.elsewhen(byteCount === 8.U) {
+    is(Idle) {
+     when(byteCount === 8.U) {
        wrEnabled := 1.U
        byteCount := 0.U
-       stateReg := Active
+       stateReg := Idle
      } .elsewhen(rx.io.channel.valid) {
        incr := 1.U
        rx.io.channel.ready := true.B
        save := 1.U
-       stateReg := Active
+       stateReg := Idle
      } .elsewhen(true.B) {
-       stateReg := Active
+       stateReg := Idle
      }
     }
   }
@@ -89,9 +89,6 @@ class BootloaderTop(frequ: Int, baudRate: Int = 115200) extends Module {
   rx.io.rxd := io.rx
 }
 
-//We will be implementing the Bootloader as a module together with Wildcat to test everything so we don't need this:
-/*
 object BootloaderTopTop extends App {
   emitVerilog(new BootloaderTop(100000000), Array("--target-dir", "generated"))
 }
-*/

@@ -15,8 +15,6 @@ class BootloaderTopTestByte extends AnyFlatSpec with
     test(new BootloaderTop(10000000))
       .withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
       val BIT_CNT = ((10000000 + 115200 / 2) / 115200 - 1)
-
-      dut.io.sleep.poke(false.B) //Set Active
       dut.io.rx.poke(1.U)
 
       //First byte:
@@ -43,8 +41,6 @@ class BootloaderTopTestByte extends AnyFlatSpec with
 
       dut.io.instrData.expect("haa000000".U)
       dut.io.wrEnabled.expect(0.U)
-
-      dut.io.sleep.poke(true.B) //Set InActive
 
 
     }
@@ -85,7 +81,9 @@ class BootloaderTopTestScala extends AnyFlatSpec with
           sendByte(n(31,24))
         }
 
-        dut.io.sleep.poke(false.B) //Set Active
+        //First send the magic number to initiate the bootloader
+        send32bit("hB00710AD".U)
+        dut.io.instrData.expect("hB00710AD".U) //Magic number should be there but will be shifted out
 
         send32bit(instrAddr) //First send address
         dut.io.instrData.expect(instrAddr) //instrAddr should be in instrData space now
@@ -93,15 +91,8 @@ class BootloaderTopTestScala extends AnyFlatSpec with
 
         dut.io.instrAddr.expect(instrAddr)
         dut.io.instrData.expect(instrData)
-        //dut.io.wrEnabled.expect(1.U) //This is not timed to the clock so will always fail but its okay
+        dut.io.wrEnabled.expect(1.U) //This is not timed to the clock so will always fail
 
-        dut.io.sleep.poke(true.B) //Set inactive
-
-        //Test whether the bootloader is asleep now
-        send32bit("h87654321".U)
-        //We should expect no change to the bootbuffer:
-        dut.io.instrData.expect(instrData)
-        dut.io.instrAddr.expect(instrAddr)
 
       }
   }
