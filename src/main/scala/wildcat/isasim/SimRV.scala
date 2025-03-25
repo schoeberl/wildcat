@@ -29,6 +29,10 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
   var reg = new Array[Int](32)
   reg(0) = 0
 
+  // Reservation state for LR/SC
+  var reservationValid = false
+  var reservationAddr = 0
+
   // stop on a test end
   var run = true;
 
@@ -43,7 +47,9 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     val rs1 = (instr >> 15) & 0x01f
     val rs2 = (instr >> 20) & 0x01f
     val funct3 = (instr >> 12) & 0x07
-    val funct7 = (instr >> 25) & 0x03f
+    val funct7 = (instr >> 25) & 0x07f  // Extended to 7 bits for AMO
+    val aq = (instr >> 26) & 0x01       // Acquire bit
+    val rl = (instr >> 25) & 0x01       // Release bit
 
     /**
      * Immediate generation is a little bit elaborated,
@@ -149,6 +155,12 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     def store(funct3: Int, base: Int, displ: Int, value: Int): Unit = {
       val addr = base + displ
       val wordAddr = addr >>> 2
+      
+      // Any store should invalidate reservations to the same address
+      if (reservationValid && (addr >>> 2) == (reservationAddr >>> 2)) {
+        reservationValid = false
+      }
+      
       funct3 match {
         case SB => {
           val mask = (addr & 0x03) match {
@@ -187,17 +199,79 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       }
     }
 
+    def atomic(funct5: Int, addr: Int, rs2Val: Int): (Int, Boolean) = {
+      if ((addr & 0x3) != 0) {
+        throw new Exception(f"Misaligned atomic address: 0x${addr}%08x")
+      }
+      val wordAddr = addr >>> 2
+      val oldValue = mem(wordAddr)
+      
+      funct5 match {
+        case 0x02 => { // LR.W
+          reservationValid = true
+          reservationAddr = addr
+          (oldValue, true)
+        }
+        case 0x03 => { // SC.W
+          if (reservationValid && reservationAddr == addr) {
+            mem(wordAddr) = rs2Val
+            reservationValid = false
+            (0, true) // Success: return 0
+          } else {
+            (1, true) // Failure: return non-zero
+          }
+        }
+        case 0x01 => { // AMOSWAP.W
+          mem(wordAddr) = rs2Val
+          (oldValue, true)
+        }
+        case 0x00 => { // AMOADD.W
+          val result = oldValue + rs2Val
+          mem(wordAddr) = result
+          (oldValue, true)
+        }
+        case 0x04 => { // AMOXOR.W
+          val result = oldValue ^ rs2Val
+          mem(wordAddr) = result
+          (oldValue, true)
+        }
+        case 0x0C => { // AMOAND.W
+          val result = oldValue & rs2Val
+          mem(wordAddr) = result
+          (oldValue, true)
+        }
+        case 0x08 => { // AMOOR.W
+          val result = oldValue | rs2Val
+          mem(wordAddr) = result
+          (oldValue, true)
+        }
+        case _ => (0, false)
+      }
+    }
+
     // read register file
     val rs1Val = reg(rs1)
     val rs2Val = reg(rs2)
     // next pc
     val pcNext = pc + 4
 
-    // printf("     pc: %04x instr: %08x ", pc, instr)
+    // Debug output for atomic instructions
+    if (opcode == 0x2f) {
+      println(f"Atomic instruction at pc=0x${pc}%08x: rs1=x${rs1}%d(0x${rs1Val}%08x) rs2=x${rs2}%d(0x${rs2Val}%08x) rd=x${rd}%d funct7=0x${funct7}%02x")
+    }
 
     // Execute the instruction and return a tuple for the result:
     //   (ALU result, writeBack, next PC)
     val result = opcode match {
+      case 0x2f => { // AMO - Atomic Memory Operations
+        val addr = rs1Val
+        if (funct3 != 0x2) {
+          throw new Exception(f"Invalid funct3 for atomic operation: 0x${funct3}%x")
+        }
+        val funct5 = (funct7 >> 2) & 0x1f  // Get bits [31:27] for funct5
+        val (value, success) = atomic(funct5, addr, rs2Val)
+        (value, success, pcNext)
+      }
       case AluImm => (alu(funct3, sraSub, rs1Val, imm), true, pcNext)
       case Alu => (alu(funct3, sraSub, rs1Val, rs2Val), true, pcNext)
       case Branch => (0, false, if (compare(funct3, rs1Val, rs2Val)) pc + imm else pcNext)
@@ -212,6 +286,11 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       case System => (ecall(), true, pcNext)
       case _ => throw new Exception("Opcode " + opcode + " at " + pc + " not (yet) implemented")
     }
+
+    // External interference simulation (uncomment for testing)
+    // if (scala.util.Random.nextInt(100) < 5) { // 5% chance
+    //   reservationValid = false
+    // }
 
     if (rd != 0 && result._2) {
       reg(rd) = result._1
