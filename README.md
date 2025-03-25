@@ -42,6 +42,8 @@ and
 }
 ```
 
+accepted at [ARCS 2025](https://arcs-conference.org/home).
+
 ## Setup
 
 Prerequisit for this project is a working installation of
