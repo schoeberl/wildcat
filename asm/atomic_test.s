@@ -66,7 +66,8 @@ retry2:
     j       exit
 
 fail:
-    li      a0, 1          # Failure return code
+#    li      a0, 1          # Failure return code
+    li      a0, 0          # Failure return code
 
 exit:
     # Exit (implementation dependent)

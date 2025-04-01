@@ -31,6 +31,9 @@ object Functions {
     decOut.isCssrw := false.B
     decOut.rs1Valid := false.B
     decOut.rs2Valid := false.B
+    decOut.isLr := false.B
+    decOut.isSc := false.B
+
     switch(opcode) {
       is(AluImm.U) {
         decOut.instrType := I.id.U
@@ -86,6 +89,15 @@ object Functions {
         } .otherwise {
           decOut.isCssrw := true.B
           decOut.rfWrite := true.B
+        }
+      }
+      is("b0101111".U) {
+        decOut.rfWrite := true.B
+        when(instruction(31,27) === "b00010".U) {
+          decOut.isLr := true.B
+        }
+        when(instruction(31,27) === "b00011".U) {
+          decOut.isSc := true.B
         }
       }
     }

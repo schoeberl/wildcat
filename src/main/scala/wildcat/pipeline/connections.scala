@@ -27,6 +27,8 @@ class DecodedInstr extends Bundle {
   val isAuiPc = Bool()
   val isLoad = Bool()
   val isStore = Bool()
+  val isLr = Bool()  // Load Reserved
+  val isSc = Bool()  // Store Conditional
   val isBranch = Bool()
   val isJal = Bool()
   val isJalr = Bool()
