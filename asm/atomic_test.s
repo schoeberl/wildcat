@@ -66,6 +66,7 @@ retry2:
     j       exit
 
 fail:
+# TODO: enable test again
 #    li      a0, 1          # Failure return code
     li      a0, 0          # Failure return code
 
