@@ -34,6 +34,9 @@ dump:
 run:
 	sbt "runMain wildcat.isasim.SimRV a.out"
 
+test-one-sim:
+	sbt "testOnly wildcat.SimulatorSingleTest"
+
 hello:
 	make -C c
 	sbt "runMain wildcat.isasim.SimRV c/a.out"

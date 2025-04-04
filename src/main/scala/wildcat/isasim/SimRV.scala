@@ -16,9 +16,11 @@ import net.fornwall.jelf.ElfFile
 import wildcat.Opcode._
 import wildcat.AluFunct3._
 import wildcat.AluFunct7._
-import wildcat.BranchFunct._
-import wildcat.LoadStoreFunct._
+import wildcat.BranchFunct3._
+import wildcat.LoadStoreFunct3._
+import wildcat.CSRFunct3._
 import wildcat.InstrType._
+import wildcat.CSR._
 import wildcat.Util
 
 class SimRV(mem: Array[Int], start: Int, stop: Int) {
@@ -37,7 +39,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
   var run = true;
 
   // some statistics
-  var iCnt = 0
+  var instrCnt = 0
 
   def execute(instr: Int): Boolean = {
 
@@ -190,12 +192,33 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     }
 
     def ecall(): Int = {
-      imm & 0xfff match {
-        case 0xf10 => 0 // hartid
-        case 0x000 =>
+      funct3 match {
+        case ESYS => {
+          println("ecall")
           run = false
-          0
-        case _ => 0 // this gets us around _start in the test cases
+          return 0
+        }
+        case CSRRS => {
+          val v = imm & 0xfff match {
+            case CYCLE => instrCnt // cycle
+            case CYCLEH => 0 // cycleh
+            case TIME => instrCnt // time
+            case TIMEH => 0 // timeh
+            case INSTRET => instrCnt // instret
+            case INSTRETH => 0 // instreth
+
+            case HARTID => 0 // hartid
+            case MARCHID => WILDCAT_MARCHID
+
+            case _ => 0 // this gets us around _start in the test cases
+          }
+          // println(s"csrrw ${imm & 0xfff} return: $v")
+          return v
+        }
+        case _ => {
+          println("Unknown ecall: " + funct3)
+          return 0
+        }
       }
     }
 
@@ -299,7 +322,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     val oldPc = pc
     pc = result._3
 
-    iCnt += 1
+    instrCnt += 1
 
     pc != oldPc && run && pc < stop // detect endless loop or go beyond code to stop simulation
   }

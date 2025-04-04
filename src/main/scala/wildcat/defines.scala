@@ -40,7 +40,7 @@ object AluFunct3 {
   val F3_AND = 0x07
 }
 
-object BranchFunct {
+object BranchFunct3 {
   val BEQ = 0x00
   val BNE = 0x01
   val BLT = 0x04
@@ -49,7 +49,7 @@ object BranchFunct {
   val BGEU = 0x07
 }
 
-object LoadStoreFunct {
+object LoadStoreFunct3 {
   val LB = 0x00
   val LH = 0x01
   val LW = 0x02
@@ -58,6 +58,16 @@ object LoadStoreFunct {
   val SB = 0x00
   val SH = 0x01
   val SW = 0x02
+}
+
+object CSRFunct3 {
+  val ESYS = 0x00
+  val CSRRW = 0x01
+  val CSRRS = 0x02
+  val CSRRC = 0x03
+  val CSRRWI = 0x05
+  val CSRRSI = 0x06
+  val CSRRCI = 0x07
 }
 
 object CSR {
@@ -74,6 +84,8 @@ object CSR {
   val INSTRET = 0xc02
   val INSTRETH = 0xc82
 
+
+  val HARTID = 0xf10
   val MARCHID = 0xf12
   val WILDCAT_MARCHID = 47 // see https://github.com/riscv/riscv-isa-manual/blob/main/marchid.md
 
