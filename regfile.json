@@ -1,0 +1,6 @@
+{
+  "DESIGN_NAME": "SynthRegFile",
+  "VERILOG_FILES": ["dir::generated/SynthRegFile.v"],
+  "CLOCK_PERIOD": 20,
+  "CLOCK_PORT": "clock"
+}

@@ -58,6 +58,10 @@ hw-fmax:
 hw-single:
 	$(SBT) "runMain wildcat.single.SingleCycleTop a.out"
 
+hw-reg-file:
+	$(SBT) "runMain wildcat.pipeline.SynthRegFile"
+	openlane regfile.json
+
 # Synthesize and copy targets
 
 # does not work from Makefile, C & P into shell
