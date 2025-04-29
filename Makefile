@@ -5,7 +5,13 @@
 -include config.mk
 
 SBT = sbt
-
+UNAME := $(shell uname)
+ifeq ($(UNAME),Darwin)
+# assuming tools are installed with Mac Homebrew
+export CROSS=riscv64-elf-
+else
+export CROSS=riscv64-unknown-elf-
+endif
 APP=asm/play.s
 #APP=asm/riscv-v1_addi.s
 # Use a different program, e.g., one from the CAE lab
@@ -20,17 +26,17 @@ work: app
 	test=$(APP) sbt "testOnly wildcat.WildcatTest"
 
 app:
-	riscv64-unknown-elf-as -march rv32ia_zicsr $(APP) -o a.o
-	riscv64-unknown-elf-ld -m elf32lriscv -T link.ld a.o -o a.out
-#	riscv64-unknown-elf-objdump -d a.out
-#	riscv64-unknown-elf-objcopy -O binary -j .text a.out a.bin
-#	riscv64-unknown-elf-objcopy -O binary -j .text a.out text.bin
-#	riscv64-unknown-elf-objcopy -O binary -j .data a.out data.bin
+	$(CROSS)as -march rv32ia_zicsr $(APP) -o a.o
+	$(CROSS)ld -m elf32lriscv -T link.ld a.o -o a.out
+#	$(CROSS)objdump -d a.out
+#	$(CROSS)objcopy -O binary -j .text a.out a.bin
+#	$(CROSS)objcopy -O binary -j .text a.out text.bin
+#	$(CROSS)objcopy -O binary -j .data a.out data.bin
 #	cat text.bin data.bin > a.bin # this does not make much sense
 #	hexdump -e '"%08x\n"' a.bin
 
 dump:
-	riscv64-unknown-elf-objdump -d a.out
+	$(CROSS)objdump -d a.out
 run:
 	sbt "runMain wildcat.isasim.SimRV a.out"
 
