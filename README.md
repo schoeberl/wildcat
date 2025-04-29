@@ -50,7 +50,7 @@ Prerequisit for this project is a working installation of
 the [RISC-V tools](https://github.com/riscv/riscv-tools). Chances are high that you can install
 them with your packet manager (see below).
 
-Furthermore, you need a Java in version >= 8 and < 21
+Furthermore, you need a *Java in version >= 8 and < 21*
 (the Chisel/Scala version in use in this project is broken for Java 21).
 
 To build Wildcat in an FPGA you need either Quartus or Vivado.
@@ -75,6 +75,15 @@ To run other programs use the environment variable APP. E.g.:
 ```
 make app run APP=asm/mem.s
 ```
+
+### Quick start on the Mac:
+
+```
+brew install sbt riscv64-elf-binutils
+git clone --recursive https://github.com/schoeberl/wildcat
+make -C wildcat app run
+```
+
 ### More make targets
 
 Running the simulation on one example (and generate .vcd files):
