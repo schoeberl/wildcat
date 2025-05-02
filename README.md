@@ -171,6 +171,11 @@ RAMs is zero.
 Use brew to install gcc:
 
 ```
+brew install sbt riscv64-elf-binutils
+```
+
+The below was an older version. Still valid?
+```
 brew tap riscv-software-src/riscv 
 brew install riscv-gnu-toolchain --with-NOmultilib
 ```
