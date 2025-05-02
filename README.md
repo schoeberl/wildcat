@@ -48,7 +48,7 @@ accepted at [ARCS 2025](https://arcs-conference.org/home).
 
 Prerequisit for this project is a working installation of
 the RISC-V tools. Chances are high that you can install
-them with your packet manager (see below).
+them with your package manager (see below).
 
 Wildcat is written in [Chisel](https://www.chisel-lang.org/).
 Therefore, you need a for Java, best installed with [SDKMAN](https://sdkman.io/),
@@ -60,9 +60,10 @@ and for the Artix 7 based Nexys A7.
 
 To start with Wildcat either fork the project or clone it from here with:
 
-    git clone https://github.com/schoeberl/wildcat
-    cd wildcat
-    git submodule update --init --recursive
+```
+git clone --recursive https://github.com/schoeberl/wildcat
+cd wildcat
+```
 
 Here you can start the ISA simulator executing a simple program with
 
@@ -124,14 +125,14 @@ make test
 Here are resource and fmax results for the 3-, 4-, and 5-stages pipeline.
 We exclude instruction and data memory/cache in the numbers.
 
-Cyclon IV has 4-bit LUTs and the timing info
+Cyclone IV has 4-bit LUTs and the timing info
 is for the Slow 1200mV 85C Model.
 
 Artix 7 has 6-bit LUTs.
 
 Skywater130 timing info is for max_tt_025C_1v80.
 
-| Design  (Cyclon IV)        | Fmax     | LEs   | Regs  | RAM bits |
+| Design  (Cyclone IV)       | Fmax     | LEs   | Regs  | RAM bits |
 |:---------------------------|:---------|:------|:------|:---------|
 | Three stages (regfile FF)  | 80.2 MHz | 3,130 | 1,295 | 0        |
 | Three stages (regfile mem) | 86.2 MHz | 1,756 | 379   | 2,048    |
@@ -169,38 +170,40 @@ RAMs is zero.
 
 ### Tools on MacOS
 
-Use brew to install gcc:
+Use [Mac Homebrew](https://brew.sh/) to install the Chisel and RISC-V tools:
 
 ```
 brew install sbt riscv64-elf-binutils
-```
-
-The below was an older version. Still valid?
-```
-brew tap riscv-software-src/riscv 
-brew install riscv-gnu-toolchain --with-NOmultilib
 ```
 
 ### Tools on Ubuntu:
 
 Should be best installed with apt-get:
 
-    sudo apt-get install -y gcc-riscv64-unknown-elf
+```
+sudo apt-get install -y gcc-riscv64-unknown-elf
+```
 
 #### Build from source
 
-If you want to compiler them from source, here are some notes:
+If you want to compiler them from source, here are some notes (this
+really shouldn't be necessary on most platforms):
 
-    sudo apt-get install autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc
-    git clone https://github.com/riscv/riscv-tools.git
-    cd riscv-tools
-    git submodule update --init --recursive
-    export RISCV=$HOME/riscv-tools/local
-    ./build.sh
+```
+sudo apt-get install autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc
+git clone https://github.com/riscv/riscv-tools.git
+cd riscv-tools
+git submodule update --init --recursive
+export RISCV=$HOME/riscv-tools/local
+./build.sh
+```
 
 Then add the tools to your PATH in .bashrc or .profile with:
 
-    export PATH=$PATH:$HOME/riscv-tools/local/bin
+```
+export PATH=$PATH:$HOME/riscv-tools/local/bin
+```
+
 
 See also: [RISC-V Ubuntu Setup](https://github.com/schoeberl/cae-lab#vm-and-tool-installation)
 
@@ -221,7 +224,7 @@ Here a list of project that could be a BSc, an MSc, a special course, an AdvCA p
 * Tapeout
     - Tiny Tapeout
     - Edu4Chip
-    - efabless
+    - efabless (R.I.P.)
 * Rust and WCET analysis
 * ISA extensions
 * Comparing RISC-V cores (start from https://dl-acm-org.proxy.findit.cvt.dk/doi/pdf/10.1145/3457388.3458657)
@@ -235,8 +238,8 @@ Here a list of project that could be a BSc, an MSc, a special course, an AdvCA p
   - floating point emulation
   - compressed instructions
 * Interrupts and interrupt controller
-* G extension
 * floating-point unit
+* G extension (= Multiply M, Atomics A, and Floating point FD)
 * Compare Ibex, Wildcat, and a third RISC-V core
 * Towards booting uLinux and full Linux
 * SoC stuff: interconnect, peripherals, ...
@@ -263,30 +266,30 @@ prerequisite for running embedded Rust using the ISA simulator.
 
 Once ```rustup``` has been installed, the following components should be added by executing the following commands:
 #### Target for RV32I
-- ```rustup target add riscv32i-unknown-none-elf```
+- `rustup target add riscv32i-unknown-none-elf`
 ##### LLVM tools
-- ```rustup component add llvm-tools-preview```
-- ```cargo install cargo-binutils```
+- `rustup component add llvm-tools-preview`
+- `cargo install cargo-binutils`
 
 ### Getting started
 Currently, a simple starter project has been setup at [rust/starter-project](rust/starter-project).
 To compile and run the starter project with the ISA simulator, 
 execute the following command from the root of the Wildcat project:
-- ```make rust-compile``` (compiles)
-- ```make rust-run``` (executes)
+- `make rust-compile` (compiles)
+- `make rust-run` (executes)
 
 Furthermore, the disassembly can be viewed by executing the following command:
-- ```make rust-disassemble``` (prints disassembly)
+- `make rust-disassemble` (prints disassembly)
 
 ### Creating new Rust projects
 To maintain an organized project structure, a new Rust project can be created by executing the following command
 from the root of the Wildcat project:
-- ```cargo new rust/[YOUR_PROJECT_NAME] --vcs=none```
+- `cargo new rust/[YOUR_PROJECT_NAME] --vcs=none`
 
 To compile and run the new project with the ISA simulator,
 execute the following command from the root of the Wildcat project:
-- ```make rust-compile RUST_PROJECT=[YOUR_PROJECT_NAME]``` (compiles target project)
-- ```make rust-run RUST_PROJECT=[YOUR_PROJECT_NAME]``` (executes target project)
+- `make rust-compile RUST_PROJECT=[YOUR_PROJECT_NAME]` (compiles target project)
+- `make rust-run RUST_PROJECT=[YOUR_PROJECT_NAME]` (executes target project)
 
 Furthermore, the disassembly for the new project can be viewed by executing the following command:
-- ```make rust-disassembly``` (prints disassembly)
+- `make rust-disassembly` (prints disassembly)
