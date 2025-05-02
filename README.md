@@ -47,11 +47,12 @@ accepted at [ARCS 2025](https://arcs-conference.org/home).
 ## Setup
 
 Prerequisit for this project is a working installation of
-the [RISC-V tools](https://github.com/riscv/riscv-tools). Chances are high that you can install
+the RISC-V tools. Chances are high that you can install
 them with your packet manager (see below).
 
-Furthermore, you need a *Java in version >= 8 and < 21*
-(the Chisel/Scala version in use in this project is broken for Java 21).
+Wildcat is written in [Chisel](https://www.chisel-lang.org/).
+Therefore, you need a for Java, best installed with [SDKMAN](https://sdkman.io/),
+and [sbt](https://www.scala-sbt.org/) installed.
 
 To build Wildcat in an FPGA you need either Quartus or Vivado.
 The repo contains configuration for the Cyclon-IV based DE2-115
