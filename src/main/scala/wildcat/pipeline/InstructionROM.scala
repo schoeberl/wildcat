@@ -8,6 +8,8 @@ import chisel3._
 class InstructionROM(code: Array[Int]) extends Module {
   val io = IO(Flipped(new InstrIO()))
 
+  // TODO: this should not be reset, as ASIC memories have no reset
+  // val addrReg = Reg(UInt(32.W))
   val addrReg = RegInit(0.U(32.W))
   addrReg := io.address
   val instructions = VecInit(code.toIndexedSeq.map(_.S(32.W).asUInt))
