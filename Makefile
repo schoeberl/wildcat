@@ -126,6 +126,10 @@ alu-speed:
 
 # need start into nix with:
 # nix-shell shell.nix
+librelane: hw-fmax
+	librelane wildcat.json
+	librelane --last-run --flow openinklayout wildcat.json
+
 openlane:
 	openlane wildcat.json
 	openlane --last-run --flow openinklayout wildcat.json
