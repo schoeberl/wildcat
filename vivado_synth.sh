@@ -77,8 +77,9 @@ echo "Top module: $TOP"
 echo "Output directory: $OUTDIR"
 echo "Input files: $@"
 
-# Generate Vivado tcl script
+# Generate Vivado tcl script, remove ERROR on unconnected IOs
 tcl_cmds="
+set_property SEVERITY {Warning} [get_drc_checks UCIO-1]
 read_verilog [ glob $@ ];
 read_xdc $XDC;
 synth_design -top $TOP -part $PART;

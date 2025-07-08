@@ -6,11 +6,11 @@ import wildcat.pipeline.Functions._
 /*
  * This file is part of the RISC-V processor Wildcat.
  *
- * This is a three stage pipeline.
+ * This is a three-stage pipeline.
  *
  * 0. PC generation
  * 1. Fetch
- * 2. Decode, register read, memory address computation and write
+ * 2. Decode, register read, memory address computation, and write
  * 3. Execute, memory read
  *
  * Author: Martin Schoeberl (martin@jopdesign.com)

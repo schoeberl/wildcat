@@ -12,6 +12,8 @@
    - [ ] but start PC with -4
    - [ ] remove initialization of the address register from the instruction ROM
  * [ ] UART
+ * [ ] Have performance (PPA) as GitHub CI action
+   - [ ] with a more useful external memory interface - instructionsn and data
  * [ ] Check if gcc can do RV32E
  * [ ] Get the C code compilation better integrated (with a reasonable linker.ld)
  * [ ] Get C compiled apps running (more than hello)

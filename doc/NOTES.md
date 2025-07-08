@@ -5,7 +5,7 @@ Keep a log on resource needs and fmax
 ## Wildcat synth results:
 
 Xilinx/AMD FPGA 100 MHz, ASIC 50 MHz constraint
-FPGA with register file as memory
+FPGA with the register file as memory
 
 ASIC size in report 13, openroad-floorplan.log at the end
 ASIC for max tt 025C 1v80 in report 54, ws.max.rpt
@@ -25,7 +25,7 @@ with 100 MHz, reg file in memory
 1214 LUTs, 303 FFs
 Slack 0.120ns
 
-probably as register file as FFs
+probably as a register file as FFs
 [INFO] Floorplanned on a die area of 0.0 0.0 434.645 445.365 (um).
 max_tt_025C_1v80: 3.07
 
@@ -46,3 +46,11 @@ max_tt_025C_1v80: 2.55
 Looks like the Verilog memory definition is more efficient than the register array.
 Probably because of the priority mux definition of the generated Verilog code.
 
+### 8 July 2025
+
+Better define the steps for fmax:
+1. `make APP=asm/apps/blink.s hw-fmax`
+1. `make synth-fmax` - synthesize with 100 MHz constraint
+
+1340 LUTs, 310 FFs
+Slack (VIOLATED) :        -0.400ns  (required time - arrival time)
