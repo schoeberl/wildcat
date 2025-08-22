@@ -49,8 +49,8 @@ Probably because of the priority mux definition of the generated Verilog code.
 ### 8 July 2025
 
 Better define the steps for fmax:
-1. `make APP=asm/apps/blink.s hw-fmax`
-1. `make synth-fmax` - synthesize with 100 MHz constraint
+
+`make APP=asm/apps/blink.s app hw-fmax synth-fmax`
 
 1340 LUTs, 310 FFs
 Slack (VIOLATED) :        -0.400ns  (required time - arrival time)
