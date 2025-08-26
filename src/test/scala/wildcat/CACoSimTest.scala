@@ -12,9 +12,7 @@ import wildcat.isasim.SimRV
 class CACoSimTest extends AnyFlatSpec with ChiselScalatestTester {
 
   val files = Util.getSimpleTests("risc-v-lab/tests/simple")
-  // val failed = List("string.bin", "width.bin")
-  val failed = List("shift2.bin", "shift.bin", "recursive.bin", "branchcnt.bin", "branchmany.bin", "branchtrap.bin", "loop.bin","string.bin", "width.bin")
-
+  val failed = List("string.bin", "recursive.bin", "loop.bin")
 
   for (f <- files) {
     s"Simulation: CA co-simulatoin (simple) $f" should "pass" in {
@@ -24,13 +22,17 @@ class CACoSimTest extends AnyFlatSpec with ChiselScalatestTester {
         succeed
       } else {
         val sim = SimRV.runSimRV(f.toString())
-        test(new WildcatTestTop(f.getAbsolutePath)) {
+        test(new WildcatTestTop(f.getAbsolutePath)).withAnnotations(Seq(WriteVcdAnnotation)) {
           d => {
-            d.clock.step(100)
+            for (i <- 0 until 100) {
+              if (!d.io.stop.peekBoolean()) {
+                d.clock.step()
+              }
+            }
             for (i <- 0 until 32) {
               val r = d.io.regFile(i).peekInt().toInt
               val e = sim.reg(i)
-              assert(r == e, f"reg($i) = $r, expected $e")
+              assert(r == e, f"reg($i) = 0x${r.toHexString}, expected 0x${e.toHexString} at ${sim.pc % 4} in $f")
             }
           }
         }

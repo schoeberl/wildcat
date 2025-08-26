@@ -194,7 +194,6 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     def ecall(): Int = {
       funct3 match {
         case ESYS => {
-          println("ecall")
           run = false
           return 0
         }

@@ -35,24 +35,16 @@ class ThreeCats() extends Wildcat() {
   }
   val exFwdReg = RegInit(0.U.asTypeOf(exFwd))
 
-  // PC generation
-  // the following should be correct, but 2 tests fail
-  // TODO: don't execute first instruction coming from memory
-  // val pcReg = RegInit(-4.S(32.W).asUInt)
-  val pcReg = RegInit(0.S(32.W).asUInt)
+  // PC generation, first (invalid) instruction will stall, so init with 0 is OK
+  val pcReg = RegInit(0.U(32.W))
   val pcNext = WireDefault(Mux(doBranch, branchTarget, pcReg + 4.U))
   pcReg := pcNext
   io.imem.address := pcNext
 
   // Fetch
   val instr = WireDefault(io.imem.data)
-  val firstClocReg = RegInit(false.B)
-  firstClocReg := true.B
-  when(firstClocReg) {
-    // instr := 0x00000013.U
-  }
   when (io.imem.stall) {
-    instr := 0x00000013.U
+    instr := 0x00000033.U
     pcNext := pcReg
   }
 

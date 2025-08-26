@@ -3,21 +3,23 @@
  * [ ] Write documentation
  * [ ] Change memory interface to `PipeCon`
  * [ ] Have a better drawing of `PipeCon` (in soc-comm)
- * [ ] why does // val pcReg = RegInit(-4.S(32.W).asUInt)  result in failing tests?
-   - [ ] Do not execute the first instruction from on-chip memory
-   - [ ] but start PC with -4
-   - [ ] remove initialization of the address register from the instruction ROM
+ * [x] why does // val pcReg = RegInit(-4.S(32.W).asUInt)  result in failing tests?
+   - [x] Do not execute the first instruction from on-chip memory
+   - [x] but start PC with -4
+   - [x] remove initialization of the address register from the instruction ROM
  * [ ] Something is fishy with testing, as SingleCycle works (even without branch)
  * [ ] Single cycle is not finished - tests are failing, disabled
- * [ ] Two tests fail with co-simulation when adding stall to fetch (the toggle)
+ * [x] Two tests fail with co-simulation when adding stall to fetch (the toggle)
  * [ ] Better names for signals (e.g., for those with feedback, e.g., RF write)
- * [ ] width.s should not fail in the ISA simulator
+ * [ ] width.s and string.s should not fail in the ISA simulator
     - [ ] string should work as well, do we need a linker script?
     - [ ] Work on failing simple tests (Simulator and Wildcat)
  * [ ] Start collecting information on other core interfaces (in my paper)
  * [ ] Make it super easy to see Wildcat in action, like in DrakRISCV
  * [ ] UART
  * [ ] Add caches
+ * [ ] I do not have a real CoSim test for the pipeline
+ * [ ] There are still three failing test with CA cosimlation
  * [ ] Have performance (PPA) as GitHub CI action
    - [ ] with a more useful external memory interface - instructions and data
  * [ ] Forwarding from ALU/memory to address computation is missing (missing a test?)

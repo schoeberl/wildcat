@@ -13,6 +13,15 @@ Some notes collected along exploring RISC-V.
  * 4 stages: standard without the WB
  * 5 stages: mostly useless WB (just a Mux)
 
+## Reset
+
+ASIC memories with an input register have a random address value in the first clock cycle.
+Therefore, the first instruction shall not be executed.
+The instruction memory (SPM or cache) shall assert stall on this initial cycle, and Wildcat will substitute the instruction with a NOP.
+Stalling keeps the PC constant, therefore we can reset it to 0 (and not -4).
+
+Caches on a miss assert stall as well.
+
 ## Notes, Ideas
 
  * LUI could be recoded as ADDI with R0
