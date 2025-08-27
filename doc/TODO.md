@@ -1,7 +1,7 @@
 # TODO
 
  * [ ] Write documentation
- * [ ] Change memory interface to `PipeCon`
+ * [x] Change memory interface to `PipeCon`
  * [ ] Have a better drawing of `PipeCon` (in soc-comm)
  * [x] why does // val pcReg = RegInit(-4.S(32.W).asUInt)  result in failing tests?
    - [x] Do not execute the first instruction from on-chip memory
@@ -23,6 +23,7 @@
  * [ ] Have performance (PPA) as GitHub CI action
    - [ ] with a more useful external memory interface - instructions and data
  * [ ] Forwarding from ALU/memory to address computation is missing (missing a test?)
+ * [ ] Get 4 and 5 stages back
  * [ ] Traps on not implemented instructions and unaligned access
  * [ ] Check if gcc can do RV32E
  * [ ] Get the C code compilation better integrated (with a reasonable linker.ld)

@@ -40,10 +40,14 @@ class ThreeCats() extends Wildcat() {
   val pcNext = WireDefault(Mux(doBranch, branchTarget, pcReg + 4.U))
   pcReg := pcNext
   io.imem.address := pcNext
+  io.imem.rd := true.B
+  io.imem.wr := false.B
+  io.imem.wrData := 0.U
+  io.imem.wrMask := 0.U
 
   // Fetch
-  val instr = WireDefault(io.imem.data)
-  when (io.imem.stall) {
+  val instr = WireDefault(io.imem.rdData)
+  when (!io.imem.ack) {
     instr := 0x00000033.U
     pcNext := pcReg
   }
@@ -94,18 +98,19 @@ class ThreeCats() extends Wildcat() {
   val memAddress = (address.asSInt + decOut.imm).asUInt
   decEx.memLow := memAddress(1, 0)
 
-  io.dmem.rdAddress := memAddress
-  io.dmem.rdEnable := false.B
-  io.dmem.wrAddress := memAddress
+  io.dmem.address := memAddress
+  io.dmem.rd := false.B
   io.dmem.wrData := data
-  io.dmem.wrEnable := VecInit(Seq.fill(4)(false.B))
+  io.dmem.wr := false.B
+  io.dmem.wrMask := 0.U
   when(decOut.isLoad && !doBranch) {
-    io.dmem.rdEnable := true.B
+    io.dmem.rd := true.B
   }
   when(decOut.isStore && !doBranch) {
-    val (wrd, wre) = getWriteData(data, decEx.func3, memAddress(1, 0))
-    io.dmem.wrData := wrd
-    io.dmem.wrEnable := wre
+    val (wrData, wr, wrMask) = getWriteData(data, decEx.func3, memAddress(1, 0))
+    io.dmem.wrData := wrData
+    io.dmem.wr := wr
+    io.dmem.wrMask := wrMask.asUInt
   }
 
 

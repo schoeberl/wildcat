@@ -1,6 +1,8 @@
 package wildcat.pipeline
 
 import chisel3._
+import chisel3.util._
+import soc._
 
 /*
  * This file is part of the RISC-V processor Wildcat.
@@ -14,7 +16,7 @@ import chisel3._
  */
 abstract class Wildcat() extends Module {
   val io = IO(new Bundle {
-    val imem = new InstrIO()
-    val dmem = new MemIO()
+    val imem = Flipped(PipeCon(32))
+    val dmem = Flipped(PipeCon(32))
   })
 }

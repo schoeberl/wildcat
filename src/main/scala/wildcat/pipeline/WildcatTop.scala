@@ -32,10 +32,7 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096) extends Module {
   val dmem = Module(new ScratchPadMem(memory, nrBytes = dmemNrByte))
   cpu.io.dmem <> dmem.io
   val imem = Module(new InstructionROM(memory))
-  imem.io.address := cpu.io.imem.address
-  cpu.io.imem.data := imem.io.data
-  cpu.io.imem.stall := imem.io.stall
-  // TODO: stalling
+  cpu.io.imem <> imem.io
 
 
   // Here IO stuff
@@ -58,25 +55,25 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096) extends Module {
   rx.io.channel.ready := false.B
 
   val uartStatusReg = RegNext(rx.io.channel.valid ## tx.io.channel.ready)
-  val memAddressReg = RegNext(cpu.io.dmem.rdAddress)
+  val memAddressReg = RegNext(cpu.io.dmem.address)
   when (memAddressReg(31, 28) === 0xf.U && memAddressReg(19,16) === 0.U) {
     when (memAddressReg(3, 0) === 0.U) {
       cpu.io.dmem.rdData := uartStatusReg
     } .elsewhen(memAddressReg(3, 0) === 4.U) {
       cpu.io.dmem.rdData := rx.io.channel.bits
-      rx.io.channel.ready := cpu.io.dmem.rdEnable
+      rx.io.channel.ready := cpu.io.dmem.rd
     }
   }
 
   val ledReg = RegInit(0.U(8.W))
-  when ((cpu.io.dmem.wrAddress(31, 28) === 0xf.U) && cpu.io.dmem.wrEnable(0)) {
-    when (cpu.io.dmem.wrAddress(19,16) === 0.U && cpu.io.dmem.wrAddress(3, 0) === 4.U) {
+  when ((cpu.io.dmem.address(31, 28) === 0xf.U) && cpu.io.dmem.wr) {
+    when (cpu.io.dmem.address(19,16) === 0.U && cpu.io.dmem.address(3, 0) === 4.U) {
       printf(" %c %d\n", cpu.io.dmem.wrData(7, 0), cpu.io.dmem.wrData(7, 0))
       tx.io.channel.valid := true.B
-    } .elsewhen (cpu.io.dmem.wrAddress(19,16) === 1.U) {
+    } .elsewhen (cpu.io.dmem.address(19,16) === 1.U) {
       ledReg := cpu.io.dmem.wrData(7, 0)
     }
-    dmem.io.wrEnable := VecInit(Seq.fill(4)(false.B))
+    dmem.io.wr := false.B
   }
 
   io.led := 1.U ## 0.U(7.W) ## RegNext(ledReg)

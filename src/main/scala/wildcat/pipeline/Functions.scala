@@ -326,29 +326,30 @@ object Functions {
 
   def getWriteData(data: UInt, func3: UInt, memLow: UInt) = {
     val wrData = WireDefault(data)
-    val wrEnable = VecInit(Seq.fill(4)(false.B))
+    val wrMask = VecInit(Seq.fill(4)(false.B))
     switch(func3) {
       is(SB.U) {
         wrData := data(7, 0) ## data(7, 0) ## data(7, 0) ## data(7, 0)
-        wrEnable(memLow) := true.B
+        wrMask(memLow) := true.B
       }
       is(SH.U) {
         wrData := data(15, 0) ## data(15, 0)
         switch(memLow) {
           is(0.U) {
-            wrEnable(0) := true.B
-            wrEnable(1) := true.B
+            wrMask(0) := true.B
+            wrMask(1) := true.B
           }
           is(2.U) {
-            wrEnable(2) := true.B
-            wrEnable(3) := true.B
+            wrMask(2) := true.B
+            wrMask(3) := true.B
           }
         }
       }
       is(SW.U) {
-        wrEnable := VecInit(Seq.fill(4)(true.B))
+        wrMask := VecInit(Seq.fill(4)(true.B))
       }
     }
-    (wrData, wrEnable)
+    val wr = wrMask.asUInt.orR
+    (wrData, wr, wrMask)
   }
 }

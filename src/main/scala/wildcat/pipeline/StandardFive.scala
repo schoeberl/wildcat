@@ -69,7 +69,7 @@ class StandardFive() extends Wildcat() {
   io.imem.address := pcNext
 
   // Fetch
-  val instr = io.imem.data
+  val instr = io.imem.rdData
 
   // Decode and register read
   val pcRegReg = RegNext(pcReg)
@@ -168,10 +168,10 @@ class StandardFive() extends Wildcat() {
   // TODO: this is one clock cycle to late. It needs to be the combinational value from EX stage
 
   val memAddress = exMemReg.address
-  io.dmem.rdAddress := memAddress
-  io.dmem.wrAddress := memAddress
+  io.dmem.address := memAddress
   io.dmem.wrData := data
-  io.dmem.wrEnable := Mux(decExReg.isStore, 15.U, 0.U)
+  io.dmem.wr := decExReg.isStore && !doBranch
+  io.dmem.wrMask := 15.U
 
   memWbReg.valid := exMemReg.valid
   memWbReg.wbDest := exMemReg.wbDest
