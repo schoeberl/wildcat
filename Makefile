@@ -142,6 +142,8 @@ forwarding:
 	sbt "runMain wildcat.explore.ForwardingSpeed"
 	openlane forwarding.json
 #	openlane --last-run --flow openinklayout forwarding.json
+synth-forwarding:
+	./vivado_synth.sh -t ForwardingSpeed -p xc7a100tcsg324-1 -x nexysA7.xdc -o build generated/ForwardingSpeed.v
 
 # serial port on Mac
 listen:
