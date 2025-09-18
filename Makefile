@@ -140,8 +140,12 @@ experiments:
 
 forwarding:
 	sbt "runMain wildcat.explore.ForwardingSpeed"
-	openlane forwarding.json
-#	openlane --last-run --flow openinklayout forwarding.json
+	librelane forwarding.json
+#	librelane --last-run --flow openinklayout forwarding.json
+
+alu:
+	sbt "runMain wildcat.explore.AluSpeed"
+	librelane alu.json
 
 synth-forwarding:
 	sbt "runMain wildcat.explore.ForwardingSpeed"

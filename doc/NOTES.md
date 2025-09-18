@@ -1,6 +1,35 @@
 # Implementation Notes
 
-Keep a log on resource usage and fmax
+Keep a log on resource usage and fmax.
+
+Sky130 use max_tt_025C_1v80
+
+We should report core sizes, as we are not intrested padframe.
+
+## Experiments
+
+### AluSpeed
+
+Palane ALU with input and output registers
+Clock period 5 ns (200 MHz)
+
+core size: 151.8 155.04
+max_tt_025C_1v80: 0.315
+
+with two registers on input and output
+core size: 165.6 168.64
+min_tt_025C_1v80: 0.28
+
+clock period 3 ns (333 MHz)
+
+core size: 151.8 155.04
+max_tt_025C_1v80: -1.81
+
+with two registers on input and output
+core size: 165.6 168.64
+max_tt_025C_1v80: -1.72
+
+Summary: the plain ALU can run at 200 MHz.
 
 ## Wildcat synth results:
 

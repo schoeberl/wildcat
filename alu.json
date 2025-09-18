@@ -1,0 +1,6 @@
+{
+  "DESIGN_NAME": "AluSpeed",
+  "VERILOG_FILES": ["dir::generated/AluSpeed.v"],
+  "CLOCK_PERIOD": 5,
+  "CLOCK_PORT": "clock"
+}
