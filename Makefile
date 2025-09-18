@@ -138,6 +138,11 @@ experiments:
 	openlane verilog/experiments.json
 	openlane --last-run --flow openinklayout experiments.json
 
+forwarding:
+	sbt "runMain wildcat.explore.ForwardingSpeed"
+	openlane forwarding.json
+#	openlane --last-run --flow openinklayout forwarding.json
+
 # serial port on Mac
 listen:
 	ls /dev/tty.*

@@ -1,6 +1,6 @@
 # Implementation Notes
 
-Keep a log on resource needs and fmax
+Keep a log on resource usage and fmax
 
 ## Wildcat synth results:
 
@@ -13,7 +13,7 @@ ASIC for max tt 025C 1v80 in report 54, ws.max.rpt
 make hw-fmax
 
 make synth-fmax
-make openlane
+make librelane
 
 
 ### 14 Sept 2024 (DATE submission) hash 01cc107dde
@@ -52,5 +52,20 @@ Better define the steps for fmax:
 
 `make APP=asm/apps/blink.s app hw-fmax synth-fmax`
 
+not really needed, as fmax does not use any app.
+
 1340 LUTs, 310 FFs
 Slack (VIOLATED) :        -0.400ns  (required time - arrival time)
+
+### 18 Sept 2025
+
+Fix reset and initial instruction.
+Change PipeCon.
+Update of LibreLane.
+
+[INFO] Floorplanned on a die area of 0.0 0.0 419.83 430.55 (µm).
+max_tt_025C_1v80: 4.32
+
+1323 LUTs, 310 FFs, 0 BRAM
+Slack (VIOLATED) :        -1.178ns  (required time - arrival time)
+

@@ -1,0 +1,6 @@
+{
+  "DESIGN_NAME": "ForwardingSpeed",
+  "VERILOG_FILES": ["dir::generated/ForwardingSpeed.v"],
+  "CLOCK_PERIOD": 20,
+  "CLOCK_PORT": "clock"
+}
