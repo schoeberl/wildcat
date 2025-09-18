@@ -14,16 +14,64 @@ class ForwardingSpeed extends Module {
     val outData = Output(UInt(32.W))
   })
 
-  val instrReg = RegNext(io.instr, 0x00000033.U) // nop on reset
 
   val rs1 = io.instr(19, 15)
   val rs2 = io.instr(24, 20)
   val rd = io.instr(11, 7)
+
   val (rs1Val, rs2Val, debugRegs) = registerFile(rs1, rs2, RegNext(io.wbDest), RegNext(io.wbData), RegNext(io.wrEna), true)
 
+  val instrReg = RegNext(io.instr, 0x00000033.U) // nop on reset
+  val dummyOp = instrReg(3, 0)
+  val rs1Reg = instrReg(19, 15)
+  val rs2Reg = instrReg(24, 20)
+  val rdReg = instrReg(11, 7)
 
+  class DecEx extends Bundle {
+    val dummyOp = UInt(4.W)
+    val rs1 = UInt(5.W)
+    val rs2 = UInt(5.W)
+    val rs1Val = UInt(32.W)
+    val rs2Val = UInt(32.W)
+    val rd = UInt(5.W)
+  }
 
-  out.outData := RegNext(rs1Val + rs2Val)
+  class ExMem extends Bundle {
+    val aluRes = UInt(32.W)
+    val rd = UInt(5.W)
+  }
+
+  val decExReg = RegInit(0.U.asTypeOf(new DecEx))
+  decExReg.dummyOp := dummyOp
+  decExReg.rs1 := rs1Reg
+  decExReg.rs2 := rs2Reg
+  decExReg.rd := rdReg
+
+  val exForwarding = false
+
+  val res = Wire(UInt(32.W))
+  val exMemReg = RegInit(0.U.asTypeOf(new ExMem))
+
+  if (exForwarding) {
+    decExReg.rs1Val := rs1Val
+    decExReg.rs2Val := rs2Val
+
+    res := alu(decExReg.dummyOp,
+                Mux(decExReg.rs1 === exMemReg.rd, exMemReg.aluRes, decExReg.rs1Val),
+                Mux(decExReg.rs2 === exMemReg.rd, exMemReg.aluRes, decExReg.rs2Val)
+               )
+  } else {
+
+    decExReg.rs1Val := Mux(rs1Reg === decExReg.rd, res, rs1Val)
+    decExReg.rs2Val := Mux(rs2Reg === decExReg.rd, res, rs2Val)
+
+    res := alu(decExReg.dummyOp, decExReg.rs1Val, decExReg.rs2Val)
+  }
+
+  exMemReg.aluRes := res
+  exMemReg.rd := decExReg.rd
+
+  out.outData := exMemReg.aluRes
 }
 
 object ForwardingSpeed extends App {

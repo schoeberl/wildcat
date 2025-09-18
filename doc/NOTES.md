@@ -31,6 +31,22 @@ max_tt_025C_1v80: -1.72
 
 Summary: the plain ALU can run at 200 MHz.
 
+### ForwardingSpeed
+
+Clock 5 ns (200 MHz)
+
+#### Forwarding in EX stage
+
+max_tt_025C_1v80: -1.25
+
+#### Forwarding in ID stage
+
+max_tt_025C_1v80: 0.094
+
+t_ex = 6.25 ns (160 MHz)
+t_id = 4.9 ns (204 MHz)
+28% higher fmax!
+
 ## Wildcat synth results:
 
 Xilinx/AMD FPGA 100 MHz, ASIC 50 MHz constraint
