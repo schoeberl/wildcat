@@ -1,6 +1,9 @@
 package wildcat.explore
 
 import chisel3._
+    import circt.stage.ChiselStage
+    import circt.stage.FirtoolOption
+
 import wildcat.pipeline.Functions._
 
 class ForwardingSpeed extends Module {
@@ -75,5 +78,5 @@ class ForwardingSpeed extends Module {
 }
 
 object ForwardingSpeed extends App {
-  emitVerilog(new ForwardingSpeed, Array("--target-dir", "generated"))
+  ChiselStage.emitSystemVerilogFile(new ForwardingSpeed, args = Array("--target-dir", "generated"), firtoolOpts = Array("--lowering-options=disallowLocalVariables,disallowPackedArrays"))
 }

@@ -1,3 +1,6 @@
 [submodule "soc-comm"]
 	path = soc-comm
 	url = git@github.com:t-crest/soc-comm.git
+[submodule "ip-contributions"]
+	path = ip-contributions
+	url = git@github.com:freechipsproject/ip-contributions.git

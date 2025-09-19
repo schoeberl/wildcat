@@ -38,14 +38,17 @@ Clock 5 ns (200 MHz)
 #### Forwarding in EX stage
 
 max_tt_025C_1v80: -1.25
+t_ex = 6.25 ns (160 MHz)
+
+FPGA (5 ns constr) slack: -1.965 ns (144 MHz)
 
 #### Forwarding in ID stage
 
 max_tt_025C_1v80: 0.094
-
-t_ex = 6.25 ns (160 MHz)
 t_id = 4.9 ns (204 MHz)
 28% higher fmax!
+
+FPGA (5 ns constr) slack: -0.178 ns (193 MHz)
 
 ## Wildcat synth results:
 
