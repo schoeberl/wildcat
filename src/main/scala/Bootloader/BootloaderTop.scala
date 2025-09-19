@@ -3,7 +3,6 @@ package Bootloader
 import chisel3._
 import chisel.lib.uart._
 import chisel3.util._
-import chisel3.experimental.ChiselEnum
 
 /**
  * Bootloader by Alexander and Georg for the Wildcat
