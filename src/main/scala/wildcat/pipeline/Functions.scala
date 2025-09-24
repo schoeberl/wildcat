@@ -245,7 +245,7 @@ object Functions {
         res := a ^ b
       }
       is(SLL.id.U) {
-        res := (a << b(4, 0))(31, 0)
+        res := (a << b(4, 0))
       }
       is(SRL.id.U) {
         res := a >> b(4, 0)
@@ -271,7 +271,7 @@ object Functions {
     res(AND.id.U) := a & b
     res(OR.id.U) := a | b
     res(XOR.id.U) := a ^ b
-    res(SLL.id.U) := (a << b(4, 0))(31, 0)
+    res(SLL.id.U) := (a << b(4, 0))
     res(SRL.id.U) := a >> b(4, 0)
     res(SRA.id.U) := (a.asSInt >> b(4, 0)).asUInt
     res(SLT.id.U) := (a.asSInt < b.asSInt).asUInt
