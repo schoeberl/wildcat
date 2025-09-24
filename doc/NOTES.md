@@ -82,7 +82,12 @@ Chisel 3.6 emitSystemVerilogFile: translated now to a casez: max_tt_025C_1v80: -
 Chisel 5: max_tt_025C_1v80: -1.29
 Chisel 6: max_tt_025C_1v80: 0.17 (best result!)
 
+**Manual Verilog Changes**
+
 droppping the not needed casez: max_tt_025C_1v80: -0.035!!!
+
+Use only 32 bits in shift left: max_tt_025C_1v80: 0.17
+Shift right signal only 5 bits: max_tt_025C_1v80: 0.17
 
 
 ## Wildcat synth results:
@@ -130,12 +135,6 @@ Looks like the Verilog memory definition is more efficient than the register arr
 Probably because of the priority mux definition of the generated Verilog code.
 
 ### 8 July 2025
-
-Better define the steps for fmax:
-
-`make APP=asm/apps/blink.s app hw-fmax synth-fmax`
-
-not really needed, as fmax does not use any app.
 
 1340 LUTs, 310 FFs
 Slack (VIOLATED) :        -0.400ns  (required time - arrival time)
