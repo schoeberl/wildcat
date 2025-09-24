@@ -50,6 +50,41 @@ t_id = 4.9 ns (204 MHz)
 
 FPGA (5 ns constr) slack: -0.178 ns (193 MHz)
 
+#### Chisel Versions
+
+ * with ID stage forwarding
+ * with ALU in a Chisel switch statement or Vec
+
+Clock 5 ns (200 MHz)
+
+Chisel 3.6, with emitVerilog
+Generates `? :` pririty muxes (probably the old Verilog emitter)
+max_tt_025C_1v80: 0.094
+Chisel 3.6 with emitSystemVerilogFile
+Generates `if` `else if` priority muxes (probably via CIRCT)
+max_tt_025C_1v80: 0.0098 (less slack than emitVerilog)
+
+Chisel 5 
+emitVerilog fails as it generates `automatic` variables, which yosys does not like, maybe Vivado and Quartus would accept it. Therefore, use emitSystemVerilogFile to have CIRCT options
+max_tt_025C_1v80: 0.0098 (same as Chisel 3.6 with emitSystemVerilogFile)
+
+Chisel 6
+max_tt_025C_1v80: -0.126 This is a regression compared to Chisel 5
+
+**With Vec instead of switch**
+
+Chisel 3.6 emitVerilog: leads to same ? : chain: max_tt_025C_1v80: -1.62 (32 % regression!)
+**TODO: needs investigation!** maybe this in line 17: `  wire [62:0] _res_res_2_T_1 = _GEN_0 << decExReg_rs2Val[4:0];`
+Check switch again, with `res := (a << b(4, 0))(31, 0)` gives less 62 bit signals, slack now max_tt_025C_1v80: 0.135!
+With Vec and `res(SLL.id.U) := (a << b(4, 0))(31, 0)`, ony one 62 bit signal, still: max_tt_025C_1v80: -1.62
+Chisel 3.6 emitSystemVerilogFile: translated now to a casez: max_tt_025C_1v80: -1.29 (still 26 % regression)
+
+Chisel 5: max_tt_025C_1v80: -1.29
+Chisel 6: max_tt_025C_1v80: 0.17 (best result!)
+
+droppping the not needed casez: max_tt_025C_1v80: -0.035!!!
+
+
 ## Wildcat synth results:
 
 Xilinx/AMD FPGA 100 MHz, ASIC 50 MHz constraint

@@ -78,5 +78,6 @@ class ForwardingSpeed extends Module {
 }
 
 object ForwardingSpeed extends App {
+  // emitVerilog(new ForwardingSpeed, Array("--target-dir", "generated")) 
   ChiselStage.emitSystemVerilogFile(new ForwardingSpeed, args = Array("--target-dir", "generated"), firtoolOpts = Array("--lowering-options=disallowLocalVariables,disallowPackedArrays"))
 }

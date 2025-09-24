@@ -224,7 +224,7 @@ object Functions {
     }
   }
 
-  // TODO: something missing? Looks OK now. Wait for the tests.
+/*
   def alu(op: UInt, a: UInt, b: UInt): UInt = {
     val res = Wire(UInt(32.W))
     res := DontCare
@@ -245,7 +245,7 @@ object Functions {
         res := a ^ b
       }
       is(SLL.id.U) {
-        res := a << b(4, 0)
+        res := (a << b(4, 0))(31, 0)
       }
       is(SRL.id.U) {
         res := a >> b(4, 0)
@@ -262,6 +262,23 @@ object Functions {
     }
     res
   }
+  */
+  
+  def alu(op: UInt, a: UInt, b: UInt): UInt = {
+    val res = Wire(Vec(10, UInt(32.W)))
+    res(ADD.id.U) := a + b
+    res(SUB.id.U) := a - b
+    res(AND.id.U) := a & b
+    res(OR.id.U) := a | b
+    res(XOR.id.U) := a ^ b
+    res(SLL.id.U) := (a << b(4, 0))(31, 0)
+    res(SRL.id.U) := a >> b(4, 0)
+    res(SRA.id.U) := (a.asSInt >> b(4, 0)).asUInt
+    res(SLT.id.U) := (a.asSInt < b.asSInt).asUInt
+    res(SLTU.id.U) := (a < b).asUInt
+    res(op)
+  }
+  
 
   def selectLoadData(data: UInt, func3: UInt, memLow: UInt): UInt = {
     val res = Wire(UInt(32.W))
