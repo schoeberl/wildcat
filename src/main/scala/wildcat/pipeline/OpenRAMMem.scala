@@ -4,73 +4,28 @@ import chisel3._
 import chisel3.util._
 import chisel3.util.experimental.loadMemoryFromFile
 import soc._
+import memory.SramMacro
 
 /**
  * On-chip memory with one clock cycle read timing and write forwarding.
  * Wrapper for OpenRAM, which is used in the tape-out.
  */
-class OpenRAMMem(data: Array[Int], nrBytes: Int = 4096) extends Module {
+class OpenRAMMem(data: Array[Int], nrBytes: Int = 1024) extends Module {
   val io = IO(PipeCon(32))
 
-  val mems = Array(
-    SyncReadMem(nrBytes/4, UInt(8.W), SyncReadMem.WriteFirst),
-    SyncReadMem(nrBytes/4, UInt(8.W), SyncReadMem.WriteFirst),
-    SyncReadMem(nrBytes/4, UInt(8.W), SyncReadMem.WriteFirst),
-    SyncReadMem(nrBytes/4, UInt(8.W), SyncReadMem.WriteFirst))
+  val mem = Module(new SramMacro)
+  mem.io.clk0 := clock
+  mem.io.csb0 := false.B
+  mem.io.web0 := !io.wr
+  mem.io.wmask0 := io.wrMask
+  mem.io.addr0 := io.address
+  mem.io.din0 := io.wrData
+  io.rdData := mem.io.dout0
 
-  /* not used, would be too easy
-  val dataHex = data.map(_.toHexString).mkString("\n")
-  val file = new java.io.PrintWriter("data.hex")
-  file.write(dataHex)
-  file.close()
-  loadMemoryFromFile(mem, "data.hex")
-   */
+  mem.io.clk1 := clock
+  mem.io.csb1 := false.B
+  mem.io.addr1 := 0.U
+  // io.dout := mem.io.dout1
 
-  // split an integer into a seq of 4 bytes
-  // little endian, so first byte in seq goes to mem(0)
-  def splitInt(x: Int): Seq[Int] = {
-    (0 until 4).map(i => (x >> (i * 8)) & 0xff)
-  }
-  val split = data.map(splitInt)
-  // Don't know how to split this in a functional style
-  // TODO: fight repetition
-  val init0 = split.map(_(0)).map(_.toHexString).mkString("\n")
-  val file0 = new java.io.PrintWriter("data0.hex")
-  file0.write(init0)
-  file0.close()
-  loadMemoryFromFile(mems(0), "data0.hex")
-  val init1 = split.map(_(1)).map(_.toHexString).mkString("\n")
-  val file1 = new java.io.PrintWriter("data1.hex")
-  file1.write(init1)
-  file1.close()
-  loadMemoryFromFile(mems(1), "data1.hex")
-  val init2 = split.map(_(2)).map(_.toHexString).mkString("\n")
-  val file2 = new java.io.PrintWriter("data2.hex")
-  file2.write(init2)
-  file2.close()
-  loadMemoryFromFile(mems(2), "data2.hex")
-  val init3 = split.map(_(3)).map(_.toHexString).mkString("\n")
-  val file3 = new java.io.PrintWriter("data3.hex")
-  file3.write(init3)
-  file3.close()
-  loadMemoryFromFile(mems(3), "data3.hex")
-
-  val idx = log2Up(nrBytes/4)
-  io.rdData := mems(3).read(io.address(idx+2, 2)) ##
-    mems(2).read(io.address(idx+2, 2)) ##
-    mems(1).read(io.address(idx+2, 2)) ##
-    mems(0).read(io.address(idx+2, 2))
-  when(io.wrMask(0) && io.wr) {
-    mems(0).write(io.address(idx+2, 2), io.wrData(7, 0))
-  }
-  when(io.wrMask(1) && io.wr) {
-    mems(1).write(io.address(idx+2, 2), io.wrData(15, 8))
-  }
-  when(io.wrMask(2) && io.wr) {
-    mems(2).write(io.address(idx+2, 2), io.wrData(23, 16))
-  }
-  when(io.wrMask(3) && io.wr) {
-    mems(3).write(io.address(idx+2, 2), io.wrData(31, 24))
-  }
-  io.ack := RegNext(io.rd || io.wr, false.B) // TODO: proper ack
+  io.ack := RegNext(io.rd || io.wr, false.B)
 }
