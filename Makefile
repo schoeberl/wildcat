@@ -125,14 +125,10 @@ alu-speed:
 	quartus_sta quartus/$(BOARD)/AluSpeed
 
 # need start into nix with:
-# nix-shell shell.nix
+# nix-shell
 librelane: hw-fmax
-	librelane wildcat.json
+	librelane wildcat.yaml
 	librelane --last-run --flow openinklayout wildcat.json
-
-openlane:
-	openlane wildcat.json
-	openlane --last-run --flow openinklayout wildcat.json
 
 experiments:
 	openlane verilog/experiments.json
@@ -142,6 +138,11 @@ forwarding:
 	sbt "runMain wildcat.explore.ForwardingSpeed"
 	librelane forwarding.json
 #	librelane --last-run --flow openinklayout forwarding.json
+
+nix-run:
+	nix run nix run github:librelane/librelane -- wildcat.json
+
+
 
 alu:
 	sbt "runMain wildcat.explore.AluSpeed"

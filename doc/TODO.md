@@ -7,6 +7,7 @@
    - [x] Do not execute the first instruction from on-chip memory
    - [x] but start PC with -4
    - [x] remove initialization of the address register from the instruction ROM
+ * [ ] If a mem stalls and is followed by a mem, then that mem shall not issue a mem command
  * [ ] Something is fishy with testing, as SingleCycle works (even without branch)
  * [ ] Single cycle is not finished - tests are failing, disabled
  * [x] Two tests fail with co-simulation when adding stall to fetch (the toggle)

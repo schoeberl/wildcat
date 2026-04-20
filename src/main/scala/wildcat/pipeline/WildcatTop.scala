@@ -12,8 +12,6 @@ import chisel.lib.uart._
  *
  * Author: Martin Schoeberl (martin@jopdesign.com)
  *
- * Edited by Georg and Alexander to test our Bootloader
- *
  */
 class WildcatTop(file: String, dmemNrByte: Int = 4096) extends Module {
 
@@ -29,7 +27,8 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096) extends Module {
   val cpu = Module(new ThreeCats())
   // val cpu = Module(new WildFour())
   // val cpu = Module(new StandardFive())
-  val dmem = Module(new ScratchPadMem(memory, nrBytes = dmemNrByte))
+  // val dmem = Module(new ScratchPadMem(memory, nrBytes = dmemNrByte))
+  val dmem = Module(new OpenRAMMem(memory, 32))
   cpu.io.dmem <> dmem.io
   val imem = Module(new InstructionROM(memory))
   cpu.io.imem <> imem.io

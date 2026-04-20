@@ -1,0 +1,4 @@
+"DESIGN_NAME": "SynthTopFmax"
+"VERILOG_FILES": ["dir::generated/SynthTopFmax.v"]
+"CLOCK_PERIOD": 20
+"CLOCK_PORT": "clock"
