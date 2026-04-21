@@ -3,7 +3,7 @@ VERILOG_FILES: ["dir::generated/WildcatTop.v"]
 CLOCK_PERIOD: 20
 CLOCK_PORT: "clock"
 FP_SIZING: "absolute"
-DIE_AREA: [0, 0, 650, 1450]
+DIE_AREA: [0, 0, 600, 1400]
 # for the memory macro
 FP_PDN_CORE_RING: true
 VDD_NETS: ["vccd1"]
@@ -15,16 +15,16 @@ MACROS:
   sky130_sram_1kbyte_1rw1r_32x256_8:
     instances:
       dmem.mem:
-        location: [150, 1000]
+        location: [50, 920]
         orientation: N
       imem.mem:
-        location: [150, 50]
+        location: [50, 50]
         orientation: S
     gds: pdk_dir::libs.ref/sky130_sram_macros/gds/sky130_sram_1kbyte_1rw1r_32x256_8.gds
     lef: pdk_dir::libs.ref/sky130_sram_macros/lef/sky130_sram_1kbyte_1rw1r_32x256_8.lef
     nl: pdk_dir::libs.ref/sky130_sram_macros/verilog/sky130_sram_1kbyte_1rw1r_32x256_8.v
-  #  lib:
-  #    "*": dir::sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C_modified.lib
+    lib:
+      "*": dir::openram_modified.lib
 MAGIC_CAPTURE_ERRORS: false
 PRIMARY_GDSII_STREAMOUT_TOOL: klayout
 RUN_KLAYOUT_DRC: true
