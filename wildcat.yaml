@@ -1,20 +1,25 @@
-"DESIGN_NAME": "WildcatTop"
-"VERILOG_FILES": ["dir::generated/WildcatTop.v"]
-"CLOCK_PERIOD": 20
-"CLOCK_PORT": "clock"
-
+DESIGN_NAME: "WildcatTop"
+VERILOG_FILES: ["dir::generated/WildcatTop.v"]
+CLOCK_PERIOD: 20
+CLOCK_PORT: "clock"
+FP_SIZING: "absolute"
+DIE_AREA: [0, 0, 650, 1450]
 # for the memory macro
 FP_PDN_CORE_RING: true
 VDD_NETS: ["vccd1"]
 GND_NETS: ["vssd1"]
 PDN_MACRO_CONNECTIONS:
   - "dmem.mem vccd1 vssd1 vccd1 vssd1"
+  - "imem.mem vccd1 vssd1 vccd1 vssd1"
 MACROS:
   sky130_sram_1kbyte_1rw1r_32x256_8:
     instances:
       dmem.mem:
-        location: [80, 150]
+        location: [150, 1000]
         orientation: N
+      imem.mem:
+        location: [150, 50]
+        orientation: S
     gds: pdk_dir::libs.ref/sky130_sram_macros/gds/sky130_sram_1kbyte_1rw1r_32x256_8.gds
     lef: pdk_dir::libs.ref/sky130_sram_macros/lef/sky130_sram_1kbyte_1rw1r_32x256_8.lef
     nl: pdk_dir::libs.ref/sky130_sram_macros/verilog/sky130_sram_1kbyte_1rw1r_32x256_8.v

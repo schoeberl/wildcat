@@ -28,9 +28,10 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096) extends Module {
   // val cpu = Module(new WildFour())
   // val cpu = Module(new StandardFive())
   // val dmem = Module(new ScratchPadMem(memory, nrBytes = dmemNrByte))
-  val dmem = Module(new OpenRAMMem(memory, 32))
+  val dmem = Module(new OpenRAMMem(memory, 1024))
   cpu.io.dmem <> dmem.io
-  val imem = Module(new InstructionROM(memory))
+  // val imem = Module(new InstructionROM(memory))
+  val imem = Module(new OpenRAMMem(memory, 1024))
   cpu.io.imem <> imem.io
 
 
