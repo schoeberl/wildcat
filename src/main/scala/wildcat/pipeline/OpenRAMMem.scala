@@ -1,16 +1,14 @@
 package wildcat.pipeline
 
 import chisel3._
-import chisel3.util._
-import chisel3.util.experimental.loadMemoryFromFile
 import soc._
 import memory.SramMacro
 
 /**
- * On-chip memory with one clock cycle read timing and write forwarding.
+ * On-chip memory with one clock cycle read timing.
  * Wrapper for OpenRAM, which is used in the tape-out.
  */
-class OpenRAMMem(data: Array[Int], nrBytes: Int = 1024) extends PipeConDevice(32) {
+class OpenRAMMem(nrBytes: Int = 1024) extends PipeConDevice(32) {
 
   val mem = Module(new SramMacro)
   mem.io.clk0 := clock

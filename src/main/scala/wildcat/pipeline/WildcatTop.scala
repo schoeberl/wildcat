@@ -13,7 +13,7 @@ import chisel.lib.uart._
  * Author: Martin Schoeberl (martin@jopdesign.com)
  *
  */
-class WildcatTop(file: String, dmemNrByte: Int = 4096, useROM: Boolean = true) extends Module {
+class WildcatTop(file: String, dmemNrByte: Int = 4096, testFPGA: Boolean = true) extends Module {
 
   val io = IO(new Bundle {
     val led = Output(UInt(16.W))
@@ -27,18 +27,14 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096, useROM: Boolean = true) e
   val cpu = Module(new ThreeCats())
   // val cpu = Module(new WildFour())
   // val cpu = Module(new StandardFive())
-  val dmem = Module(new ScratchPadMem(memory, nrBytes = dmemNrByte))
-  // val dmem = Module(new OpenRAMMem(memory, 1024))
+  val dmem = if (testFPGA) Module(new ScratchPadMem(memory, nrBytes = dmemNrByte)) else Module(new OpenRAMMem())
   cpu.io.dmem <> dmem.cpuPort
   // gate memory access when not to data memory
   when (cpu.io.dmem.address(31, 28) =/= 0.U) {
     dmem.cpuPort.rd      := false.B
     dmem.cpuPort.wr      := false.B
   }
-  //var imem = Module(new OpenRAMMem(memory, 1024))
-  //if (useROM) {
-    val imem = Module(new InstructionROM(memory))
-  //}
+  val imem = if (testFPGA) Module(new InstructionROM(memory)) else Module(new OpenRAMMem())
   cpu.io.imem <> imem.cpuPort
 
   // Here IO stuff
@@ -85,5 +81,5 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096, useROM: Boolean = true) e
 }
 
 object WildcatTop extends App {
-  emitVerilog(new WildcatTop(args(0), useROM = false), Array("--target-dir", "generated"))
+  emitVerilog(new WildcatTop(args(0), testFPGA = false), Array("--target-dir", "generated"))
 }
