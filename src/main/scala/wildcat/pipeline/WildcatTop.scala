@@ -29,17 +29,17 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096, useROM: Boolean = true) e
   // val cpu = Module(new StandardFive())
   val dmem = Module(new ScratchPadMem(memory, nrBytes = dmemNrByte))
   // val dmem = Module(new OpenRAMMem(memory, 1024))
-  cpu.io.dmem <> dmem.io
+  cpu.io.dmem <> dmem.cpuPort
   // gate memory access when not to data memory
   when (cpu.io.dmem.address(31, 28) =/= 0.U) {
-    dmem.io.rd      := false.B
-    dmem.io.wr      := false.B
+    dmem.cpuPort.rd      := false.B
+    dmem.cpuPort.wr      := false.B
   }
   //var imem = Module(new OpenRAMMem(memory, 1024))
   //if (useROM) {
     val imem = Module(new InstructionROM(memory))
   //}
-  cpu.io.imem <> imem.io
+  cpu.io.imem <> imem.cpuPort
 
   // Here IO stuff
   // IO is mapped ot 0xf000_0000
@@ -79,7 +79,6 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096, useROM: Boolean = true) e
     } .elsewhen (cpu.io.dmem.address(19,16) === 1.U) {
       ledReg := cpu.io.dmem.wrData(7, 0)
     }
-    dmem.io.wr := false.B
   }
 
   io.led := 1.U ## 0.U(7.W) ## RegNext(ledReg)

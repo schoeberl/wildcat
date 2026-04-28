@@ -9,8 +9,7 @@ import soc._
 /**
  * On-chip memory with one clock cycle read timing and write forwarding
  */
-class ScratchPadMem(data: Array[Int], nrBytes: Int = 4096) extends Module {
-  val io = IO(PipeCon(32))
+class ScratchPadMem(data: Array[Int], nrBytes: Int = 4096) extends PipeConDevice(32) {
 
   val mems = Array(
     SyncReadMem(nrBytes/4, UInt(8.W), SyncReadMem.WriteFirst),
@@ -56,21 +55,21 @@ class ScratchPadMem(data: Array[Int], nrBytes: Int = 4096) extends Module {
   loadMemoryFromFile(mems(3), "data3.hex")
 
   val idx = log2Up(nrBytes/4)
-  io.rdData := mems(3).read(io.address(idx+2, 2)) ##
-    mems(2).read(io.address(idx+2, 2)) ##
-    mems(1).read(io.address(idx+2, 2)) ##
-    mems(0).read(io.address(idx+2, 2))
-  when(io.wrMask(0) && io.wr) {
-    mems(0).write(io.address(idx+2, 2), io.wrData(7, 0))
+  cpuPort.rdData := mems(3).read(cpuPort.address(idx+2, 2)) ##
+    mems(2).read(cpuPort.address(idx+2, 2)) ##
+    mems(1).read(cpuPort.address(idx+2, 2)) ##
+    mems(0).read(cpuPort.address(idx+2, 2))
+  when(cpuPort.wrMask(0) && cpuPort.wr) {
+    mems(0).write(cpuPort.address(idx+2, 2), cpuPort.wrData(7, 0))
   }
-  when(io.wrMask(1) && io.wr) {
-    mems(1).write(io.address(idx+2, 2), io.wrData(15, 8))
+  when(cpuPort.wrMask(1) && cpuPort.wr) {
+    mems(1).write(cpuPort.address(idx+2, 2), cpuPort.wrData(15, 8))
   }
-  when(io.wrMask(2) && io.wr) {
-    mems(2).write(io.address(idx+2, 2), io.wrData(23, 16))
+  when(cpuPort.wrMask(2) && cpuPort.wr) {
+    mems(2).write(cpuPort.address(idx+2, 2), cpuPort.wrData(23, 16))
   }
-  when(io.wrMask(3) && io.wr) {
-    mems(3).write(io.address(idx+2, 2), io.wrData(31, 24))
+  when(cpuPort.wrMask(3) && cpuPort.wr) {
+    mems(3).write(cpuPort.address(idx+2, 2), cpuPort.wrData(31, 24))
   }
-  io.ack := RegNext(io.rd || io.wr, false.B) // TODO: proper ack
+  cpuPort.ack := RegNext(cpuPort.rd || cpuPort.wr, false.B) // TODO: test stalling
 }
