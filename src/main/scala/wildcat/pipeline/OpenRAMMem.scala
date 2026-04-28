@@ -18,7 +18,7 @@ class OpenRAMMem(data: Array[Int], nrBytes: Int = 1024) extends Module {
   mem.io.csb0 := false.B
   mem.io.web0 := !io.wr
   mem.io.wmask0 := io.wrMask
-  mem.io.addr0 := io.address
+  mem.io.addr0 := io.address(9, 2)
   mem.io.din0 := io.wrData
   io.rdData := mem.io.dout0
 

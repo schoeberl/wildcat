@@ -13,7 +13,7 @@ import chisel.lib.uart._
  * Author: Martin Schoeberl (martin@jopdesign.com)
  *
  */
-class WildcatTop(file: String, dmemNrByte: Int = 4096) extends Module {
+class WildcatTop(file: String, dmemNrByte: Int = 4096, useROM: Boolean = true) extends Module {
 
   val io = IO(new Bundle {
     val led = Output(UInt(16.W))
@@ -27,13 +27,19 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096) extends Module {
   val cpu = Module(new ThreeCats())
   // val cpu = Module(new WildFour())
   // val cpu = Module(new StandardFive())
-  // val dmem = Module(new ScratchPadMem(memory, nrBytes = dmemNrByte))
-  val dmem = Module(new OpenRAMMem(memory, 1024))
+  val dmem = Module(new ScratchPadMem(memory, nrBytes = dmemNrByte))
+  // val dmem = Module(new OpenRAMMem(memory, 1024))
   cpu.io.dmem <> dmem.io
-  // val imem = Module(new InstructionROM(memory))
-  val imem = Module(new OpenRAMMem(memory, 1024))
+  // gate memory access when not to data memory
+  when (cpu.io.dmem.address(31, 28) =/= 0.U) {
+    dmem.io.rd      := false.B
+    dmem.io.wr      := false.B
+  }
+  //var imem = Module(new OpenRAMMem(memory, 1024))
+  //if (useROM) {
+    val imem = Module(new InstructionROM(memory))
+  //}
   cpu.io.imem <> imem.io
-
 
   // Here IO stuff
   // IO is mapped ot 0xf000_0000
@@ -80,5 +86,5 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096) extends Module {
 }
 
 object WildcatTop extends App {
-  emitVerilog(new WildcatTop(args(0)), Array("--target-dir", "generated"))
+  emitVerilog(new WildcatTop(args(0), useROM = false), Array("--target-dir", "generated"))
 }
