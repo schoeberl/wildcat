@@ -83,3 +83,7 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096, testFPGA: Boolean = true)
 object WildcatTop extends App {
   emitVerilog(new WildcatTop(args(0), testFPGA = true), Array("--target-dir", "generated"))
 }
+
+object WildcatTopAsic extends App {
+  emitVerilog(new WildcatTop(args(0), testFPGA = false), Array("--target-dir", "generated"))
+}
