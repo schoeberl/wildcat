@@ -54,7 +54,7 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096, testFPGA: Boolean = true)
 
   tx.io.channel.bits := cpu.io.dmem.wrData(7, 0)
   tx.io.channel.valid := false.B
-  rx.io.channel.ready := false.B
+  rx.io.channel.ready := cpu.io.dmem.rd && (cpu.io.dmem.address(31, 28) === 0xf.U && cpu.io.dmem.address(19,16) === 0.U && cpu.io.dmem.address(3, 0) === 4.U)
 
   val uartStatusReg = RegNext(rx.io.channel.valid ## tx.io.channel.ready)
   val memAddressReg = RegNext(cpu.io.dmem.address)
@@ -63,7 +63,6 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096, testFPGA: Boolean = true)
       cpu.io.dmem.rdData := uartStatusReg
     } .elsewhen(memAddressReg(3, 0) === 4.U) {
       cpu.io.dmem.rdData := rx.io.channel.bits
-      rx.io.channel.ready := cpu.io.dmem.rd
     }
   }
 
@@ -81,5 +80,5 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096, testFPGA: Boolean = true)
 }
 
 object WildcatTop extends App {
-  emitVerilog(new WildcatTop(args(0), testFPGA = false), Array("--target-dir", "generated"))
+  emitVerilog(new WildcatTop(args(0), testFPGA = true), Array("--target-dir", "generated"))
 }
