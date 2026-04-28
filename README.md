@@ -63,6 +63,12 @@ git clone --recursive git@github.com:schoeberl/wildcat.git
 cd wildcat
 ```
 
+To later update the submodules you can use:
+
+```
+git submodule update --init --recursive
+```
+
 Here you can start the ISA simulator executing a simple program with
 
 ```
@@ -97,6 +103,9 @@ LED:
 
 ```
 make APP=asm/apps/blink.s hw
+```
+Make sure Vivado is in your path (see the `source` command in the Makefile) and run:
+```
 make synth
 ```
 
@@ -116,7 +125,7 @@ make test
 
  * Current memory starts at 0
  * Simulator has a simple text output at address 0xf000_0000
- * LED is mapped to, maybe 0xe000_0000
+ * LEDs are mapped to 0xf001_0000
 
 ## Results
 
