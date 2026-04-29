@@ -79,6 +79,17 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
   // halt flag
   var run = true
 
+  // UART RX: background reader pushes stdin bytes into a queue.
+  private val rxQueue =
+    new java.util.concurrent.ConcurrentLinkedQueue[Integer]()
+  private val rxThread = new Thread(() => {
+    val in = java.lang.System.in
+    var b = in.read()
+    while (b >= 0) { rxQueue.offer(b & 0xff); b = in.read() }
+  }, "uart-rx")
+  rxThread.setDaemon(true)
+  rxThread.start()
+
   // Translate a physical address into an index into `mem` (word array).
   // Throws if the address is outside RAM.
   @inline private def memIdx(addr: Int): Int = {
@@ -239,7 +250,10 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       if (isUart(addr)) {
         val offset = addr - 0x10000000
         return offset match {
-          case 5 => 0x60 // LSR: THRE | TEMT  (transmit always ready)
+          case 0 => // RBR
+            val b = rxQueue.poll(); if (b == null) 0 else b.intValue()
+          case 5 => // LSR: THRE | TEMT | DR
+            0x60 | (if (rxQueue.isEmpty) 0 else 1)
           case _ => 0x00
         }
       }
