@@ -18,6 +18,7 @@ APP=asm/play.s
 # APP=../../cae-lab/lab3/minimal.s
 # APP can be set from the command line, such as:
 # make app run APP=../cae-lab/lab3/minimal.s
+PROGRAM ?= a.out
 
 all:
 	echo "Select your make target"
@@ -38,7 +39,7 @@ app:
 dump:
 	$(CROSS)objdump -d a.out
 run:
-	sbt "runMain wildcat.isasim.SimRV a.out"
+	sbt "runMain wildcat.isasim.SimRV $(PROGRAM)"
 
 test-one-sim:
 	sbt "testOnly wildcat.SimulatorSingleTest"

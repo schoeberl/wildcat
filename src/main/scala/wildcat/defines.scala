@@ -38,6 +38,14 @@ object AluFunct3 {
   val F3_SRL_SRA = 0x05
   val F3_OR = 0x06
   val F3_AND = 0x07
+  val F3_MUL = 0x00
+  val F3_MULH = 0x01
+  val F3_MULHSU = 0x02
+  val F3_MULHU = 0x03
+  val F3_DIV = 0x04
+  val F3_DIVU = 0x05
+  val F3_REM = 0x06
+  val F3_REMU = 0x07
 }
 
 object BranchFunct3 {
