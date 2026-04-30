@@ -13,9 +13,9 @@ class LittleCat extends Module {
   })
 
   // Just a pass-through for testing the interface
-  io.out := io.in
-  io.tx := io.rx
-  io.txConf := io.rxConf
+  io.out := RegNext(RegNext(io.in))
+  io.tx := RegNext(RegNext(io.rx))
+  io.txConf := RegNext(RegNext(io.rxConf))
 }
 
 object LittleCat extends App {
