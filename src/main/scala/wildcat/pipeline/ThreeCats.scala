@@ -10,8 +10,8 @@ import wildcat.pipeline.Functions._
  *
  * 0. PC generation
  * 1. Fetch
- * 2. Decode, register read, and memory address computation
- * 3. Execute, memory access, and optional wait for acknowledgement
+ * 2. Decode, register read, memory address computation, and write
+ * 3. Execute, memory read
  *
  * Author: Martin Schoeberl (martin@jopdesign.com)
  *
@@ -51,23 +51,14 @@ class ThreeCats() extends Wildcat() {
     instr := 0x00000033.U
     pcNext := pcReg
   }
-  when (stall) {
-    pcNext := pcReg
-  }
 
   // Decode, register read, and memory access
-  val pcRegReg = RegInit(0.U(32.W))
-  when(!stall) {
-    pcRegReg := pcReg
-  }
+  val pcRegReg = RegNext(pcReg)
   val instrReg = RegInit(0x00000033.U) // nop on reset
-  when(!stall) {
-    instrReg := Mux(doBranch, 0x00000033.U, instr)
-  }
-  val rfReadInstr = Mux(stall, instrReg, instr)
-  val rs1 = rfReadInstr(19, 15)
-  val rs2 = rfReadInstr(24, 20)
-  val rd = rfReadInstr(11, 7)
+  instrReg := Mux(doBranch, 0x00000033.U, instr)
+  val rs1 = instr(19, 15)
+  val rs2 = instr(24, 20)
+  val rd = instr(11, 7)
   val (rs1Val, rs2Val, debugRegs) = registerFile(rs1, rs2, wbDest, wbData, wrEna, true)
 
   val csr = Module(new Csr())
@@ -88,9 +79,6 @@ class ThreeCats() extends Wildcat() {
     val csrVal = UInt(32.W)
     val func3 = UInt(3.W)
     val memLow = UInt(2.W)
-    val memAddress = UInt(32.W)
-    val memWrData = UInt(32.W)
-    val memWrMask = UInt(4.W)
   })
   decEx.decOut := decOut
   decEx.valid := !doBranch
@@ -109,21 +97,26 @@ class ThreeCats() extends Wildcat() {
 
   val memAddress = (address.asSInt + decOut.imm).asUInt
   decEx.memLow := memAddress(1, 0)
-  decEx.memAddress := memAddress
-  decEx.memWrData := data
-  decEx.memWrMask := 0.U
+
+  io.dmem.address := memAddress
+  io.dmem.rd := false.B
+  io.dmem.wrData := data
+  io.dmem.wr := false.B
+  io.dmem.wrMask := 0.U
+  when(decOut.isLoad && !doBranch) {
+    io.dmem.rd := true.B
+  }
   when(decOut.isStore && !doBranch) {
     val (wrData, wr, wrMask) = getWriteData(data, decEx.func3, memAddress(1, 0))
-    decEx.memWrData := wrData
-    decEx.memWrMask := wrMask.asUInt
+    io.dmem.wrData := wrData
+    io.dmem.wr := wr
+    io.dmem.wrMask := wrMask.asUInt
   }
 
 
   // Execute
   val decExReg = RegInit(0.U.asTypeOf(decEx))
-  when(!stall) {
-    decExReg := decEx
-  }
+  decExReg := decEx
 
   // Forwarding
   val v1 = Mux(exFwdReg.valid && exFwdReg.wbDest === decExReg.rs1, exFwdReg.wbData, decExReg.rs1Val)
@@ -153,37 +146,18 @@ class ThreeCats() extends Wildcat() {
     branchTarget := res
   }
   doBranch := ((compare(decExReg.func3, v1, v2) && decExReg.decOut.isBranch) || decExReg.decOut.isJal || decExReg.decOut.isJalr) && decExReg.valid
-  val dmemAccess = decExReg.valid && (decExReg.decOut.isLoad || decExReg.decOut.isStore) && !doBranch
-  val dmemStartedReg = RegInit(false.B)
-  val dmemDone = dmemAccess && dmemStartedReg && io.dmem.ack
-  stall := dmemAccess && !dmemDone
-
-  when(!dmemAccess || dmemDone) {
-    dmemStartedReg := false.B
-  }.elsewhen(!dmemStartedReg) {
-    dmemStartedReg := true.B
-  }
-
-  io.dmem.address := decExReg.memAddress
-  io.dmem.rd := dmemAccess && decExReg.decOut.isLoad && !dmemStartedReg
-  io.dmem.wrData := decExReg.memWrData
-  io.dmem.wr := dmemAccess && decExReg.decOut.isStore && !dmemStartedReg
-  io.dmem.wrMask := Mux(dmemAccess && decExReg.decOut.isStore && !dmemStartedReg, decExReg.memWrMask, 0.U)
-
-  wrEna := decExReg.valid && decExReg.decOut.rfWrite && (!decExReg.decOut.isLoad || dmemDone)
+  wrEna := decExReg.valid && decExReg.decOut.rfWrite
 
   // Memory read access
-  when(decExReg.decOut.isLoad && dmemDone) {
+  when(decExReg.decOut.isLoad && !doBranch) {
     res := selectLoadData(io.dmem.rdData, decExReg.func3, decExReg.memLow)
   }
 
 
   // Forwarding register values to ALU
-  when(wrEna && (wbDest =/= 0.U)) {
-    exFwdReg.valid := true.B
-    exFwdReg.wbDest := wbDest
-    exFwdReg.wbData := wbData
-  }
+  exFwdReg.valid := wrEna && (wbDest =/= 0.U)
+  exFwdReg.wbDest := wbDest
+  exFwdReg.wbData := wbData
 
   // Just to exit tests
   val stop = decExReg.decOut.isECall
