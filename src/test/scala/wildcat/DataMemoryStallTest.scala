@@ -4,6 +4,7 @@ import chisel3._
 import chisel3.util._
 import chisel3.util.experimental.BoringUtils
 import chiseltest._
+import memory.InstructionROM
 import org.scalatest.flatspec.AnyFlatSpec
 import soc._
 import wildcat.pipeline._

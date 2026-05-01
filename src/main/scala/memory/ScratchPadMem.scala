@@ -1,9 +1,8 @@
-package wildcat.pipeline
+package memory
 
 import chisel3._
 import chisel3.util._
 import chisel3.util.experimental.loadMemoryFromFile
-
 import soc._
 
 /**

@@ -1,8 +1,7 @@
-package wildcat.pipeline
+package memory
 
 import chisel3._
 import soc._
-import memory.SramMacro
 
 /**
  * On-chip memory with one clock cycle read timing.
