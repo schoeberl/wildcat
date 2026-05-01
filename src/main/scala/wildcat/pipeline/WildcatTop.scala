@@ -1,10 +1,13 @@
 package wildcat.pipeline
 
 import chisel3._
-import wildcat.Util
 import chisel.lib.uart._
 import chisel3.util.RegEnable
+
+import wildcat.Util
+import device._
 import memory.{InstructionROM, OpenRAMMem, ScratchPadMem}
+
 
 /*
  * This file is part of the RISC-V processor Wildcat.
@@ -28,19 +31,40 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096, testFPGA: Boolean = true)
   val cpu = Module(new ThreeCats())
   // val cpu = Module(new WildFour())
   // val cpu = Module(new StandardFive())
-  val dmem = if (testFPGA) Module(new ScratchPadMem(memory, nrBytes = dmemNrByte)) else Module(new OpenRAMMem())
-  cpu.io.dmem <> dmem.cpuPort
-  // gate memory access when not to data memory
-  when (cpu.io.dmem.address(31, 28) =/= 0.U) {
-    dmem.cpuPort.rd      := false.B
-    dmem.cpuPort.wr      := false.B
-  }
+
   val imem = if (testFPGA) Module(new InstructionROM(memory)) else Module(new OpenRAMMem())
   cpu.io.imem <> imem.cpuPort
+  // for read multiplexing
+  val memAddressReg = RegEnable(cpu.io.dmem.address, 0.U, cpu.io.dmem.rd)
 
-  // Here IO stuff
+
+  val csMem = cpu.io.dmem.address(31, 28) === 0.U
+  val dmem = if (testFPGA) Module(new ScratchPadMem(memory, nrBytes = dmemNrByte)) else Module(new OpenRAMMem())
+  cpu.io.dmem <> dmem.cpuPort
+  dmem.cpuPort.rd := csMem && cpu.io.dmem.rd
+  dmem.cpuPort.wr := csMem && cpu.io.dmem.wr
+
   // IO is mapped ot 0xf000_0000
-  // use lower bits to select IOs
+  // use bits 19..16 to select IO devices
+
+  val csIO = cpu.io.dmem.address(31, 28) === 0xf.U
+  val csIOReg = memAddressReg(31, 28) === 0xf.U
+  val ioDecodeAddress = cpu.io.dmem.address(19,16)
+  val ioDecodeAddressReg = memAddressReg(19, 16)
+
+  val csLed = csIO && ioDecodeAddress === 1.U
+  val csLedReg = csIOReg && ioDecodeAddressReg === 1.U
+  val ledDevice = Module(new LedDevice(16))
+  ledDevice.cpuPort <> cpu.io.dmem
+  ledDevice.cpuPort.rd := csLed && cpu.io.dmem.rd
+  ledDevice.cpuPort.wr := csLed && cpu.io.dmem.wr
+
+  // read and ack mux
+  cpu.io.dmem.rdData := dmem.cpuPort.rdData
+  when (csLedReg) {
+    cpu.io.dmem.rdData := ledDevice.cpuPort.rdData
+  }
+  cpu.io.dmem.ack := dmem.cpuPort.ack || ledDevice.cpuPort.ack
 
   // UART:
   // 0xf000_0000 status:
@@ -58,7 +82,6 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096, testFPGA: Boolean = true)
   rx.io.channel.ready := cpu.io.dmem.rd && (cpu.io.dmem.address(31, 28) === 0xf.U && cpu.io.dmem.address(19,16) === 0.U && cpu.io.dmem.address(3, 0) === 4.U)
 
   val uartStatusReg = RegNext(rx.io.channel.valid ## tx.io.channel.ready)
-  val memAddressReg = RegEnable(cpu.io.dmem.address, 0.U, cpu.io.dmem.rd)
   when (memAddressReg(31, 28) === 0xf.U && memAddressReg(19,16) === 0.U) {
     when (memAddressReg(3, 0) === 0.U) {
       cpu.io.dmem.rdData := uartStatusReg
@@ -67,17 +90,14 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096, testFPGA: Boolean = true)
     }
   }
 
-  val ledReg = RegInit(0.U(8.W))
   when ((cpu.io.dmem.address(31, 28) === 0xf.U) && cpu.io.dmem.wr) {
     when (cpu.io.dmem.address(19,16) === 0.U && cpu.io.dmem.address(3, 0) === 4.U) {
       printf(" %c %d\n", cpu.io.dmem.wrData(7, 0), cpu.io.dmem.wrData(7, 0))
       tx.io.channel.valid := true.B
-    } .elsewhen (cpu.io.dmem.address(19,16) === 1.U) {
-      ledReg := cpu.io.dmem.wrData(7, 0)
     }
   }
 
-  io.led := 1.U ## 0.U(7.W) ## RegNext(ledReg)
+  io.led := 1.U ## 0.U(7.W) ## RegNext(ledDevice.io.leds)
 }
 
 object WildcatTop extends App {

@@ -24,8 +24,7 @@ class WildcatTestTop(file: String) extends Module {
   BoringUtils.bore(cpuTop.cpu.debugRegs, Seq(io.regFile))
   io.stop := DontCare
   BoringUtils.bore(cpuTop.cpu.stop, Seq(io.stop))
-  io.led := DontCare
-  BoringUtils.bore(cpuTop.ledReg, Seq(io.led))
+  io.led := cpuTop.io.led
 
   cpuTop.io.rx := io.rx
   io.tx := cpuTop.io.tx
