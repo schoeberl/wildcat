@@ -37,7 +37,6 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096, testFPGA: Boolean = true)
   // for read multiplexing
   val memAddressReg = RegEnable(cpu.io.dmem.address, 0.U, cpu.io.dmem.rd)
 
-
   val csMem = cpu.io.dmem.address(31, 28) === 0.U
   val dmem = if (testFPGA) Module(new ScratchPadMem(memory, nrBytes = dmemNrByte)) else Module(new OpenRAMMem())
   cpu.io.dmem <> dmem.cpuPort
@@ -45,57 +44,38 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096, testFPGA: Boolean = true)
   dmem.cpuPort.wr := csMem && cpu.io.dmem.wr
 
   // IO is mapped ot 0xf000_0000
-  // use bits 19..16 to select IO devices
-
+  // bits 19..16 are used to select IO devices
   val csIO = cpu.io.dmem.address(31, 28) === 0xf.U
   val csIOReg = memAddressReg(31, 28) === 0xf.U
   val ioDecodeAddress = cpu.io.dmem.address(19,16)
   val ioDecodeAddressReg = memAddressReg(19, 16)
 
-  val csLed = csIO && ioDecodeAddress === 1.U
-  val csLedReg = csIOReg && ioDecodeAddressReg === 1.U
   val ledDevice = Module(new LedDevice(16))
+  val csLed = csIO && ioDecodeAddress === 1.U
+  val muxLed = csIOReg && ioDecodeAddressReg === 1.U
   ledDevice.cpuPort <> cpu.io.dmem
   ledDevice.cpuPort.rd := csLed && cpu.io.dmem.rd
   ledDevice.cpuPort.wr := csLed && cpu.io.dmem.wr
 
-  // read and ack mux
+  val uartDevice = Module(new UartDevice(100000000, 115200))
+  io.tx := uartDevice.io.txd
+  uartDevice.io.rxd := io.rx
+
+  val csUart = csIO && ioDecodeAddress === 0.U
+  val muxUart = csIOReg && ioDecodeAddressReg === 0.U
+  uartDevice.cpuPort <> cpu.io.dmem
+  uartDevice.cpuPort.rd := csUart && cpu.io.dmem.rd
+  uartDevice.cpuPort.wr := csUart && cpu.io.dmem.wr
+
+  // read mux
   cpu.io.dmem.rdData := dmem.cpuPort.rdData
-  when (csLedReg) {
-    cpu.io.dmem.rdData := ledDevice.cpuPort.rdData
+  when (muxUart) {
+    cpu.io.dmem.rdData := uartDevice.cpuPort.rdData
+  } .elsewhen(muxLed) {
+    cpu.io.dmem.rdData := RegNext(ledDevice.io.leds)
   }
-  cpu.io.dmem.ack := dmem.cpuPort.ack || ledDevice.cpuPort.ack
-
-  // UART:
-  // 0xf000_0000 status:
-  // bit 0 TX ready (TDE)
-  // bit 1 RX data available (RDF)
-  // 0xf000_0004 send and receive register
-
-  val tx = Module(new BufferedTx(100000000, 115200))
-  val rx = Module(new Rx(100000000, 115200))
-  io.tx := tx.io.txd
-  rx.io.rxd := io.rx
-
-  tx.io.channel.bits := cpu.io.dmem.wrData(7, 0)
-  tx.io.channel.valid := false.B
-  rx.io.channel.ready := cpu.io.dmem.rd && (cpu.io.dmem.address(31, 28) === 0xf.U && cpu.io.dmem.address(19,16) === 0.U && cpu.io.dmem.address(3, 0) === 4.U)
-
-  val uartStatusReg = RegNext(rx.io.channel.valid ## tx.io.channel.ready)
-  when (memAddressReg(31, 28) === 0xf.U && memAddressReg(19,16) === 0.U) {
-    when (memAddressReg(3, 0) === 0.U) {
-      cpu.io.dmem.rdData := uartStatusReg
-    } .elsewhen(memAddressReg(3, 0) === 4.U) {
-      cpu.io.dmem.rdData := rx.io.channel.bits
-    }
-  }
-
-  when ((cpu.io.dmem.address(31, 28) === 0xf.U) && cpu.io.dmem.wr) {
-    when (cpu.io.dmem.address(19,16) === 0.U && cpu.io.dmem.address(3, 0) === 4.U) {
-      printf(" %c %d\n", cpu.io.dmem.wrData(7, 0), cpu.io.dmem.wrData(7, 0))
-      tx.io.channel.valid := true.B
-    }
-  }
+  // or all ack signals together
+  cpu.io.dmem.ack := dmem.cpuPort.ack || uartDevice.cpuPort.ack || ledDevice.cpuPort.ack
 
   io.led := 1.U ## 0.U(7.W) ## RegNext(ledDevice.io.leds)
 }
