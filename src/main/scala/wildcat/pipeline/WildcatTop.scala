@@ -1,7 +1,6 @@
 package wildcat.pipeline
 
 import chisel3._
-import chisel.lib.uart._
 import chisel3.util.RegEnable
 
 import wildcat.Util
@@ -12,7 +11,7 @@ import memory.{InstructionROM, OpenRAMMem, ScratchPadMem}
 /*
  * This file is part of the RISC-V processor Wildcat.
  *
- * This is the top-level for a three stage pipeline.
+ * This is one top-level for the Wildcat pipeline.
  *
  * Author: Martin Schoeberl (martin@jopdesign.com)
  *
@@ -27,14 +26,15 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096, testFPGA: Boolean = true)
 
   val (memory, start) = Util.getCode(file)
 
-  // Here switch between different designs
+  // Switch between different pipes
   val cpu = Module(new ThreeCats())
   // val cpu = Module(new WildFour())
   // val cpu = Module(new StandardFive())
 
   val imem = if (testFPGA) Module(new InstructionROM(memory)) else Module(new OpenRAMMem())
   cpu.io.imem <> imem.cpuPort
-  // for read multiplexing
+
+  // Address register for read multiplexing
   val memAddressReg = RegEnable(cpu.io.dmem.address, 0.U, cpu.io.dmem.rd)
 
   val csMem = cpu.io.dmem.address(31, 28) === 0.U
@@ -50,13 +50,7 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096, testFPGA: Boolean = true)
   val ioDecodeAddress = cpu.io.dmem.address(19,16)
   val ioDecodeAddressReg = memAddressReg(19, 16)
 
-  val ledDevice = Module(new LedDevice(16))
-  val csLed = csIO && ioDecodeAddress === 1.U
-  val muxLed = csIOReg && ioDecodeAddressReg === 1.U
-  ledDevice.cpuPort <> cpu.io.dmem
-  ledDevice.cpuPort.rd := csLed && cpu.io.dmem.rd
-  ledDevice.cpuPort.wr := csLed && cpu.io.dmem.wr
-
+  // Everyone needs a UART
   val uartDevice = Module(new UartDevice(100000000, 115200))
   io.tx := uartDevice.io.txd
   uartDevice.io.rxd := io.rx
@@ -67,17 +61,25 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096, testFPGA: Boolean = true)
   uartDevice.cpuPort.rd := csUart && cpu.io.dmem.rd
   uartDevice.cpuPort.wr := csUart && cpu.io.dmem.wr
 
-  // read mux
+  // We also love to have an LED to blink
+  val ledDevice = Module(new LedDevice(16))
+  io.led := 1.U ## 0.U(7.W) ## RegNext(ledDevice.io.leds)
+
+  val csLed = csIO && ioDecodeAddress === 1.U
+  val muxLed = csIOReg && ioDecodeAddressReg === 1.U
+  ledDevice.cpuPort <> cpu.io.dmem
+  ledDevice.cpuPort.rd := csLed && cpu.io.dmem.rd
+  ledDevice.cpuPort.wr := csLed && cpu.io.dmem.wr
+
+  // read mux for memory and IO devices
   cpu.io.dmem.rdData := dmem.cpuPort.rdData
   when (muxUart) {
     cpu.io.dmem.rdData := uartDevice.cpuPort.rdData
   } .elsewhen(muxLed) {
     cpu.io.dmem.rdData := RegNext(ledDevice.io.leds)
   }
-  // or all ack signals together
+  // or reduce all ack signals
   cpu.io.dmem.ack := dmem.cpuPort.ack || uartDevice.cpuPort.ack || ledDevice.cpuPort.ack
-
-  io.led := 1.U ## 0.U(7.W) ## RegNext(ledDevice.io.leds)
 }
 
 object WildcatTop extends App {
