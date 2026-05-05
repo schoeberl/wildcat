@@ -17,7 +17,7 @@ class OpenRAMInstrMem(nrBytes: Int = 1024) extends PipeConDevice(32) {
   mem.io.clk1 := clock
   mem.io.csb1 := false.B
   mem.io.addr1 := cpuPort.address(9, 2)
-  cpuPort.rdData := mem.io.dout0
+  cpuPort.rdData := mem.io.dout1
 
   cpuPort.ack := RegNext(cpuPort.rd || cpuPort.wr, false.B)
 

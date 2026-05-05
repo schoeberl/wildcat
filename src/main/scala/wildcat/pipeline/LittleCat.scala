@@ -32,6 +32,7 @@ class LittleCat(frequency: Int = 100000000, baudRate: Int = 115200) extends Modu
   imem.writePort.wr := config.io.dout(42)
   imem.writePort.rd := config.io.dout(43)
   imem.writePort.wrMask := 15.U
+  cpu.reset := RegNext(config.io.dout(44))
   config.io.din := imem.writePort.rdData
 
   // Address register for read multiplexing
