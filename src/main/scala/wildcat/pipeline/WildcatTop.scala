@@ -6,6 +6,7 @@ import chisel3.util.RegEnable
 import wildcat.Util
 import device._
 import memory.{InstructionROM, OpenRAMMem, ScratchPadMem}
+import memory.OpenRAMInstrMem
 
 
 /*
@@ -31,7 +32,7 @@ class WildcatTop(file: String, dmemNrByte: Int = 4096, testFPGA: Boolean = true)
   // val cpu = Module(new WildFour())
   // val cpu = Module(new StandardFive())
 
-  val imem = if (testFPGA) Module(new InstructionROM(memory)) else Module(new OpenRAMMem())
+  val imem = if (testFPGA) Module(new InstructionROM(memory)) else Module(new OpenRAMInstrMem())
   cpu.io.imem <> imem.cpuPort
 
   // Address register for read multiplexing

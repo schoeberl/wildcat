@@ -62,7 +62,7 @@ hw: app
 	$(SBT) "runMain wildcat.pipeline.WildcatTop a.out"
 
 hw-asic: app
-	$(SBT) "runMain wildcat.pipeline.WildcatTopAsic a.out"
+	$(SBT) "runMain wildcat.pipeline.LittleCat"
 
 hw-fmax:
 	$(SBT) "runMain wildcat.pipeline.SynthTopFmax a.out"
@@ -130,8 +130,8 @@ alu-speed:
 # need start into nix with:
 # nix-shell
 librelane: hw-asic
-	librelane wildcat.yaml
-	librelane --last-run --flow openinklayout wildcat.yaml
+	librelane littlecat.yaml
+	librelane --last-run --flow openinklayout littlecat.yaml
 
 experiments:
 	openlane verilog/experiments.json
@@ -143,9 +143,7 @@ forwarding:
 #	librelane --last-run --flow openinklayout forwarding.json
 
 nix-run:
-	nix run nix run github:librelane/librelane -- wildcat.json
-
-
+	nix run github:librelane/librelane -- wildcat.yaml
 
 alu:
 	sbt "runMain wildcat.explore.AluSpeed"
