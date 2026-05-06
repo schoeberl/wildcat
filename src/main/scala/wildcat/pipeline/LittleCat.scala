@@ -27,6 +27,8 @@ class LittleCat(frequency: Int = 100000000, baudRate: Int = 115200) extends Modu
 
   val imem = Module(new OpenRAMInstrMem())
   cpu.io.imem <> imem.cpuPort
+
+  // Configuration port for writing instructions
   imem.writePort.wrData := config.io.dout(31, 0)
   imem.writePort.address := config.io.dout(41, 32)
   imem.writePort.wr := config.io.dout(42)
@@ -52,7 +54,7 @@ class LittleCat(frequency: Int = 100000000, baudRate: Int = 115200) extends Modu
   val ioDecodeAddressReg = memAddressReg(19, 16)
 
   // Everyone needs a UART
-  val uartDevice = Module(new UartDevice(100000000, 115200))
+  val uartDevice = Module(new UartDevice(frequency, baudRate))
   io.tx := uartDevice.io.txd
   uartDevice.io.rxd := io.rx
 
@@ -62,25 +64,40 @@ class LittleCat(frequency: Int = 100000000, baudRate: Int = 115200) extends Modu
   uartDevice.cpuPort.rd := csUart && cpu.io.dmem.rd
   uartDevice.cpuPort.wr := csUart && cpu.io.dmem.wr
 
-  // We also love to have an LED to blink
-  val ledDevice = Module(new LedDevice(16))
-  io.out := 1.U ## 0.U(7.W) ## RegNext(ledDevice.io.leds)
+  class IODevice() extends PipeConDevice(32) {
+    val io = IO(new Bundle {
+      val out = Output(UInt(2.W))
+      val in = Input(UInt(2.W))
+    })
 
-  val csLed = csIO && ioDecodeAddress === 1.U
-  val muxLed = csIOReg && ioDecodeAddressReg === 1.U
-  ledDevice.cpuPort <> cpu.io.dmem
-  ledDevice.cpuPort.rd := csLed && cpu.io.dmem.rd
-  ledDevice.cpuPort.wr := csLed && cpu.io.dmem.wr
+    val outReg = RegInit(0.U(2.W))
+    when (cpuPort.wr) {
+      outReg := cpuPort.wrData(1, 0)
+    }
+    cpuPort.rdData := RegNext(RegNext(io.in))
+    cpuPort.ack := RegNext(cpuPort.rd || cpuPort.wr, false.B)
+    io.out := RegNext(RegNext(outReg))
+  }
+  // Minimal IO device for testing
+  val ioDevice = Module(new IODevice())
+  ioDevice.io.in := io.in
+  io.out := ioDevice.io.out
+
+  val csIODev = csIO && ioDecodeAddress === 1.U
+  val muxIODev = csIOReg && ioDecodeAddressReg === 1.U
+  ioDevice.cpuPort <> cpu.io.dmem
+  ioDevice.cpuPort.rd := csIODev && cpu.io.dmem.rd
+  ioDevice.cpuPort.wr := csIODev && cpu.io.dmem.wr
 
   // read mux for memory and IO devices
   cpu.io.dmem.rdData := dmem.cpuPort.rdData
   when (muxUart) {
     cpu.io.dmem.rdData := uartDevice.cpuPort.rdData
-  } .elsewhen(muxLed) {
-    cpu.io.dmem.rdData := RegNext(ledDevice.io.leds)
+  } .elsewhen(muxIODev) {
+    cpu.io.dmem.rdData := ioDevice.io.out
   }
   // or reduce all ack signals
-  cpu.io.dmem.ack := dmem.cpuPort.ack || uartDevice.cpuPort.ack || ledDevice.cpuPort.ack
+  cpu.io.dmem.ack := dmem.cpuPort.ack || uartDevice.cpuPort.ack || ioDevice.cpuPort.ack
 }
 
 object LittleCat extends App {

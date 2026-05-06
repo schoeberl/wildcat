@@ -2,7 +2,8 @@
 
  * [ ] Write documentation
  * [x] Change memory interface to `PipeCon`
- * [ ] Have a better drawing of `PipeCon` (in soc-comm)
+ * [ ] Have a better drawing of `PipeCon` (in soc-comm, with pipe reads and writes and delayed ack)
+ * [ ] Do some fmax testing with added stalling and also with OpenRAM memories
  * [x] why does // val pcReg = RegInit(-4.S(32.W).asUInt)  result in failing tests?
    - [x] Do not execute the first instruction from on-chip memory
    - [x] but start PC with -4
@@ -17,7 +18,7 @@
     - [ ] Work on failing simple tests (Simulator and Wildcat)
  * [ ] Start collecting information on other core interfaces (in my paper)
  * [ ] Make it super easy to see Wildcat in action, like in DrakRISCV
- * [ ] UART
+ * [x] UART
  * [ ] Add caches
  * [ ] I do not have a real CoSim test for the pipeline
  * [ ] There are still three failing test with CA cosimlation
@@ -26,7 +27,7 @@
  * [ ] Forwarding from ALU/memory to address computation is missing (missing a test?)
  * [ ] Get 4 and 5 stages back
  * [ ] Traps on not implemented instructions and unaligned access
- * [ ] Check if gcc can do RV32E
+ * [x] Check if gcc can do RV32E
  * [ ] Get the C code compilation better integrated (with a reasonable linker.ld)
  * [ ] Get C compiled apps running (more than hello)
  * [ ] Aim to have the same interface for pipeline and single cycle
