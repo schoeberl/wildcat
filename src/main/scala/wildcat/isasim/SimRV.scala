@@ -5,7 +5,7 @@
 
 /*
  * A simple ISA simulator of RISC-V.
- *
+ * 
  * Author: Martin Schoeberl (martin@jopdesign.com)
  */
 
@@ -53,7 +53,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
   private var currentPriv: Int = 3 // 3 = M-mode at reset
 
   // stop on a test end
-  var run = true
+  var run = true;
 
   // some statistics
   var instrCnt: Long = 0L
@@ -125,26 +125,26 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     val rs1 = (instr >> 15) & 0x01f
     val rs2 = (instr >> 20) & 0x01f
     val funct3 = (instr >> 12) & 0x07
-    val funct7 = (instr >> 25) & 0x07f // Extended to 7 bits for AMO
-    val aq = (instr >> 26) & 0x01 // Acquire bit
-    val rl = (instr >> 25) & 0x01 // Release bit
+    val funct7 = (instr >> 25) & 0x07f  // Extended to 7 bits for AMO
+    val aq = (instr >> 26) & 0x01       // Acquire bit
+    val rl = (instr >> 25) & 0x01       // Release bit
 
-    /** Immediate generation is a little bit elaborated, but shall give smaller
-      * multiplexers in the hardware.
-      */
+    /** Immediate generation is a little bit elaborated,
+     *  but shall give smaller multiplexers in the hardware.
+     */
     def genImm() = {
       val instrType: InstrType = opcode match {
         case AluImm => I
-        case Alu    => R
+        case Alu => R
         case Branch => SBT
-        case Load   => I
-        case Store  => S
-        case Lui    => U
-        case AuiPc  => U
-        case Jal    => UJ
-        case JalR   => I
+        case Load => I
+        case Store => S
+        case Lui => U
+        case AuiPc => U
+        case Jal => UJ
+        case JalR => I
         case System => I
-        case _      => R
+        case _ => R
       }
       // subfields of the instruction
       val instr7 = (instr >> 7) & 0x01
