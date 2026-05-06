@@ -41,14 +41,14 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
   private var mtimecmp: Long = Long.MaxValue // no pending timer by default
 
   // CLINT Registers
-  private var mstatus: Int = 0
-  private var mie: Int = 0
-  private var mtvec: Int = 0
-  private var mscratch: Int = 0
-  private var mepc: Int = 0
-  private var mcause: Int = 0
-  private var mtval: Int = 0
-  private var mip: Int = 0
+  private var mstatus: Int = 0 // Machine status register
+  private var mie: Int = 0 // Machine interrupt-enable register
+  private var mtvec: Int = 0 // Machine trap-handler base address
+  private var mscratch: Int = 0 // Machine scratch register
+  private var mepc: Int = 0 // Machine exception program counter
+  private var mcause: Int = 0 // Machine trap cause
+  private var mtval: Int = 0 // Machine trap value
+  private var mip: Int = 0 // Machine interrupt pending
 
   private var currentPriv: Int = 3 // 3 = M-mode at reset
 
@@ -98,7 +98,6 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       case 0xbffc => ((instrCnt >>> 32) & 0xffffffffL).toInt // mtime hi
       case 0x4000 => (mtimecmp & 0xffffffffL).toInt // mtimecmp lo
       case 0x4004 => ((mtimecmp >>> 32) & 0xffffffffL).toInt // mtimecmp hi
-      case 0x0000 => 0 // msip (hart 0)
       case _      => 0
     }
   }
@@ -325,7 +324,6 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
         } else
           imm12 match {
             case 0x000 => // ECALL
-              val fromM = ((mstatus >>> 11) & 0x3) == 3
               val cause = if (currentPriv == 3) 11 else 8
               takeTrap(cause, pc, 0)
               (0, false, pc) // takeTrap set pc = mtvec base
@@ -566,7 +564,6 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
             cont = false
         }
     }
-
   }
   Console.err.println(f"Simulation ended. pc=0x$pc%08x, steps=$instrCnt")
 }
