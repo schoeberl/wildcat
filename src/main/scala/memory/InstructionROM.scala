@@ -1,4 +1,4 @@
-package wildcat.pipeline
+package memory
 
 import chisel3._
 import soc._

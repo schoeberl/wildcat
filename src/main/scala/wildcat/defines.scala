@@ -92,11 +92,25 @@ object CSR {
   val INSTRET = 0xc02
   val INSTRETH = 0xc82
 
-
   val HARTID = 0xf10
   val MARCHID = 0xf12
   val WILDCAT_MARCHID = 47 // see https://github.com/riscv/riscv-isa-manual/blob/main/marchid.md
 
   val MINSTRET = 0xb02
   val MINSTRETH = 0xb82
+
+  // mstatus bits (RV32)
+  val MSTATUS_MIE = 1 << 3
+  val MSTATUS_MPIE = 1 << 7
+  val MSTATUS_MPP = 3 << 11 // 2 bits; always 0b11 (M-mode) for us
+
+  // mie/mip bits
+  val MIP_MSIP = 1 << 3
+  val MIP_MTIP = 1 << 7
+  val MIP_MEIP = 1 << 11
+
+  // mcause interrupt codes (with MSB=1)
+  val CAUSE_M_TIMER = 0x80000007
+  val CAUSE_M_EXTERNAL = 0x8000000b
+  val CAUSE_M_SOFTWARE = 0x80000003
 }
