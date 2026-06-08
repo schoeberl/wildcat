@@ -507,9 +507,6 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
   def updateMip(): Unit = {
     // Timer: set MTIP whenever mtime >= mtimecmp
     if (instrCnt >= mtimecmp) mip |= MIP_MTIP else mip &= ~MIP_MTIP
-    // External: set MEIP whenever any PLIC source is pending+enabled
-    if (false) mip |= MIP_MEIP else mip &= ~MIP_MEIP
-    // MSIP from CLINT msip reg (you currently ignore writes to it — fine for now)
   }
 
   def pendingInterruptCause(): Option[Int] = {
