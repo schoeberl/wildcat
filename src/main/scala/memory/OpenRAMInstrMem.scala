@@ -9,7 +9,7 @@ import soc._
  */
 class OpenRAMInstrMem(nrBytes: Int = 1024) extends PipeConDevice(32) {
 
-  val writePort = IO(new PipeCon(10))
+  val writePort = IO(new PipeConIO(10))
 
   val mem = Module(new SramMacro)
 
