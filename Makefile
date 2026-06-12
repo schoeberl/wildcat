@@ -41,6 +41,9 @@ dump:
 run:
 	sbt "runMain wildcat.isasim.SimRV $(PROGRAM)"
 
+linux:
+	sbt "runMain wildcat.isasim.SimRV --linux $(PROGRAM)"
+
 test-one-sim:
 	sbt "testOnly wildcat.SimulatorSingleTest"
 

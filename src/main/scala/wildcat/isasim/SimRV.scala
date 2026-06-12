@@ -21,8 +21,8 @@ import wildcat.LoadStoreFunct3._
 import wildcat.CSRFunct3._
 import wildcat.InstrType._
 import wildcat.CSR._
+import wildcat.MMIO._
 import wildcat.Util
-import spi.SerialSpiDriver.s
 
 class SimRV(mem: Array[Int], start: Int, stop: Int) {
   import SimRV._
@@ -72,10 +72,9 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
   rxThread.setDaemon(true)
   rxThread.start()
 
-  // Translate a physical address into an index into `mem` (word array).
-  // Throws if the address is outside RAM.
+  // Translate a physical address into an index into the memory array
   private def memIdx(addr: Int): Int = {
-    val idx = (addr - MEM_BASE) >>> 2
+    val idx = (addr - start) >>> 2
     if (idx < 0 || idx >= mem.length) {
       throw new RuntimeException(
         f"RAM access out of bounds: addr=0x$addr%08x (idx=$idx, mem.length=${mem.length})"
@@ -84,35 +83,29 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     idx
   }
 
-  // MMIO helpers
-  private def isUart(addr: Int): Boolean =
-    addr >= 0x10000000 && addr < 0x10000100
-  private def isClint(addr: Int): Boolean =
-    addr >= 0x02000000 && addr < 0x02010000
+  // MMIO helpers - Matches DTS address ranges
+  private def isUart(addr: Int): Boolean = addr >= UART_BASE && addr < UART_BASE + 0x100
+  private def isClint(addr: Int): Boolean = addr >= CLINT_BASE && addr < CLINT_BASE + 0x10000
 
   // CLINT load
   private def clintLoad(addr: Int): Int = {
-    val off = addr - 0x02000000
+    val off = addr - CLINT_BASE
     off match {
       case 0xbff8 => (instrCnt & 0xffffffffL).toInt // mtime lo
       case 0xbffc => ((instrCnt >>> 32) & 0xffffffffL).toInt // mtime hi
       case 0x4000 => (mtimecmp & 0xffffffffL).toInt // mtimecmp lo
       case 0x4004 => ((mtimecmp >>> 32) & 0xffffffffL).toInt // mtimecmp hi
-      case _      => 0
+      case _ => 0
     }
   }
 
   // CLINT store
   private def clintStore(addr: Int, value: Int): Unit = {
-    val off = addr - 0x02000000
+    val off = addr - CLINT_BASE
     off match {
-      case 0x4000 =>
-        mtimecmp =
-          (mtimecmp & 0xffffffff00000000L) | (value.toLong & 0xffffffffL)
-      case 0x4004 =>
-        mtimecmp =
-          (mtimecmp & 0x00000000ffffffffL) | ((value.toLong & 0xffffffffL) << 32)
-      case _ => () // msip + everything else: ignore
+      case 0x4000 => mtimecmp = (mtimecmp & 0xffffffff00000000L) | (value.toLong & 0xffffffffL)
+      case 0x4004 => mtimecmp = (mtimecmp & 0x00000000ffffffffL) | ((value.toLong & 0xffffffffL) << 32)
+      case _ => ()
     }
   }
 
@@ -129,10 +122,12 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     val aq = (instr >> 26) & 0x01       // Acquire bit
     val rl = (instr >> 25) & 0x01       // Release bit
 
-    /** Immediate generation is a little bit elaborated,
-     *  but shall give smaller multiplexers in the hardware.
+    /**
+     * Immediate generation is a little bit elaborated,
+     * but shall give smaller multiplexers in the hardware.
      */
     def genImm() = {
+
       val instrType: InstrType = opcode match {
         case AluImm => I
         case Alu => R
@@ -146,7 +141,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
         case System => I
         case _ => R
       }
-      // subfields of the instruction
+      // subfields of the instruction 
       val instr7 = (instr >> 7) & 0x01
       val instr11_8 = (instr >> 8) & 0x0f
       val instr19_12 = (instr >> 12) & 0xff
@@ -165,21 +160,22 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
         case _ => 0
       }
       val imm4_1 = instrType match {
-        case I  => instr24_21
-        case U  => 0
+        case I => instr24_21
+        case U => 0
         case UJ => instr24_21
-        case _  => instr11_8
+        case _ => instr11_8
       }
       val imm10_5 = if (instrType == U) 0 else instr30_25
       val imm11 = instrType match {
         case SBT => instr7
-        case U   => 0
-        case UJ  => instr20
-        case _   => instr31
+        case U => 0
+        case UJ => instr20
+        case _ => instr31
       }
       val imm19_12 = if (instrType == U || instrType == UJ) instr19_12 else sext8
       val imm31_20 = if (instrType == U) instr31_20 else sext12
 
+      // now glue together
       (imm31_20 << 20) | (imm19_12 << 12) | (imm11 << 11) |
         (imm10_5 << 5) | (imm4_1 << 1) | imm0
     }
@@ -194,13 +190,13 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
 
       funct3 match {
         case F3_ADD_SUB => if (sraSub) op1 - op2 else op1 + op2
-        case F3_SLL     => op1 << shamt
-        case F3_SLT     => if (op1 < op2) 1 else 0
-        case F3_SLTU    => if ((op1 < op2) ^ (op1 < 0) ^ (op2 < 0)) 1 else 0
-        case F3_XOR     => op1 ^ op2
+        case F3_SLL => op1 << shamt
+        case F3_SLT => if (op1 < op2) 1 else 0
+        case F3_SLTU => if ((op1 < op2) ^ (op1 < 0) ^ (op2 < 0)) 1 else 0
+        case F3_XOR => op1 ^ op2
         case F3_SRL_SRA => if (sraSub) op1 >> shamt else op1 >>> shamt
-        case F3_OR      => op1 | op2
-        case F3_AND     => op1 & op2
+        case F3_OR => op1 | op2
+        case F3_AND => op1 & op2
       }
     }
 
@@ -221,13 +217,15 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       }
     }
 
-    def compare(funct3: Int, op1: Int, op2: Int): Boolean = funct3 match {
-      case BEQ  => op1 == op2
-      case BNE  => !(op1 == op2)
-      case BLT  => op1 < op2
-      case BGE  => op1 >= op2
-      case BLTU => (op1 < op2) ^ (op1 < 0) ^ (op2 < 0)
-      case BGEU => op1 == op2 || ((op1 > op2) ^ (op1 < 0) ^ (op2 < 0))
+    def compare(funct3: Int, op1: Int, op2: Int): Boolean = {
+      funct3 match {
+        case BEQ => op1 == op2
+        case BNE => !(op1 == op2)
+        case BLT => op1 < op2
+        case BGE => op1 >= op2
+        case BLTU => (op1 < op2) ^ (op1 < 0) ^ (op2 < 0)
+        case BGEU => op1 == op2 || ((op1 > op2) ^ (op1 < 0) ^ (op2 < 0))
+      }
     }
 
     def load(funct3: Int, base: Int, displ: Int): Int = {
@@ -235,7 +233,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
 
       // MMIO: UART
       if (isUart(addr)) {
-        val offset = addr - 0x10000000
+        val offset = addr - UART_BASE
         return offset match {
           case 0 => val b = rxQueue.poll(); if (b == null) 0 else b.intValue()
           case 5 => 0x60 | (if (rxQueue.isEmpty) 0 else 1)
@@ -249,9 +247,9 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       // RAM
       val data = mem(memIdx(addr))
       funct3 match {
-        case LB  => (((data >> (8 * (addr & 0x03))) & 0xff) << 24) >> 24
-        case LH  => (((data >> (8 * (addr & 0x03))) & 0xffff) << 16) >> 16
-        case LW  => data
+        case LB => (((data >> (8 * (addr & 0x03))) & 0xff) << 24) >> 24
+        case LH => (((data >> (8 * (addr & 0x03))) & 0xffff) << 16) >> 16
+        case LW => data
         case LBU => (data >> (8 * (addr & 0x03))) & 0xff
         case LHU => (data >> (8 * (addr & 0x03))) & 0xffff
       }
@@ -262,7 +260,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
 
       // MMIO: UART
       if (isUart(addr)) {
-        val offset = addr - 0x10000000
+        val offset = addr - UART_BASE
         funct3 match {
           case SB if offset == 0 =>
             val b = value & 0xff
@@ -283,12 +281,12 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       val wordAddr = memIdx(addr)
 
       // Any store should invalidate reservations to the same address
-      if (reservationValid && wordAddr == (reservationAddr >>> 2) - (MEM_BASE >>> 2)) {
+      if (reservationValid && wordAddr == (reservationAddr >>> 2) - (start >>> 2)) {
         reservationValid = false
       }
 
       funct3 match {
-        case SB =>
+        case SB => {
           val mask = (addr & 0x03) match {
             case 0 => 0xffffff00
             case 1 => 0xffff00ff
@@ -296,13 +294,22 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
             case 3 => 0x00ffffff
           }
           mem(wordAddr) = (mem(wordAddr) & mask) | ((value & 0xff) << (8 * (addr & 0x03)))
-        case SH =>
+        }
+        case SH => {
           val mask = (addr & 0x03) match {
             case 0 => 0xffff0000
             case 2 => 0x0000ffff
           }
           mem(wordAddr) = (mem(wordAddr) & mask) | ((value & 0xffff) << (8 * (addr & 0x03)))
-        case SW => mem(wordAddr) = value
+        }
+        case SW => {
+          // very primitive IO simulation
+          if (addr == 0xf0000004) {
+            println("out: " + value.toChar)
+          } else {
+            mem(wordAddr) = value
+          }
+        }
       }
     }
 
@@ -328,11 +335,11 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
               takeTrap(cause, pc, 0)
               (0, false, pc) // takeTrap set pc = mtvec base
             case 0x001 => // EBREAK
-              takeTrap(cause = 3, epc = pc, tval = pc)
+              takeTrap(3, pc, pc)
               (0, false, pc)
-            case 0x105 => // WFI — no-op (we don't deliver interrupts anyway)
+            case 0x105 => // WFI — no-op
               (0, false, pcNext)
-            case 0x102 | 0x302 =>
+            case 0x302 => // MRET — return from trap
               val mpie = (mstatus & MSTATUS_MPIE) >>> 4 // bit 7 -> bit 3
               mstatus = (mstatus & ~MSTATUS_MIE) | mpie // MIE <- MPIE
               mstatus |= MSTATUS_MPIE // MPIE <- 1
@@ -345,21 +352,21 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
               (0, false, pcNext)
           }
       } else {
-        // CSR read/write — return 0 / MARCHID, silently accept writes
+        // CSR read/write
         (csrOp(), true, pcNext)
       }
     }
 
     def applyCsrWrite(old: Int, src: Int, funct3: Int): Int = funct3 match {
-      case CSRRW | CSRRWI => src // write:  new = src
-      case CSRRS | CSRRSI => old | src // set:    new = old | src
+      case CSRRW | CSRRWI => src        // write:  new = src
+      case CSRRS | CSRRSI => old | src  // set:    new = old | src
       case CSRRC | CSRRCI => old & ~src // clear:  new = old & ~src
-      case _              => old // shouldn't happen
+      case _ => old                     // shouldn't happen
     }
 
     def csrRead(addr: Int): Int = addr match {
       case 0x300 => mstatus
-      case 0x301 => 0x40001100 // misa: MXL=1, I|M|A
+      case 0x301 => WILDCAT_MISA
       case 0x304 => mie
       case 0x305 => mtvec
       case 0x340 => mscratch
@@ -367,11 +374,8 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       case 0x342 => mcause
       case 0x343 => mtval
       case 0x344 => mip
-      case 0xf11 => 0 // mvendorid
-      case 0xf12 => WILDCAT_MARCHID // marchid
-      case 0xf13 => 0 // mimpid
-      case 0xf14 => 0 // mhartid
-      case _     => 0
+      case 0xf12 => WILDCAT_MARCHID
+      case _ => 0 // mvendorid/mimpid/mhartid or unknown return 0
     }
 
     def csrWrite(addr: Int, value: Int): Unit = addr match {
@@ -383,14 +387,14 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       case 0x342 => mcause = value
       case 0x343 => mtval = value
       case 0x344 => mip = value
-      case _     => () // RO CSRs + unknowns: drop
+      case _ => () // RO CSRs and unknowns get dropped
     }
 
     def csrOp(): Int = {
       val doWrite: Boolean = funct3 match {
-        case CSRRW | CSRRWI                  => true
+        case CSRRW | CSRRWI => true
         case CSRRS | CSRRSI | CSRRC | CSRRCI => src != 0
-        case _                               => false
+        case _ => false
       }
       val old = csrRead(csrAddr)
       if (doWrite) csrWrite(csrAddr, applyCsrWrite(old, src, funct3))
@@ -503,7 +507,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     pc != oldPc && run && pc < stop // detect endless loop or go beyond code to stop simulation
   }
 
-  // Trap Handler
+  // Interrupt and trap handling
   def updateMip(): Unit = {
     // Timer: set MTIP whenever mtime >= mtimecmp
     if (instrCnt >= mtimecmp) mip |= MIP_MTIP else mip &= ~MIP_MTIP
@@ -512,9 +516,9 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
   def pendingInterruptCause(): Option[Int] = {
     if ((mstatus & MSTATUS_MIE) == 0) return None
     val active = mip & mie
-    if ((active & MIP_MEIP) != 0) Some(CAUSE_M_EXTERNAL)
+    if ((active & MIP_MTIP) != 0) Some(CAUSE_M_TIMER) // We only ever expect timer interrupts
     else if ((active & MIP_MSIP) != 0) Some(CAUSE_M_SOFTWARE)
-    else if ((active & MIP_MTIP) != 0) Some(CAUSE_M_TIMER)
+    else if ((active & MIP_MEIP) != 0) Some(CAUSE_M_EXTERNAL)
     else None
   }
 
@@ -525,11 +529,14 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     // Save current privilege into MPP, save MIE into MPIE, clear MIE.
     val mpie = (mstatus & MSTATUS_MIE) << 4 // bit 3 -> bit 7
     val mpp = currentPriv << 11 // 0 = U, 3 = M
-    mstatus =
-      (mstatus & ~(MSTATUS_MIE | MSTATUS_MPIE | MSTATUS_MPP)) | mpie | mpp
-    currentPriv = 3 // trap always enters M
+    mstatus = (mstatus & ~(MSTATUS_MIE | MSTATUS_MPIE | MSTATUS_MPP)) | mpie | mpp
+    currentPriv = 3 // trap always enters M-mode
     val base = mtvec & ~0x3
     val mode = mtvec & 0x3
+
+    if (base == 0) { // mtvec=0 means no linux; halt on ecall
+      run = false
+    }
     pc =
       if (mode == 1 && (cause & 0x80000000) != 0)
         base + 4 * (cause & 0x7fffffff)
@@ -567,39 +574,37 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
 
 object SimRV {
 
-  // Physical base of RAM. Must match the kernel's CONFIG_PHYS_RAM_BASE and
-  // the . = 0x80000000; in boot.ld and the memory@80000000 node in wildcat.dts.
-  val MEM_BASE = 0x80000000
+  def runSimRV(file: String, linux: Boolean = false) = {
+    val (code, start) = Util.getCode(file)
 
-  val memSize = 48 // MB
-  val memWords = memSize * 1024 * 1024 / 4
-  val maxAddr = memSize * 1024 * 1024 - 1
+    val (memBase, memSize) =
+      if (linux) (0x80000000, 48 * 1024 * 1024) // 48 MB
+      else (start, code.length * 4)
 
-  def runSimRV(file: String) = {
+    val memWords = memSize / 4
+    val maxAddr = memSize - 1
+
     val mem = new Array[Int](memWords)
-
-    val (code, startOrig) = Util.getCode(file)
 
     for (i <- 0 until code.length) {
       mem(i) = code(i)
     }
 
-    // boot.bin is a raw binary whose first byte is the bootloader entry
-    // (`_start`), linked at MEM_BASE. For ELF inputs the entry comes from
-    // the file itself; otherwise we default to MEM_BASE.
-    val start =
-      if (startOrig == 0 || startOrig == MEM_BASE) MEM_BASE
-      else startOrig
-
-    val stop = MEM_BASE + memSize * 1024 * 1024
+    val stop = memBase + memSize
 
     // TODO: do we really want ot ba able to start at an arbitrary address?
     // Read in RV spec
-    val sim = new SimRV(mem, start, stop)
+    val sim = new SimRV(mem, memBase, stop)
     sim
   }
 
   def main(args: Array[String]): Unit = {
-    runSimRV(args(0))
+    val linux = args.contains("--linux")
+    args.filterNot(_ == "--linux").headOption match {
+      case Some(file) => runSimRV(file, linux)
+      case None =>
+        Console.err.println("usage: SimRV [--linux] <program-file>")
+        sys.exit(1)
+    }
   }
 }

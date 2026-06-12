@@ -1,5 +1,11 @@
 package wildcat
 
+object MMIO {
+  // MMIO base addresses - matches DTS address ranges
+  val UART_BASE = 0x10000000
+  val CLINT_BASE = 0x02000000
+}
+
 object Opcode {
   val AluImm = 0x13
   val Alu = 0x33
@@ -38,6 +44,7 @@ object AluFunct3 {
   val F3_SRL_SRA = 0x05
   val F3_OR = 0x06
   val F3_AND = 0x07
+  // M-Extension
   val F3_MUL = 0x00
   val F3_MULH = 0x01
   val F3_MULHSU = 0x02
@@ -92,9 +99,11 @@ object CSR {
   val INSTRET = 0xc02
   val INSTRETH = 0xc82
 
+
   val HARTID = 0xf10
   val MARCHID = 0xf12
   val WILDCAT_MARCHID = 47 // see https://github.com/riscv/riscv-isa-manual/blob/main/marchid.md
+  val WILDCAT_MISA = 0x40001100 // RV32IMA
 
   val MINSTRET = 0xb02
   val MINSTRETH = 0xb82
@@ -102,7 +111,7 @@ object CSR {
   // mstatus bits (RV32)
   val MSTATUS_MIE = 1 << 3
   val MSTATUS_MPIE = 1 << 7
-  val MSTATUS_MPP = 3 << 11 // 2 bits; always 0b11 (M-mode) for us
+  val MSTATUS_MPP = 3 << 11 // Always M-mode
 
   // mie/mip bits
   val MIP_MSIP = 1 << 3
@@ -110,7 +119,7 @@ object CSR {
   val MIP_MEIP = 1 << 11
 
   // mcause interrupt codes (with MSB=1)
+  val CAUSE_M_SOFTWARE = 0x80000003
   val CAUSE_M_TIMER = 0x80000007
   val CAUSE_M_EXTERNAL = 0x8000000b
-  val CAUSE_M_SOFTWARE = 0x80000003
 }
