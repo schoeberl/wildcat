@@ -16,7 +16,7 @@ import soc._
  */
 abstract class Wildcat() extends Module {
   val io = IO(new Bundle {
-    val imem = Flipped(PipeCon(32))
-    val dmem = Flipped(PipeCon(32))
+    val imem = Flipped(PipeConIO(32))
+    val dmem = Flipped(PipeConIO(32))
   })
 }

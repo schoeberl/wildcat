@@ -4,6 +4,10 @@
  * [x] Change memory interface to `PipeCon`
  * [ ] Have a better drawing of `PipeCon` (in soc-comm, with pipe reads and writes and delayed ack)
  * [ ] Do some fmax testing with added stalling and also with OpenRAM memories
+ * [ ] Use caches and a memory simulation for testing
+    - avoid memory initializaion, which is broken for Chisel 6, and does not work for ASIC RAMs
+    - current tests run for 190s
+    * [ ] then switch to Chisel 6
  * [x] why does // val pcReg = RegInit(-4.S(32.W).asUInt)  result in failing tests?
    - [x] Do not execute the first instruction from on-chip memory
    - [x] but start PC with -4
