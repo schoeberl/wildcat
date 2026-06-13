@@ -80,6 +80,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int, linux: Boolean = false) {
     val funct7 = (instr >> 25) & 0x07f  // Extended to 7 bits for AMO
     val aq = (instr >> 26) & 0x01       // Acquire bit
     val rl = (instr >> 25) & 0x01       // Release bit
+    val csrAddr = (instr >> 20) & 0xfff // CSR address
 
     /**
      * Immediate generation is a little bit elaborated,
@@ -249,49 +250,41 @@ class SimRV(mem: Array[Int], start: Int, stop: Int, linux: Boolean = false) {
       }
     }
 
-    // Decoded once per instruction
-    val csrAddr: Int = (instr >>> 20) & 0xfff
-    val rs1Idx: Int = (instr >>> 15) & 0x1f
+    // CSR operand selection (used only by SYSTEM/CSR ops)
     val isImm: Boolean = (funct3 & 0x4) != 0 // CSRR*I have bit 2 set
-    val src: Int = if (isImm) rs1Idx else reg(rs1Idx) // 5-bit zero-ext imm OR reg
+    val src: Int = if (isImm) rs1 else reg(rs1) // 5-bit zero-ext imm OR reg
 
     // SYSTEM opcode: separate priv instructions (funct3=0) from CSR ops (funct3!=0)
     def systemOp(): (Int, Boolean, Int) = {
       val pcNext = pc + 4
       if (funct3 == 0) {
-        val f7 = (instr >>> 25) & 0x7f
-        val imm12 = (instr >>> 20) & 0xfff
-        if (f7 == 0x09 || f7 == 0x0b) {
-          // sfence.vma / sinval.vma: no-op (no MMU)
-          (0, false, pcNext)
-        } else
-          imm12 match {
-            case 0x000 => // ECALL
-              // Test programs run bare-metal (no trap handler), so ECALL ends the run.
-              if (linux) {
-                val cause = if (currentPriv == 3) 11 else 8
-                takeTrap(cause, pc, 0)
-              } else {
-                run = false
-              }
-              (0, false, pc) // if trapped, takeTrap set pc = mtvec base
-            case 0x001 => // EBREAK
-              if (linux) takeTrap(3, pc, pc) else run = false
-              (0, false, pc)
-            case 0x105 => // WFI — no-op
-              (0, false, pcNext)
-            case 0x302 => // MRET — return from trap
-              val mpie = (mstatus & MSTATUS_MPIE) >>> 4 // bit 7 -> bit 3
-              mstatus = (mstatus & ~MSTATUS_MIE) | mpie // MIE <- MPIE
-              mstatus |= MSTATUS_MPIE // MPIE <- 1
-              currentPriv = (mstatus >>> 11) & 0x3 // priv <- MPP
-              (0, false, mepc)
-            case _ =>
-              Console.err.println(
-                f"Unknown SYSTEM f3=0 imm12=0x$imm12%03x at pc=0x$pc%08x — treating as nop"
-              )
-              (0, false, pcNext)
-          }
+        csrAddr match { // I-imm field [31:20] selects the priv instruction
+          case 0x000 => // ECALL
+            // Test programs run bare-metal (no trap handler), so ECALL ends the run.
+            if (linux) {
+              val cause = if (currentPriv == 3) 11 else 8
+              takeTrap(cause, pc, 0)
+            } else {
+              run = false
+            }
+            (0, false, pc) // if trapped, takeTrap set pc = mtvec base
+          case 0x001 => // EBREAK
+            if (linux) takeTrap(3, pc, pc) else run = false
+            (0, false, pc)
+          case 0x105 => // WFI — no-op
+            (0, false, pcNext)
+          case 0x302 => // MRET — return from trap
+            val mpie = (mstatus & MSTATUS_MPIE) >>> 4 // bit 7 -> bit 3
+            mstatus = (mstatus & ~MSTATUS_MIE) | mpie // MIE <- MPIE
+            mstatus |= MSTATUS_MPIE // MPIE <- 1
+            currentPriv = (mstatus >>> 11) & 0x3 // priv <- MPP
+            (0, false, mepc)
+          case _ =>
+            Console.err.println(
+              f"Unknown SYSTEM f3=0 imm12=0x$csrAddr%03x at pc=0x$pc%08x — treating as nop"
+            )
+            (0, false, pcNext)
+        }
       } else {
         // CSR read/write
         (csrOp(), true, pcNext)
