@@ -21,10 +21,9 @@ import wildcat.LoadStoreFunct3._
 import wildcat.CSRFunct3._
 import wildcat.InstrType._
 import wildcat.CSR._
-import wildcat.MMIO._
 import wildcat.Util
 
-class SimRV(mem: Array[Int], start: Int, stop: Int) {
+class SimRV(mem: Array[Int], start: Int, stop: Int, linux: Boolean = false) {
   import SimRV._
 
   // That's the state of the processor.
@@ -37,10 +36,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
   var reservationValid = false
   var reservationAddr = 0
 
-  // CLINT timer state
-  private var mtimecmp: Long = Long.MaxValue // no pending timer by default
-
-  // CLINT Registers
+  // M-mode CSRs
   private var mstatus: Int = 0 // Machine status register
   private var mie: Int = 0 // Machine interrupt-enable register
   private var mtvec: Int = 0 // Machine trap-handler base address
@@ -58,19 +54,8 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
   // some statistics
   var instrCnt: Long = 0L
 
-  // UART RX: background reader pushes stdin bytes into a queue.
-  private val rxQueue =
-    new java.util.concurrent.ConcurrentLinkedQueue[Integer]()
-  private val rxThread = new Thread(
-    () => {
-      val in = java.lang.System.in
-      var b = in.read()
-      while (b >= 0) { rxQueue.offer(b & 0xff); b = in.read() }
-    },
-    "uart-rx"
-  )
-  rxThread.setDaemon(true)
-  rxThread.start()
+  // Memory-mapped UART + CLINT, only active in Linux mode.
+  private val mmio = new Mmio(linux)
 
   // Translate a physical address into an index into the memory array
   private def memIdx(addr: Int): Int = {
@@ -81,32 +66,6 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       )
     }
     idx
-  }
-
-  // MMIO helpers - Matches DTS address ranges
-  private def isUart(addr: Int): Boolean = addr >= UART_BASE && addr < UART_BASE + 0x100
-  private def isClint(addr: Int): Boolean = addr >= CLINT_BASE && addr < CLINT_BASE + 0x10000
-
-  // CLINT load
-  private def clintLoad(addr: Int): Int = {
-    val off = addr - CLINT_BASE
-    off match {
-      case 0xbff8 => (instrCnt & 0xffffffffL).toInt // mtime lo
-      case 0xbffc => ((instrCnt >>> 32) & 0xffffffffL).toInt // mtime hi
-      case 0x4000 => (mtimecmp & 0xffffffffL).toInt // mtimecmp lo
-      case 0x4004 => ((mtimecmp >>> 32) & 0xffffffffL).toInt // mtimecmp hi
-      case _ => 0
-    }
-  }
-
-  // CLINT store
-  private def clintStore(addr: Int, value: Int): Unit = {
-    val off = addr - CLINT_BASE
-    off match {
-      case 0x4000 => mtimecmp = (mtimecmp & 0xffffffff00000000L) | (value.toLong & 0xffffffffL)
-      case 0x4004 => mtimecmp = (mtimecmp & 0x00000000ffffffffL) | ((value.toLong & 0xffffffffL) << 32)
-      case _ => ()
-    }
   }
 
   def execute(instr: Int): Boolean = {
@@ -231,18 +190,8 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     def load(funct3: Int, base: Int, displ: Int): Int = {
       val addr = base + displ
 
-      // MMIO: UART
-      if (isUart(addr)) {
-        val offset = addr - UART_BASE
-        return offset match {
-          case 0 => val b = rxQueue.poll(); if (b == null) 0 else b.intValue()
-          case 5 => 0x60 | (if (rxQueue.isEmpty) 0 else 1)
-          case _ => 0x00
-        }
-      }
-
-      // MMIO: CLINT
-      if (isClint(addr)) return clintLoad(addr)
+      // Memory-mapped IO (UART + CLINT)
+      if (mmio.isMmio(addr)) return mmio.load(addr, instrCnt)
 
       // RAM
       val data = mem(memIdx(addr))
@@ -258,24 +207,11 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     def store(funct3: Int, base: Int, displ: Int, value: Int): Unit = {
       val addr = base + displ
 
-      // MMIO: UART
-      if (isUart(addr)) {
-        val offset = addr - UART_BASE
-        funct3 match {
-          case SB if offset == 0 =>
-            val b = value & 0xff
-            if (b != 0x0d) { // Check for \r
-              Console.out.write(b)
-              Console.out.flush()
-            }
-          case _ =>
-          // writes to IER/FCR/LCR/MCR/SCR — no-op
-        }
+      // Memory-mapped IO (UART + CLINT)
+      if (mmio.isMmio(addr)) {
+        mmio.store(funct3, addr, value)
         return
       }
-
-      // MMIO: CLINT
-      if (isClint(addr)) { clintStore(addr, value); return }
 
       // RAM
       val wordAddr = memIdx(addr)
@@ -331,11 +267,16 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
         } else
           imm12 match {
             case 0x000 => // ECALL
-              val cause = if (currentPriv == 3) 11 else 8
-              takeTrap(cause, pc, 0)
-              (0, false, pc) // takeTrap set pc = mtvec base
+              // Test programs run bare-metal (no trap handler), so ECALL ends the run.
+              if (linux) {
+                val cause = if (currentPriv == 3) 11 else 8
+                takeTrap(cause, pc, 0)
+              } else {
+                run = false
+              }
+              (0, false, pc) // if trapped, takeTrap set pc = mtvec base
             case 0x001 => // EBREAK
-              takeTrap(3, pc, pc)
+              if (linux) takeTrap(3, pc, pc) else run = false
               (0, false, pc)
             case 0x105 => // WFI — no-op
               (0, false, pcNext)
@@ -465,7 +406,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     // Execute the instruction and return a tuple for the result:
     //   (ALU result, writeBack, next PC)
     val result = opcode match {
-      case 0x2f => { // AMO - Atomic Memory Operations
+      case Amo => { // AMO - Atomic Memory Operations
         val addr = rs1Val
         if (funct3 != 0x2) {
           throw new Exception(f"Invalid funct3 for atomic operation: 0x${funct3}%x")
@@ -510,7 +451,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
   // Interrupt and trap handling
   def updateMip(): Unit = {
     // Timer: set MTIP whenever mtime >= mtimecmp
-    if (instrCnt >= mtimecmp) mip |= MIP_MTIP else mip &= ~MIP_MTIP
+    if (mmio.timerPending(instrCnt)) mip |= MIP_MTIP else mip &= ~MIP_MTIP
   }
 
   def pendingInterruptCause(): Option[Int] = {
@@ -531,12 +472,9 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     val mpp = currentPriv << 11 // 0 = U, 3 = M
     mstatus = (mstatus & ~(MSTATUS_MIE | MSTATUS_MPIE | MSTATUS_MPP)) | mpie | mpp
     currentPriv = 3 // trap always enters M-mode
+
     val base = mtvec & ~0x3
     val mode = mtvec & 0x3
-
-    if (base == 0) { // mtvec=0 means no linux; halt on ecall
-      run = false
-    }
     pc =
       if (mode == 1 && (cause & 0x80000000) != 0)
         base + 4 * (cause & 0x7fffffff)
@@ -594,17 +532,19 @@ object SimRV {
 
     // TODO: do we really want ot ba able to start at an arbitrary address?
     // Read in RV spec
-    val sim = new SimRV(mem, memBase, stop)
+    val sim = new SimRV(mem, memBase, stop, linux)
     sim
   }
 
   def main(args: Array[String]): Unit = {
     val linux = args.contains("--linux")
-    args.filterNot(_ == "--linux").headOption match {
-      case Some(file) => runSimRV(file, linux)
-      case None =>
-        Console.err.println("usage: SimRV [--linux] <program-file>")
-        sys.exit(1)
+    val files = args.filter(_ != "--linux") // Args with flags removed i.e. just program file
+
+    if (files.isEmpty) {
+      Console.err.println("usage: SimRV [--linux] <program-file>")
+      sys.exit(1)
     }
+
+    runSimRV(files(0), linux)
   }
 }

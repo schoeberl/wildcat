@@ -1,12 +1,7 @@
 package wildcat
 
-object MMIO {
-  // MMIO base addresses - matches DTS address ranges
-  val UART_BASE = 0x10000000
-  val CLINT_BASE = 0x02000000
-}
-
 object Opcode {
+  val Amo = 0x2f
   val AluImm = 0x13
   val Alu = 0x33
   val Branch = 0x63
@@ -122,4 +117,12 @@ object CSR {
   val CAUSE_M_SOFTWARE = 0x80000003
   val CAUSE_M_TIMER = 0x80000007
   val CAUSE_M_EXTERNAL = 0x8000000b
+}
+
+object MMIO {
+  // MMIO memory map (base + size) - Should match Linux DTS address ranges
+  val UART_BASE = 0x10000000
+  val UART_SIZE = 0x100
+  val CLINT_BASE = 0x02000000
+  val CLINT_SIZE = 0x10000
 }
