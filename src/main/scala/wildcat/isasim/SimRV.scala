@@ -508,20 +508,20 @@ object SimRV {
   def runSimRV(file: String, linux: Boolean = false) = {
     val (code, start) = Util.getCode(file)
 
-    val (memBase, memSize) =
-      if (linux) (0x80000000, 48 * 1024 * 1024) // 48 MB
-      else (start, code.length * 4)
+    // MemSize in MB
+    val (memBase, memSize, stop) =
+      if (linux)
+        (0x80000000, 48, 0x80000000 + 48 * 1024 * 1024)
+      else
+        (start, 1, start + code.length * 4)
 
-    val memWords = memSize / 4
-    val maxAddr = memSize - 1
+    val memWords = memSize * 1024 * 1024 / 4
 
     val mem = new Array[Int](memWords)
 
     for (i <- 0 until code.length) {
       mem(i) = code(i)
     }
-
-    val stop = memBase + memSize
 
     // TODO: do we really want ot ba able to start at an arbitrary address?
     // Read in RV spec
