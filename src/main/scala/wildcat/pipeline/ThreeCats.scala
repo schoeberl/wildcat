@@ -49,7 +49,9 @@ class ThreeCats() extends Wildcat() {
   val instr = WireDefault(io.imem.rdData)
   when (!io.imem.ack) {
     instr := 0x00000033.U
-    pcNext := pcReg
+    when(!doBranch) {
+      pcNext := pcReg
+    }
   }
   when (stall) {
     pcNext := pcReg
