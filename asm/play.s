@@ -1,7 +1,7 @@
 #
 # Play ground
 #
-	li	x1, 3
+	li	x1, 4
 	li  x2, 2
 loop:
 	addi x2, x2, 1

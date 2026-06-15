@@ -25,11 +25,14 @@ class WildcatTestCacheTop(file: String) extends Module {
   BoringUtils.bore(cpuTop.cpu.debugRegs, Seq(io.regFile))
   io.stop := DontCare
   BoringUtils.bore(cpuTop.cpu.stop, Seq(io.stop))
-  io.led := 0.U
 
   val (memory, start) = Util.getCode(file)
   val imem = Module(new InstructionROM(memory))
   cpuTop.memPort <> imem.cpuPort
 
-  io.tx := 0.U
+  val mmio = Module(new WildcatMmio(100000000, 115200, 16))
+  cpuTop.mmioPort <> mmio.cpuPort
+  io.tx := mmio.io.tx
+  mmio.io.rx := io.rx
+  io.led := mmio.io.led(7, 0)
 }

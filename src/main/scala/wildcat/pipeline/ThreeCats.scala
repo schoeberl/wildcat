@@ -42,26 +42,21 @@ class ThreeCats() extends Wildcat() {
   io.imem.address := pcNext
   val fetchPendingReg = RegInit(false.B)
   val fetchDiscardReg = RegInit(false.B)
-  val fetchReq = !fetchPendingReg && !stall
+  val fetchAck = fetchPendingReg && io.imem.ack
+  val fetchReq = !stall && (!fetchPendingReg || fetchAck)
   io.imem.rd := fetchReq
   io.imem.wr := false.B
   io.imem.wrData := 0.U
   io.imem.wrMask := 0.U
 
+  fetchPendingReg := Mux(fetchReq, true.B, Mux(fetchAck, false.B, fetchPendingReg))
+  fetchDiscardReg := Mux(fetchAck, false.B, Mux(doBranch && fetchPendingReg, true.B, fetchDiscardReg))
   when(fetchReq) {
-    fetchPendingReg := true.B
-    fetchDiscardReg := false.B
-  }
-  when(doBranch && fetchPendingReg) {
-    fetchDiscardReg := true.B
-  }
-  when(io.imem.ack) {
-    fetchPendingReg := false.B
     fetchDiscardReg := false.B
   }
 
   // Fetch
-  val fetchAckValid = io.imem.ack && !fetchDiscardReg && !doBranch
+  val fetchAckValid = fetchAck && !fetchDiscardReg && !doBranch
   val instr = WireDefault(io.imem.rdData)
   when (!fetchAckValid) {
     instr := 0x00000033.U

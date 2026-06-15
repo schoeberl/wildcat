@@ -22,11 +22,17 @@ class WildcatCache() extends Module {
   val cpu = Module(new ThreeCats())
 
   val memPort = IO(Flipped(new PipeConIO(32)))
+  val mmioPort = IO(Flipped(new PipeConIO(32)))
 
   val icache = Module(new PipeConCache())
   cpu.io.imem <> icache.cpuPort
+
+  val memoryMap = Module(new PipeConMemoryMap())
+  cpu.io.dmem <> memoryMap.cpuPort
+
   val dcache = Module(new PipeConCache())
-  cpu.io.dmem <> dcache.cpuPort
+  memoryMap.memPort <> dcache.cpuPort
+  memoryMap.mmioPort <> mmioPort
 
   val arbiter = Module(new PipeConArbiter(addrWidth = 32, nrPorts = 2))
   arbiter.cpuPorts(0) <> icache.memPort
