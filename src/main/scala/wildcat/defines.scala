@@ -1,6 +1,7 @@
 package wildcat
 
 object Opcode {
+  val Amo = 0x2f
   val AluImm = 0x13
   val Alu = 0x33
   val Branch = 0x63
@@ -38,6 +39,15 @@ object AluFunct3 {
   val F3_SRL_SRA = 0x05
   val F3_OR = 0x06
   val F3_AND = 0x07
+  // M-Extension
+  val F3_MUL = 0x00
+  val F3_MULH = 0x01
+  val F3_MULHSU = 0x02
+  val F3_MULHU = 0x03
+  val F3_DIV = 0x04
+  val F3_DIVU = 0x05
+  val F3_REM = 0x06
+  val F3_REMU = 0x07
 }
 
 object BranchFunct3 {
@@ -88,7 +98,31 @@ object CSR {
   val HARTID = 0xf10
   val MARCHID = 0xf12
   val WILDCAT_MARCHID = 47 // see https://github.com/riscv/riscv-isa-manual/blob/main/marchid.md
+  val WILDCAT_MISA = 0x40001100 // RV32IMA
 
   val MINSTRET = 0xb02
   val MINSTRETH = 0xb82
+
+  // mstatus bits (RV32)
+  val MSTATUS_MIE = 1 << 3
+  val MSTATUS_MPIE = 1 << 7
+  val MSTATUS_MPP = 3 << 11 // Always M-mode
+
+  // mie/mip bits
+  val MIP_MSIP = 1 << 3
+  val MIP_MTIP = 1 << 7
+  val MIP_MEIP = 1 << 11
+
+  // mcause interrupt codes (with MSB=1)
+  val CAUSE_M_SOFTWARE = 0x80000003
+  val CAUSE_M_TIMER = 0x80000007
+  val CAUSE_M_EXTERNAL = 0x8000000b
+}
+
+object MMIO {
+  // MMIO memory map (base + size) - Should match Linux DTS address ranges
+  val UART_BASE = 0x10000000
+  val UART_SIZE = 0x100
+  val CLINT_BASE = 0x02000000
+  val CLINT_SIZE = 0x10000
 }

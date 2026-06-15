@@ -23,7 +23,8 @@ import wildcat.InstrType._
 import wildcat.CSR._
 import wildcat.Util
 
-class SimRV(mem: Array[Int], start: Int, stop: Int) {
+class SimRV(mem: Array[Int], start: Int, stop: Int, linux: Boolean = false) {
+  import SimRV._
 
   // That's the state of the processor.
   // That's it, nothing else (except memory ;-)
@@ -35,13 +36,40 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
   var reservationValid = false
   var reservationAddr = 0
 
+  // M-mode CSRs
+  private var mstatus: Int = 0 // Machine status register
+  private var mie: Int = 0 // Machine interrupt-enable register
+  private var mtvec: Int = 0 // Machine trap-handler base address
+  private var mscratch: Int = 0 // Machine scratch register
+  private var mepc: Int = 0 // Machine exception program counter
+  private var mcause: Int = 0 // Machine trap cause
+  private var mtval: Int = 0 // Machine trap value
+  private var mip: Int = 0 // Machine interrupt pending
+
+  private var currentPriv: Int = 3 // 3 = M-mode at reset
+
   // stop on a test end
   var run = true;
 
   // some statistics
-  var instrCnt = 0
+  var instrCnt: Long = 0L
+
+  // Memory-mapped UART + CLINT, only active in Linux mode.
+  private val mmio = new Mmio(linux)
+
+  // Translate a physical address into an index into the memory array
+  private def memIdx(addr: Int): Int = {
+    val idx = (addr - start) >>> 2
+    if (idx < 0 || idx >= mem.length) {
+      throw new RuntimeException(
+        f"RAM access out of bounds: addr=0x$addr%08x (idx=$idx, mem.length=${mem.length})"
+      )
+    }
+    idx
+  }
 
   def execute(instr: Int): Boolean = {
+    val oldPc = pc
 
     // Do some decoding: extraction of decoded fields
     val opcode = instr & 0x7f
@@ -52,6 +80,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     val funct7 = (instr >> 25) & 0x07f  // Extended to 7 bits for AMO
     val aq = (instr >> 26) & 0x01       // Acquire bit
     val rl = (instr >> 25) & 0x01       // Release bit
+    val csrAddr = (instr >> 20) & 0xfff // CSR address
 
     /**
      * Immediate generation is a little bit elaborated,
@@ -131,6 +160,23 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       }
     }
 
+    def mulDiv(funct3: Int, op1: Int, op2: Int): Int = {
+      val a = op1.toLong
+      val b = op2.toLong
+      val au = op1.toLong & 0xffffffffL
+      val bu = op2.toLong & 0xffffffffL
+      funct3 match {
+        case F3_MUL    => ((a * b) & 0xffffffffL).toInt
+        case F3_MULH   => ((a * b) >> 32).toInt
+        case F3_MULHSU => ((a * bu) >> 32).toInt
+        case F3_MULHU  => ((au * bu) >> 32).toInt
+        case F3_DIV    => if (b == 0) -1 else (a / b).toInt
+        case F3_DIVU   => if (bu == 0) -1 else (au / bu).toInt
+        case F3_REM    => if (b == 0) a.toInt else (a % b).toInt
+        case F3_REMU   => if (bu == 0) au.toInt else (au % bu).toInt
+      }
+    }
+
     def compare(funct3: Int, op1: Int, op2: Int): Boolean = {
       funct3 match {
         case BEQ => op1 == op2
@@ -143,8 +189,13 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     }
 
     def load(funct3: Int, base: Int, displ: Int): Int = {
-      val addr = ((base + displ) & 0xfffff) // 1 MB wrap around
-      val data = mem(addr >>> 2)
+      val addr = base + displ
+
+      // Memory-mapped IO (UART + CLINT)
+      if (mmio.isMmio(addr)) return mmio.load(addr, instrCnt)
+
+      // RAM
+      val data = mem(memIdx(addr))
       funct3 match {
         case LB => (((data >> (8 * (addr & 0x03))) & 0xff) << 24) >> 24
         case LH => (((data >> (8 * (addr & 0x03))) & 0xffff) << 16) >> 16
@@ -156,13 +207,21 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
 
     def store(funct3: Int, base: Int, displ: Int, value: Int): Unit = {
       val addr = base + displ
-      val wordAddr = addr >>> 2
-      
+
+      // Memory-mapped IO (UART + CLINT)
+      if (mmio.isMmio(addr)) {
+        mmio.store(funct3, addr, value)
+        return
+      }
+
+      // RAM
+      val wordAddr = memIdx(addr)
+
       // Any store should invalidate reservations to the same address
-      if (reservationValid && (addr >>> 2) == (reservationAddr >>> 2)) {
+      if (reservationValid && wordAddr == (reservationAddr >>> 2) - (start >>> 2)) {
         reservationValid = false
       }
-      
+
       funct3 match {
         case SB => {
           val mask = (addr & 0x03) match {
@@ -191,41 +250,96 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       }
     }
 
-    def ecall(): Int = {
-      funct3 match {
-        case ESYS => {
-          run = false
-          return 0
-        }
-        case CSRRS => {
-          val v = imm & 0xfff match {
-            case CYCLE => instrCnt // cycle
-            case CYCLEH => 0 // cycleh
-            case TIME => instrCnt // time
-            case TIMEH => 0 // timeh
-            case INSTRET => instrCnt // instret
-            case INSTRETH => 0 // instreth
+    // CSR operand selection (used only by SYSTEM/CSR ops)
+    val isImm: Boolean = (funct3 & 0x4) != 0 // CSRR*I have bit 2 set
+    val src: Int = if (isImm) rs1 else reg(rs1) // 5-bit zero-ext imm OR reg
 
-            case HARTID => 0 // hartid
-            case MARCHID => WILDCAT_MARCHID
-
-            case _ => 0 // this gets us around _start in the test cases
-          }
-          // println(s"csrrw ${imm & 0xfff} return: $v")
-          return v
+    // SYSTEM opcode: separate priv instructions (funct3=0) from CSR ops (funct3!=0)
+    def systemOp(): (Int, Boolean, Int) = {
+      val pcNext = pc + 4
+      if (funct3 == 0) {
+        csrAddr match { // I-imm field [31:20] selects the priv instruction
+          case 0x000 => // ECALL
+            // Test programs run bare-metal (no trap handler), so ECALL ends the run.
+            if (linux) {
+              val cause = if (currentPriv == 3) 11 else 8
+              takeTrap(cause, pc, 0)
+            } else {
+              run = false
+            }
+            (0, false, pc) // if trapped, takeTrap set pc = mtvec base
+          case 0x001 => // EBREAK
+            if (linux) takeTrap(3, pc, pc) else run = false
+            (0, false, pc)
+          case 0x105 => // WFI — no-op
+            (0, false, pcNext)
+          case 0x302 => // MRET — return from trap
+            val mpie = (mstatus & MSTATUS_MPIE) >>> 4 // bit 7 -> bit 3
+            mstatus = (mstatus & ~MSTATUS_MIE) | mpie // MIE <- MPIE
+            mstatus |= MSTATUS_MPIE // MPIE <- 1
+            currentPriv = (mstatus >>> 11) & 0x3 // priv <- MPP
+            (0, false, mepc)
+          case _ =>
+            Console.err.println(
+              f"Unknown SYSTEM f3=0 imm12=0x$csrAddr%03x at pc=0x$pc%08x — treating as nop"
+            )
+            (0, false, pcNext)
         }
-        case _ => {
-          println("Unknown ecall: " + funct3)
-          return 0
-        }
+      } else {
+        // CSR read/write
+        (csrOp(), true, pcNext)
       }
+    }
+
+    def applyCsrWrite(old: Int, src: Int, funct3: Int): Int = funct3 match {
+      case CSRRW | CSRRWI => src        // write:  new = src
+      case CSRRS | CSRRSI => old | src  // set:    new = old | src
+      case CSRRC | CSRRCI => old & ~src // clear:  new = old & ~src
+      case _ => old                     // shouldn't happen
+    }
+
+    def csrRead(addr: Int): Int = addr match {
+      case 0x300 => mstatus
+      case 0x301 => WILDCAT_MISA
+      case 0x304 => mie
+      case 0x305 => mtvec
+      case 0x340 => mscratch
+      case 0x341 => mepc
+      case 0x342 => mcause
+      case 0x343 => mtval
+      case 0x344 => mip
+      case 0xf12 => WILDCAT_MARCHID
+      case _ => 0 // mvendorid/mimpid/mhartid or unknown return 0
+    }
+
+    def csrWrite(addr: Int, value: Int): Unit = addr match {
+      case 0x300 => mstatus = value
+      case 0x304 => mie = value
+      case 0x305 => mtvec = value
+      case 0x340 => mscratch = value
+      case 0x341 => mepc = value
+      case 0x342 => mcause = value
+      case 0x343 => mtval = value
+      case 0x344 => mip = value
+      case _ => () // RO CSRs and unknowns get dropped
+    }
+
+    def csrOp(): Int = {
+      val doWrite: Boolean = funct3 match {
+        case CSRRW | CSRRWI => true
+        case CSRRS | CSRRSI | CSRRC | CSRRCI => src != 0
+        case _ => false
+      }
+      val old = csrRead(csrAddr)
+      if (doWrite) csrWrite(csrAddr, applyCsrWrite(old, src, funct3))
+      old
     }
 
     def atomic(funct5: Int, addr: Int, rs2Val: Int): (Int, Boolean) = {
       if ((addr & 0x3) != 0) {
         throw new Exception(f"Misaligned atomic address: 0x${addr}%08x")
       }
-      val wordAddr = addr >>> 2
+      val wordAddr = memIdx(addr)
       val oldValue = mem(wordAddr)
       
       funct5 match {
@@ -279,13 +393,13 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
 
     // Debug output for atomic instructions
     if (opcode == 0x2f) {
-      println(f"Atomic instruction at pc=0x${pc}%08x: rs1=x${rs1}%d(0x${rs1Val}%08x) rs2=x${rs2}%d(0x${rs2Val}%08x) rd=x${rd}%d funct7=0x${funct7}%02x")
+      // println(f"Atomic instruction at pc=0x${pc}%08x: rs1=x${rs1}%d(0x${rs1Val}%08x) rs2=x${rs2}%d(0x${rs2Val}%08x) rd=x${rd}%d funct7=0x${funct7}%02x")
     }
 
     // Execute the instruction and return a tuple for the result:
     //   (ALU result, writeBack, next PC)
     val result = opcode match {
-      case 0x2f => { // AMO - Atomic Memory Operations
+      case Amo => { // AMO - Atomic Memory Operations
         val addr = rs1Val
         if (funct3 != 0x2) {
           throw new Exception(f"Invalid funct3 for atomic operation: 0x${funct3}%x")
@@ -295,6 +409,8 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
         (value, success, pcNext)
       }
       case AluImm => (alu(funct3, sraSub, rs1Val, imm), true, pcNext)
+      case Alu if funct7 == 0x01 =>
+        (mulDiv(funct3, rs1Val, rs2Val), true, pcNext)
       case Alu => (alu(funct3, sraSub, rs1Val, rs2Val), true, pcNext)
       case Branch => (0, false, if (compare(funct3, rs1Val, rs2Val)) pc + imm else pcNext)
       case Load => (load(funct3, rs1Val, imm), true, pcNext)
@@ -305,7 +421,7 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       case Jal => (pc + 4, true, pc + imm)
       case JalR => (pc + 4, true, (rs1Val + imm) & 0xfffffffe)
       case Fence => (0, false, pcNext)
-      case System => (ecall(), true, pcNext)
+      case System => systemOp()
       case _ => throw new Exception("Opcode " + opcode + " at " + pc + " not (yet) implemented")
     }
 
@@ -318,7 +434,6 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
       reg(rd) = result._1
     }
 
-    val oldPc = pc
     pc = result._3
 
     instrCnt += 1
@@ -326,36 +441,103 @@ class SimRV(mem: Array[Int], start: Int, stop: Int) {
     pc != oldPc && run && pc < stop // detect endless loop or go beyond code to stop simulation
   }
 
-  var cont = true
-  while (cont) {
-    cont = execute(mem(pc >> 2))
-    // print("regs: ")
-    // reg.foreach(printf("%08x ", _))
-    // println()
+  // Interrupt and trap handling
+  def updateMip(): Unit = {
+    // Timer: set MTIP whenever mtime >= mtimecmp
+    if (mmio.timerPending(instrCnt)) mip |= MIP_MTIP else mip &= ~MIP_MTIP
   }
 
+  def pendingInterruptCause(): Option[Int] = {
+    if ((mstatus & MSTATUS_MIE) == 0) return None
+    val active = mip & mie
+    if ((active & MIP_MTIP) != 0) Some(CAUSE_M_TIMER) // We only ever expect timer interrupts
+    else if ((active & MIP_MSIP) != 0) Some(CAUSE_M_SOFTWARE)
+    else if ((active & MIP_MEIP) != 0) Some(CAUSE_M_EXTERNAL)
+    else None
+  }
+
+  def takeTrap(cause: Int, epc: Int, tval: Int): Unit = {
+    mepc = epc
+    mcause = cause
+    mtval = tval
+    // Save current privilege into MPP, save MIE into MPIE, clear MIE.
+    val mpie = (mstatus & MSTATUS_MIE) << 4 // bit 3 -> bit 7
+    val mpp = currentPriv << 11 // 0 = U, 3 = M
+    mstatus = (mstatus & ~(MSTATUS_MIE | MSTATUS_MPIE | MSTATUS_MPP)) | mpie | mpp
+    currentPriv = 3 // trap always enters M-mode
+
+    val base = mtvec & ~0x3
+    val mode = mtvec & 0x3
+    pc =
+      if (mode == 1 && (cause & 0x80000000) != 0)
+        base + 4 * (cause & 0x7fffffff)
+      else base
+  }
+
+  var cont = true
+  while (cont) {
+    updateMip() // update pending interrupts before each instruction
+    pendingInterruptCause() match {
+      case Some(c) => takeTrap(c, pc, 0) // tval = 0 for interrupts
+      case None    =>
+        try {
+          val instr = mem(memIdx(pc))
+          cont = execute(instr)
+        } catch {
+          case e: Throwable =>
+            Console.err.println(
+              f"\n*** SIM HALTED at pc=0x$pc%08x after $instrCnt steps"
+            )
+            Console.err.println(
+              s"***   reason: ${e.getClass.getSimpleName}: ${e.getMessage}"
+            )
+            Console.err.println("***   registers:")
+            for (i <- 0 until 32) {
+              Console.err.print(f"x$i%02d=0x${reg(i)}%08x ")
+              if ((i & 3) == 3) Console.err.println()
+            }
+            cont = false
+        }
+    }
+  }
+  Console.err.println(f"Simulation ended. pc=0x$pc%08x, steps=$instrCnt")
 }
 
 object SimRV {
 
-  def runSimRV(file: String) = {
-    val mem = new Array[Int](1024 * 256) // 1 MB, also check masking in load and store
-
+  def runSimRV(file: String, linux: Boolean = false) = {
     val (code, start) = Util.getCode(file)
+
+    // MemSize in MB
+    val (memBase, memSize, stop) =
+      if (linux)
+        (0x80000000, 48, 0x80000000 + 48 * 1024 * 1024)
+      else
+        (start, 1, start + code.length * 4)
+
+    val memWords = memSize * 1024 * 1024 / 4
+
+    val mem = new Array[Int](memWords)
 
     for (i <- 0 until code.length) {
       mem(i) = code(i)
     }
 
-    val stop = start + code.length * 4
-
     // TODO: do we really want ot ba able to start at an arbitrary address?
     // Read in RV spec
-    val sim = new SimRV(mem, start, stop)
+    val sim = new SimRV(mem, memBase, stop, linux)
     sim
   }
 
   def main(args: Array[String]): Unit = {
-    runSimRV(args(0))
+    val linux = args.contains("--linux")
+    val files = args.filter(_ != "--linux") // Args with flags removed i.e. just program file
+
+    if (files.isEmpty) {
+      Console.err.println("usage: SimRV [--linux] <program-file>")
+      sys.exit(1)
+    }
+
+    runSimRV(files(0), linux)
   }
 }

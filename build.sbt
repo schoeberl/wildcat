@@ -65,3 +65,7 @@ Test / parallelExecution := false
 
 // library name
 name := "wildcat"
+
+// Enable colors in the terminal
+fork := true
+connectInput := true
