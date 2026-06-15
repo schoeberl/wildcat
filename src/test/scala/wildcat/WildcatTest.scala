@@ -27,6 +27,7 @@ class WildcatTest() extends AnyFlatSpec with ChiselScalatestTester {
       }
       //    test(new FiveCats(Array("a.out"))).withAnnotations(Seq(WriteVcdAnnotation)) {
       test(new WildcatTestTop(app)).withAnnotations(Seq(WriteVcdAnnotation)) {
+      // test(new WildcatTestCacheTop(app)).withAnnotations(Seq(WriteVcdAnnotation)) {
         d => {
           var stop = false
           var cnt = 0

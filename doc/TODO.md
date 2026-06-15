@@ -6,7 +6,7 @@
  * [ ] Do some fmax testing with added stalling and also with OpenRAM memories
  * [ ] Use caches and a memory simulation for testing
     - avoid memory initializaion, which is broken for Chisel 6, and does not work for ASIC RAMs
-    - current tests run for 190s
+    - current tests run for 190s - 158s
     * [ ] then switch to Chisel 6
  * [x] why does // val pcReg = RegInit(-4.S(32.W).asUInt)  result in failing tests?
    - [x] Do not execute the first instruction from on-chip memory
@@ -23,7 +23,7 @@
  * [ ] Start collecting information on other core interfaces (in my paper)
  * [ ] Make it super easy to see Wildcat in action, like in DrakRISCV
  * [x] UART
- * [ ] Add caches
+ * [x] Add caches
  * [ ] I do not have a real CoSim test for the pipeline
  * [ ] There are still three failing test with CA cosimlation
  * [ ] Have performance (PPA) as GitHub CI action
@@ -49,7 +49,7 @@
  * [ ] Maybe commit the .elf files for faster tests
  * [ ] Maybe add some tracing facility
  * [ ] compare code can be optimized (see Tommy's code, or JOP code)
- * [ ] Get Rust bare metal running
+ * [x] Get Rust bare metal running
  * [ ] Move selection between register and imm back into decode
    - [ ] maybe more of the muxing could be done there
    - [ ] probably branch target computation
