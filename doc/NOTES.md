@@ -90,7 +90,7 @@ Use only 32 bits in shift left: max_tt_025C_1v80: 0.17
 Shift right signal only 5 bits: max_tt_025C_1v80: 0.17
 
 
-## Wildcat synth results:
+## Track Wildcat Synthesis Results:
 
 Xilinx/AMD FPGA 100 MHz, ASIC 50 MHz constraint
 FPGA with the register file as memory
@@ -151,3 +151,49 @@ max_tt_025C_1v80: 4.32
 1323 LUTs, 310 FFs, 0 BRAM
 Slack (VIOLATED) :        -1.178ns  (required time - arrival time)
 
+
+
+### d6213ce17d Wed Sep 24
+
+Chisel 6, slack -1.837
+
+### d20e55a7a2faa 2025-12-11
+
+Chisel 3.6, slack -0.677
+
+### fb6e936c6cfcc3 2026-04-28
+
+slack -0.677
+
+### 2026-07-13
+
+fmax: slack -2.113 LUTs 1505, Regs 382
+
+Probably the data memory forwarding added the extra slack.
+This is with the Vec version in the ALU function.
+
+With the switch statement in the ALU function:
+
+slack -1.811, LUTs 1346, Regs 382
+
+The two different version result in two different orders of the priority MUX.
+
+#### Chisel 6 and 7
+
+Chisel 6 vector: slack -1.709 LUTs 1429, Regs 382
+
+Vector indexes in a 16 entry array
+
+Chisel 6 switch: slack -2.125 LUTs 1268, Regs 382
+
+Switch is still doing a priority MUX
+
+Chisel 7 vector: slack -1.709 LUTs 1429, Regs 382
+
+Vector indexes in a 16 entry array
+
+Chisel 7 switch: -2.125 slack LUTs 1268, Regs 382
+
+Switch is still doing a priority MUX
+
+**Vec is better than switch for Chisel 6+, but not for Chisel 3.6**

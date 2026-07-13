@@ -24,7 +24,6 @@ addCompilerPlugin("edu.berkeley.cs" %% "chisel3-plugin" % chiselVersion cross Cr
 libraryDependencies += "edu.berkeley.cs" %% "chisel3" % chiselVersion
 libraryDependencies += "edu.berkeley.cs" %% "chiseltest" % "0.6.2"
 
-
 /*
 libraryDependencies += "edu.berkeley.cs" % "ip-contributions" % "0.6.1"
 */
@@ -35,7 +34,6 @@ val chiselVersion = "5.3.0"
 addCompilerPlugin("org.chipsalliance" % "chisel-plugin" % chiselVersion cross CrossVersion.full)
 libraryDependencies += "org.chipsalliance" %% "chisel" % chiselVersion
 libraryDependencies += "edu.berkeley.cs" %% "chiseltest" % "5.0.2"
-libraryDependencies += "net.fornwall" % "jelf" % "0.9.0"
 */
 
 /*
@@ -44,12 +42,11 @@ val chiselVersion = "6.7.0"
 addCompilerPlugin("org.chipsalliance" % "chisel-plugin" % chiselVersion cross CrossVersion.full)
 libraryDependencies += "org.chipsalliance" %% "chisel" % chiselVersion
 libraryDependencies += "edu.berkeley.cs" %% "chiseltest" % "6.0.0"
-libraryDependencies += "net.fornwall" % "jelf" % "0.9.0"
 */
 
 /*
 scalaVersion := "2.13.16"
-val chiselVersion = "7.0.0"
+val chiselVersion = "7.13.0"
 addCompilerPlugin("org.chipsalliance" % "chisel-plugin" % chiselVersion cross CrossVersion.full)
 libraryDependencies += "org.chipsalliance" %% "chisel" % chiselVersion
 // libraryDependencies += "edu.berkeley.cs" %% "chiseltest" % "6.0.0"

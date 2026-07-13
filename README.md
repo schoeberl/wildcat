@@ -174,13 +174,7 @@ The memory based register file is implemented with distributed
 LUT RAMs in the Artix. Therefore, the number of bits in block
 RAMs is zero.
 
-### Track Performance Changes
 
-on the Artix 7, with the commands above:
-
-#### 13.07.2026
-
-fmax: slack -2.113 LUTs 1505, Regs 382
 
 ## RISC-V Tools
 
