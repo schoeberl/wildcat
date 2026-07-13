@@ -69,7 +69,7 @@ hw-asic: app
 	$(SBT) "runMain wildcat.pipeline.LittleCat"
 
 hw-fmax:
-	$(SBT) "runMain wildcat.pipeline.SynthTopFmax a.out"
+	$(SBT) "runMain wildcat.pipeline.SynthTopFmax"
 
 hw-single:
 	$(SBT) "runMain wildcat.single.SingleCycleTop a.out"

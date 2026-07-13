@@ -40,7 +40,7 @@ and
 }
 ```
 
-accepted at [ARCS 2025](https://arcs-conference.org/home).
+Available at [ARCS 2025 paper](https://www.jopdesign.com/doc/wildcat-arcs.pdf).
 
 ## Setup
 
@@ -110,10 +110,11 @@ make synth
 ```
 
 For resource and timing analysis there is a top-level with
-connections to the instruction and data memory:
+open connections to the instruction and data memory:
 
 ```
 make hw-fmax
+make synth-fmax
 ```
 
 Tests are run with
@@ -172,6 +173,14 @@ It is estimated that the register file dominates the area in the ASIC design.
 The memory based register file is implemented with distributed
 LUT RAMs in the Artix. Therefore, the number of bits in block
 RAMs is zero.
+
+### Track Performance Changes
+
+on the Artix 7, with the commands above:
+
+#### 13.07.2026
+
+fmax: slack -2.113 LUTs 1505, Regs 382
 
 ## RISC-V Tools
 
@@ -264,7 +273,7 @@ Scribbles related to RISC-V projects and tools:
 
  * [Collection of Notes](doc)
 
-## Rust integration
+## Rust Integration
 **Note: This is still work-in-progress.**
 
 ### Setup
@@ -278,7 +287,7 @@ Once ```rustup``` has been installed, the following components should be added b
 - `rustup component add llvm-tools-preview`
 - `cargo install cargo-binutils`
 
-### Getting started
+### Getting Started
 Currently, a simple starter project has been setup at [rust/starter-project](rust/starter-project).
 To compile and run the starter project with the ISA simulator, 
 execute the following command from the root of the Wildcat project:
@@ -288,7 +297,7 @@ execute the following command from the root of the Wildcat project:
 Furthermore, the disassembly can be viewed by executing the following command:
 - `make rust-disassemble` (prints disassembly)
 
-### Creating new Rust projects
+### Creating new Rust Projects
 To maintain an organized project structure, a new Rust project can be created by executing the following command
 from the root of the Wildcat project:
 - `cargo new rust/[YOUR_PROJECT_NAME] --vcs=none`
